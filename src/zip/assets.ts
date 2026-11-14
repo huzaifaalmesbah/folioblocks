@@ -5,12 +5,17 @@ export function publicUrl(path: string): string {
   return new URL(`${import.meta.env.BASE_URL}${path}`, window.location.href).href;
 }
 
-/** Fetch theme asset files (fonts) from the app's public/ folder, keyed by their path in the theme. */
+/** Where the browser can load an asset from: the student's data URL, or the app's public/ file. */
+export function assetUrl(a: ThemeAsset): string {
+  return a.data ?? publicUrl(a.src ?? '');
+}
+
+/** Fetch theme asset files (fonts, images), keyed by their path in the theme. */
 export async function fetchAssets(assets: ThemeAsset[]): Promise<Record<string, Uint8Array>> {
   const entries = await Promise.all(
     assets.map(async (a) => {
-      const res = await fetch(publicUrl(a.src));
-      if (!res.ok) throw new Error(`Could not load ${a.src} (${res.status})`);
+      const res = await fetch(assetUrl(a));
+      if (!res.ok) throw new Error(`Could not load ${a.path} (${res.status})`);
       return [a.path, new Uint8Array(await res.arrayBuffer())] as const;
     }),
   );

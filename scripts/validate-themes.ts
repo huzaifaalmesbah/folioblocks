@@ -35,7 +35,8 @@ for (const [label, state] of cases) {
   }
   for (const a of assets) {
     mkdirSync(dirname(join(dir, a.path)), { recursive: true });
-    copyFileSync(join('public', a.src), join(dir, a.path));
+    if (a.data) writeFileSync(join(dir, a.path), Buffer.from(a.data.replace(/^data:[^,]*,/, ''), 'base64'));
+    else copyFileSync(join('public', a.src!), join(dir, a.path));
   }
   try {
     const out = execFileSync('node', ['scripts/validate-theme.mjs'], { env: { ...process.env, THEME_DIR: dir }, encoding: 'utf8' });

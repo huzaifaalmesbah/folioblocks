@@ -16,7 +16,8 @@ Nothing is sent to a server. Everything stays in the browser.
 | 2 | Section library + 4 layout presets, Info / Style / Layout wizard, bundled fonts | ✅ done |
 | 2.5 | "Open in WordPress Playground" button (theme embedded in a Blueprint) | ✅ done |
 | 3 | Quick preview that updates as you type (any browser), Open in WordPress Playground | ✅ done |
-| 4 | Drag-and-drop layout customizer, custom presets, JSON import/export | |
+| 3.5 | Photos (profile, cover, projects), featured images, four distinct designs | ✅ done |
+| 4 | Drag-and-drop layout customizer, custom presets, JSON import/export | ⏳ next |
 | 5 | Tests, accessibility, docs, GitHub Pages deploy, beta with students | |
 
 ## Development
@@ -82,6 +83,10 @@ src/generator/   pure functions → { "style.css": "...", "theme.json": "...", .
 
 - **Preview** (default) renders the generated block markup in the browser: it evaluates the few PHP calls our patterns use, parses the blocks with `@wordpress/block-serialization-default-parser`, fills dynamic blocks (site title, navigation, query loops, post fields) with sample content, and turns `theme.json` into CSS on top of WordPress' block-library styles. It works in every browser and updates as you type; links inside it (menu, post titles) switch pages. It is a close approximation, not WordPress.
 - **Open in WordPress Playground** opens the real site in a new tab. (An embedded Playground was tried and dropped: some browsers won't start Playground inside an iframe.)
+
+### Images
+
+Students can add a profile photo, a cover image and a picture per project. They are resized to WebP in the browser (`src/images.ts`) and shipped in the theme's `assets/images/`, referenced with `get_parent_theme_file_uri()` and translated alt text, as Ipsum does. Without a photo, the theme uses one of our placeholders (`public/images/`, drawn by `scripts/make-placeholders.py`, CC0). Only images the chosen layout uses are shipped. Sample posts get placeholder featured images in Playground and the preview.
 
 ### Fonts
 

@@ -47,10 +47,18 @@ function searchForm(php: Php): string {
 function mainQuery(php: Php): string {
   const posts = postTemplate(
     join(
-      group(join(block('post-title', { isLink: true }), block('post-date'), block('post-excerpt')), {
-        name: php.name('Post'),
-        layout: { type: 'default' },
-      }),
+      group(
+        join(
+          block('post-featured-image', { isLink: true, aspectRatio: '16/9' }),
+          block('post-title', { isLink: true }),
+          block('post-date'),
+          block('post-excerpt'),
+        ),
+        {
+          name: php.name('Post'),
+          layout: { type: 'default' },
+        },
+      ),
       separator(),
     ),
   );
@@ -181,7 +189,7 @@ export function templates(php: Php, slug: string): { patterns: PatternDef[]; fil
         join(
           block('post-title', { level: 1 }),
           postMeta(php),
-          block('post-featured-image'),
+          block('post-featured-image', { aspectRatio: '16/9' }),
           block('post-content', { layout: { type: 'constrained' } }),
           block('post-terms', { term: 'post_tag' }),
           authorCard(php),

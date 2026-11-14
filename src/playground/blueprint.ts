@@ -1,4 +1,5 @@
 import { SITE_URL } from '../config';
+import { SAMPLE_POST_IMAGES } from '../generator/images';
 import type { ThemeAsset } from '../fonts';
 import type { BuilderState, ThemeFiles } from '../types';
 
@@ -55,7 +56,7 @@ $posts = array(
 	array( 'Building a block theme from scratch', 'theme.json, templates, template parts and patterns: what each one does.' ),
 );
 foreach ( $posts as $i => $p ) {
-	wp_insert_post( array(
+	$post_id = wp_insert_post( array(
 		'post_author'   => 1,
 		'post_status'   => 'publish',
 		'post_title'    => $p[0],
@@ -65,6 +66,23 @@ foreach ( $posts as $i => $p ) {
 		'tags_input'    => array( 'wordpress', 'student' ),
 		'post_date'     => gmdate( 'Y-m-d H:i:s', time() - ( $i + 1 ) * DAY_IN_SECONDS ),
 	) );
+
+	// A featured image, from the placeholder written by an earlier step.
+	$relative = 'folioblocks/post-' . ( $i + 1 ) . '.webp';
+	$file     = WP_CONTENT_DIR . '/uploads/' . $relative;
+	if ( file_exists( $file ) ) {
+		$attachment = wp_insert_attachment(
+			array(
+				'post_mime_type' => 'image/webp',
+				'post_title'     => $p[0],
+				'post_status'    => 'inherit',
+			),
+			$file,
+			$post_id
+		);
+		wp_update_attachment_metadata( $attachment, array( 'width' => 1200, 'height' => 800, 'file' => $relative, 'sizes' => array() ) );
+		set_post_thumbnail( $post_id, $attachment );
+	}
 }
 
 flush_rewrite_rules( false );
@@ -93,13 +111,30 @@ export function buildBlueprint(
   // Binary files can't travel inside the JSON, so Playground downloads them from the FolioBlocks site.
   // writeFile does not create folders, so make each asset folder first.
   const themeDir = `/wordpress/wp-content/themes/${folder}`;
+  // The student's own photos are data URLs: they travel inside the Blueprint and PHP writes them out.
   const dirs = [...new Set(assets.map((a) => a.path.slice(0, a.path.lastIndexOf('/'))))];
   const assetSteps = [
     ...dirs.map((dir) => ({ step: 'mkdir', path: `${themeDir}/${dir}` })),
-    ...assets.map((a) => ({
+    ...assets.map((a) =>
+      a.data
+        ? {
+            step: 'runPHP',
+            code: `<?php file_put_contents( '${themeDir}/${a.path}', base64_decode( '${a.data.replace(/^data:[^,]*,/, '')}' ) );`,
+          }
+        : {
+            step: 'writeFile',
+            path: `${themeDir}/${a.path}`,
+            data: { resource: 'url', url: new URL(a.src ?? '', assetBaseUrl).href },
+          },
+    ),
+  ];
+  // Sample post thumbnails go in the uploads folder; SETUP_PHP attaches them to the posts.
+  const sampleImageSteps = [
+    { step: 'mkdir', path: '/wordpress/wp-content/uploads/folioblocks' },
+    ...SAMPLE_POST_IMAGES.map((src, i) => ({
       step: 'writeFile',
-      path: `${themeDir}/${a.path}`,
-      data: { resource: 'url', url: new URL(a.src, assetBaseUrl).href },
+      path: `/wordpress/wp-content/uploads/folioblocks/post-${i + 1}.webp`,
+      data: { resource: 'url', url: new URL(src, assetBaseUrl).href },
     })),
   ];
   return {
@@ -120,6 +155,7 @@ export function buildBlueprint(
         options: { activate: true },
       },
       ...assetSteps,
+      ...sampleImageSteps,
       {
         step: 'setSiteOptions',
         options: {

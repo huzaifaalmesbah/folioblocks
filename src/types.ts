@@ -2,7 +2,10 @@ import type { FontKey } from './fonts';
 
 export type { FontKey };
 
-export type Project = { title: string; description: string; url: string };
+/** An uploaded image, resized in the browser: a data URL (image/webp), or '' for none. */
+export type ImageDataUrl = string;
+
+export type Project = { title: string; description: string; url: string; image?: ImageDataUrl };
 export type Contribution = { team: string; description: string };
 
 export type Socials = {
@@ -23,6 +26,10 @@ export type Info = {
   contributions: Contribution[];
   projects: Project[];
   socials: Socials;
+  /** Profile photo. Falls back to a placeholder. */
+  avatar?: ImageDataUrl;
+  /** Wide cover image, used by heroes that show one. Falls back to a placeholder. */
+  cover?: ImageDataUrl;
 };
 
 export type Palette = {

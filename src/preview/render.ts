@@ -7,7 +7,7 @@
  */
 import { parse } from '@wordpress/block-serialization-default-parser';
 import type { BuilderState, ThemeFiles } from '../types';
-import { escapeHtml, renderPhp } from './php';
+import { escapeHtml, renderPhp, type FileUrl } from './php';
 
 export type PreviewPage = 'home' | 'about' | 'blog' | 'post' | 'contact';
 
@@ -22,7 +22,7 @@ export const PREVIEW_PAGES: { key: PreviewPage; label: string; template: string 
 /** A parsed block (the parser doesn't export its type). */
 type ParsedBlock = ReturnType<typeof parse>[number];
 
-type Post = { title: string; excerpt: string; date: string };
+type Post = { title: string; excerpt: string; date: string; image: number };
 
 /** The same sample posts the Playground Blueprint creates. */
 const SAMPLE_POSTS: Post[] = [
@@ -30,16 +30,19 @@ const SAMPLE_POSTS: Post[] = [
     title: 'My first WordPress contribution',
     excerpt: 'How I found a good first ticket, set up wordpress-develop and opened my first patch.',
     date: 'November 13, 2026',
+    image: 0,
   },
   {
     title: 'What I learned at my first WordCamp',
     excerpt: 'Notes from the talks, the contributor day and the people I met.',
     date: 'November 12, 2026',
+    image: 1,
   },
   {
     title: 'Building a block theme from scratch',
     excerpt: 'theme.json, templates, template parts and patterns: what each one does.',
     date: 'November 11, 2026',
+    image: 2,
   },
 ];
 
@@ -55,6 +58,8 @@ type Ctx = {
   css: string[];
   /** Depth guard against a pattern including itself. */
   depth: number;
+  /** URL of sample post thumbnail i. */
+  sampleImage: (i: number) => string;
 };
 
 let containerId = 0;
@@ -172,9 +177,16 @@ function renderDynamic(block: ParsedBlock, ctx: Ctx): string | null {
       const posts = SAMPLE_POSTS.map((p) => `<li class="wp-block-post">${renderChildren(block.innerBlocks, { ...ctx, post: p })}</li>`);
       return addToFirstTag(`<ul class="wp-block-post-template">${posts.join('')}</ul>`, layoutClasses(block, ctx));
     }
+    case 'core/post-featured-image': {
+      const src = ctx.sampleImage(post.image);
+      if (!src) return '';
+      const ratio = a.aspectRatio ? `aspect-ratio:${a.aspectRatio};` : '';
+      const width = a.width ? ` style="width:${a.width}"` : '';
+      const img = `<img src="${escapeHtml(src)}" alt="" style="${ratio}object-fit:cover;width:100%;height:100%"/>`;
+      return `<figure class="wp-block-post-featured-image"${width}>${a.isLink ? `<a href="#" data-preview-page="post">${img}</a>` : img}</figure>`;
+    }
     case 'core/query-no-results':
     case 'core/term-description':
-    case 'core/post-featured-image':
     case 'core/comments-title':
     case 'core/comment-template':
     case 'core/comments-pagination':
@@ -235,12 +247,12 @@ function renderMarkup(markup: string, ctx: Ctx): string {
 }
 
 /** Pattern bodies by slug (`theme/slug`), with their PHP evaluated. */
-export function patternMap(files: ThemeFiles): Map<string, string> {
+export function patternMap(files: ThemeFiles, fileUrl?: FileUrl): Map<string, string> {
   const map = new Map<string, string>();
   for (const [path, content] of Object.entries(files)) {
     if (!path.startsWith('patterns/')) continue;
     const slug = /^\s*\*\s*Slug:\s*(\S+)/m.exec(content)?.[1];
-    if (slug) map.set(slug, renderPhp(content));
+    if (slug) map.set(slug, renderPhp(content, fileUrl));
   }
   return map;
 }
@@ -250,10 +262,18 @@ export function renderPage(
   state: BuilderState,
   files: ThemeFiles,
   page: PreviewPage,
-  patterns = patternMap(files),
+  opts: { patterns?: Map<string, string>; fileUrl?: FileUrl; sampleImage?: (i: number) => string } = {},
 ): { html: string; css: string } {
   const template = PREVIEW_PAGES.find((p) => p.key === page)!.template;
-  const ctx: Ctx = { state, files, patterns, css: [], depth: 0, post: page === 'post' ? SAMPLE_POSTS[0] : undefined };
+  const ctx: Ctx = {
+    state,
+    files,
+    patterns: opts.patterns ?? patternMap(files, opts.fileUrl),
+    css: [],
+    depth: 0,
+    post: page === 'post' ? SAMPLE_POSTS[0] : undefined,
+    sampleImage: opts.sampleImage ?? (() => ''),
+  };
   const html = renderMarkup(files[`templates/${template}.html`] ?? '', ctx);
   return { html, css: ctx.css.join('\n') };
 }

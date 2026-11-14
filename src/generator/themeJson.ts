@@ -141,6 +141,9 @@ export function themeJson(style: Style): string {
         'core/post-date': { typography: { fontSize: 'var:preset|font-size|small', fontWeight: '600' } },
         'core/post-terms': { typography: { fontSize: 'var:preset|font-size|small', fontWeight: '600' } },
         'core/separator': { color: { text: color('accent-6') }, border: { width: '1px' } },
+        // Set corners here once instead of on every image (Ipsum's rule for repeated block styles).
+        'core/image': { border: { radius: RADIUS[style.radius] } },
+        'core/post-featured-image': { border: { radius: RADIUS[style.radius] } },
       },
     },
     customTemplates: [

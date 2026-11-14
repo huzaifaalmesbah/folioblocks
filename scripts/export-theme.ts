@@ -21,6 +21,7 @@ for (const [path, content] of Object.entries(files)) {
 for (const asset of assets) {
   const full = join(outDir, slug, asset.path);
   mkdirSync(dirname(full), { recursive: true });
-  copyFileSync(join('public', asset.src), full);
+  if (asset.data) writeFileSync(full, Buffer.from(asset.data.replace(/^data:[^,]*,/, ''), 'base64'));
+  else copyFileSync(join('public', asset.src!), full);
 }
 console.log(join(outDir, slug));

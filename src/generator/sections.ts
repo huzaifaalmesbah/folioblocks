@@ -1,5 +1,6 @@
 import type { Info, Section, SectionType } from '../types';
-import { badge, block, buttons, columns, container, group, heading, join, list, paragraph, separator } from './blocks';
+import { badge, block, buttons, columns, container, group, heading, image, join, list, paragraph, separator } from './blocks';
+import { AVATAR, COVER, projectImage } from './images';
 import { cleanUrl, type Php } from './utils';
 
 export type Ctx = { info: Info; php: Php; /** Card/button corner radius as CSS, e.g. "10px". */ radius: string };
@@ -15,13 +16,9 @@ function grid(items: string[], size = 3): string[] {
   return rows;
 }
 
-function initials(name: string): string {
-  return name
-    .split(/\s+/)
-    .map((w) => w[0] ?? '')
-    .join('')
-    .slice(0, 2)
-    .toUpperCase();
+/** The student's photo (or the placeholder), with translated alt text. */
+function avatar({ info, php }: Ctx, opts: Parameters<typeof image>[2]): string {
+  return image(php.themeFile(AVATAR), php.attr(`Portrait of ${info.name}`), opts);
 }
 
 /* ---------- Hero ---------- */
@@ -43,14 +40,17 @@ function heroText(ctx: Ctx, center: boolean): string {
 const heroCentered: Renderer = (ctx) =>
   group(heroText(ctx, true), { name: ctx.php.name('Hero'), tagName: 'section', align: 'full', padY: 80 });
 
-const heroSplit: Renderer = (ctx) => {
-  const art = group(heading(ctx.php.t(initials(ctx.info.name) || 'Hi'), 2, true), {
-    name: ctx.php.name('Initials'),
-    background: SURFACE,
-    padY: 70,
-    radius: ctx.radius,
+/** Round photo above a centered name: the friendliest start. */
+const heroAvatar: Renderer = (ctx) =>
+  group(join(avatar(ctx, { aspectRatio: '1', width: '160px', align: 'center', rounded: true }), heroText(ctx, true)), {
+    name: ctx.php.name('Hero'),
+    tagName: 'section',
+    align: 'full',
+    padY: 80,
   });
-  return group(columns([heroText(ctx, false), art]), {
+
+const heroSplit: Renderer = (ctx) => {
+  return group(columns([heroText(ctx, false), avatar(ctx, { aspectRatio: '1' })]), {
     name: ctx.php.name('Hero'),
     tagName: 'section',
     align: 'full',
@@ -68,6 +68,7 @@ const heroBig: Renderer = (ctx) => {
       paragraph(php.t(info.tagline)),
       meta && paragraph(php.t(meta)),
       buttons(heroCtas(ctx)),
+      image(php.themeFile(COVER), php.attr('Cover image'), { aspectRatio: '21/9', align: 'wide' }),
     ),
     {
       name: php.name('Hero'),
@@ -77,6 +78,26 @@ const heroBig: Renderer = (ctx) => {
       layout: { type: 'constrained', contentSize: '1000px' },
     },
   );
+};
+
+/** A research-profile start: portrait beside name, details and bio. */
+const heroProfile: Renderer = (ctx) => {
+  const { info, php } = ctx;
+  const meta = [info.university, info.location].filter(Boolean).join(' · ');
+  const text = join(
+    heading(php.t(info.name), 1),
+    paragraph(php.t(info.tagline)),
+    meta && paragraph(php.t(meta)),
+    paragraph(php.t(info.bio)),
+    buttons(heroCtas(ctx)),
+  );
+  return group(columns([avatar(ctx, { aspectRatio: '4/5' }), text]), {
+    name: php.name('Hero'),
+    tagName: 'section',
+    align: 'full',
+    padY: 70,
+    layout: { type: 'constrained', contentSize: '1000px' },
+  });
 };
 
 /* ---------- About ---------- */
@@ -98,6 +119,19 @@ const aboutColumns: Renderer = ({ info, php }) => {
   const meta = aboutMeta(info);
   const left = join(heading(php.t('About me')), meta && paragraph(php.t(meta)));
   return group(columns([left, paragraph(php.t(info.bio))]), {
+    name: php.name('About'),
+    tagName: 'section',
+    padY: 60,
+    layout: { type: 'constrained', contentSize: '1000px' },
+  });
+};
+
+/** Photo beside the story. */
+const aboutPhoto: Renderer = (ctx) => {
+  const { info, php } = ctx;
+  const meta = aboutMeta(info);
+  const text = join(heading(php.t('About me')), paragraph(php.t(info.bio)), meta && paragraph(php.t(meta)));
+  return group(columns([avatar(ctx, { aspectRatio: '4/5' }), text]), {
     name: php.name('About'),
     tagName: 'section',
     padY: 60,
@@ -150,6 +184,7 @@ const contributionsCards: Renderer = ({ info, php, radius }) => {
       background: SURFACE,
       pad: 40,
       radius,
+      layout: { type: 'default' },
     }),
   );
   return group(join(heading(php.t('My WordPress journey')), ...grid(cards)), {
@@ -162,9 +197,18 @@ const contributionsCards: Renderer = ({ info, php, radius }) => {
 
 /* ---------- Projects ---------- */
 
-function projectContent({ php }: Ctx, p: Info['projects'][number]): string {
+function projectText({ php }: Ctx, p: Info['projects'][number]): string {
   const title = p.url ? `<a href="${php.url(p.url)}">${php.t(p.title)}</a>` : php.t(p.title);
   return join(heading(title, 3), paragraph(php.t(p.description)));
+}
+
+function projectPicture({ php }: Ctx, p: Info['projects'][number], i: number, aspectRatio = '3/2'): string {
+  return image(php.themeFile(projectImage(i)), php.attr(`Screenshot of ${p.title}`), { aspectRatio });
+}
+
+/** Picture on top, then title and description. */
+function projectContent(ctx: Ctx, p: Info['projects'][number], i: number): string {
+  return join(projectPicture(ctx, p, i), projectText(ctx, p));
 }
 
 function projectItems(info: Info): Info['projects'] {
@@ -178,7 +222,7 @@ function projectItems(info: Info): Info['projects'] {
 }
 
 const projectsGrid: Renderer = (ctx) =>
-  group(join(heading(ctx.php.t('Projects')), ...grid(projectItems(ctx.info).map((p) => projectContent(ctx, p)))), {
+  group(join(heading(ctx.php.t('Projects')), ...grid(projectItems(ctx.info).map((p, i) => projectContent(ctx, p, i)))), {
     name: ctx.php.name('Projects'),
     tagName: 'section',
     anchor: 'projects',
@@ -188,8 +232,14 @@ const projectsGrid: Renderer = (ctx) =>
   });
 
 const projectsCards: Renderer = (ctx) => {
-  const cards = projectItems(ctx.info).map((p) =>
-    group(projectContent(ctx, p), { name: ctx.php.name('Project card'), background: SURFACE, pad: 40, radius: ctx.radius }),
+  const cards = projectItems(ctx.info).map((p, i) =>
+    group(projectContent(ctx, p, i), {
+      name: ctx.php.name('Project card'),
+      background: SURFACE,
+      pad: 40,
+      radius: ctx.radius,
+      layout: { type: 'default' },
+    }),
   );
   return group(join(heading(ctx.php.t('Projects')), ...grid(cards)), {
     name: ctx.php.name('Projects'),
@@ -200,13 +250,35 @@ const projectsCards: Renderer = (ctx) => {
   });
 };
 
+/** Compact rows: small picture beside the text. */
 const projectsList: Renderer = (ctx) =>
-  group(join(heading(ctx.php.t('Projects')), ...projectItems(ctx.info).map((p) => projectContent(ctx, p))), {
-    name: ctx.php.name('Projects'),
-    tagName: 'section',
-    padY: 60,
-    anchor: 'projects',
-  });
+  group(
+    join(
+      heading(ctx.php.t('Projects')),
+      ...projectItems(ctx.info).map((p, i) => columns([projectPicture(ctx, p, i), projectText(ctx, p)])),
+    ),
+    { name: ctx.php.name('Projects'), tagName: 'section', padY: 60, anchor: 'projects' },
+  );
+
+/** Large pictures, alternating sides: a showcase. */
+const projectsRows: Renderer = (ctx) =>
+  group(
+    join(
+      heading(ctx.php.t('Selected work')),
+      ...projectItems(ctx.info).map((p, i) => {
+        const pic = projectPicture(ctx, p, i, '4/3');
+        const text = projectText(ctx, p);
+        return columns(i % 2 ? [text, pic] : [pic, text]);
+      }),
+    ),
+    {
+      name: ctx.php.name('Projects'),
+      tagName: 'section',
+      anchor: 'projects',
+      padY: 70,
+      layout: { type: 'constrained', contentSize: '1280px' },
+    },
+  );
 
 /* ---------- Latest posts ---------- */
 
@@ -232,7 +304,12 @@ function latestQuery(template: string): string {
 
 const postsGrid: Renderer = ({ php }) => {
   const template = postTemplate(
-    join(block('post-title', { isLink: true, level: 3 }), block('post-date'), block('post-excerpt')),
+    join(
+      block('post-featured-image', { isLink: true, aspectRatio: '3/2' }),
+      block('post-title', { isLink: true, level: 3 }),
+      block('post-date'),
+      block('post-excerpt'),
+    ),
     { layout: { type: 'grid', columnCount: 3 } },
   );
   return group(join(heading(php.t('Latest posts')), latestQuery(template)), {
@@ -244,7 +321,17 @@ const postsGrid: Renderer = ({ php }) => {
 };
 
 const postsList: Renderer = ({ php }) => {
-  const template = postTemplate(join(block('post-title', { isLink: true, level: 3 }), block('post-date'), separator()));
+  const row = group(
+    join(
+      block('post-featured-image', { isLink: true, aspectRatio: '3/2', width: '200px' }),
+      group(join(block('post-title', { isLink: true, level: 3 }), block('post-date')), {
+        name: php.name('Title and Date'),
+        layout: { type: 'default' },
+      }),
+    ),
+    { name: php.name('Post'), layout: { type: 'flex', flexWrap: 'nowrap' } },
+  );
+  const template = postTemplate(join(row, separator()));
   return group(join(heading(php.t('Latest posts')), latestQuery(template)), {
     name: php.name('Latest posts'),
     tagName: 'section',
@@ -320,13 +407,16 @@ export const SECTION_LABELS: Record<SectionType, string> = {
 
 export const SECTIONS: Record<SectionType, Record<string, Variant>> = {
   hero: {
-    centered: { label: 'Centered', render: heroCentered },
-    split: { label: 'Split with initials', render: heroSplit },
-    big: { label: 'Big type', render: heroBig },
+    avatar: { label: 'Round photo, centered', render: heroAvatar },
+    centered: { label: 'Centered text', render: heroCentered },
+    split: { label: 'Text beside photo', render: heroSplit },
+    big: { label: 'Big type with cover image', render: heroBig },
+    profile: { label: 'Profile: photo, details and bio', render: heroProfile },
   },
   about: {
     text: { label: 'Text', render: aboutText },
     columns: { label: 'Two columns', render: aboutColumns },
+    photo: { label: 'Photo beside text', render: aboutPhoto },
   },
   skills: {
     list: { label: 'List', render: skillsList },
@@ -339,11 +429,12 @@ export const SECTIONS: Record<SectionType, Record<string, Variant>> = {
   projects: {
     grid: { label: 'Grid band', render: projectsGrid },
     cards: { label: 'Cards', render: projectsCards },
-    list: { label: 'List', render: projectsList },
+    rows: { label: 'Showcase rows', render: projectsRows },
+    list: { label: 'Compact list', render: projectsList },
   },
   posts: {
-    grid: { label: '3-column grid', render: postsGrid },
-    list: { label: 'List', render: postsList },
+    grid: { label: '3-column grid with images', render: postsGrid },
+    list: { label: 'List with thumbnails', render: postsList },
   },
   contact: {
     cta: { label: 'Call to action', render: contactCta },

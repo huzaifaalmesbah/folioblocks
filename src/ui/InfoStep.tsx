@@ -1,6 +1,7 @@
-import { useBuilder } from '../store';
+import { IMAGE_LIMITS, resizeImage } from '../images';
+import { storageStatus, useBuilder } from '../store';
 import type { Socials } from '../types';
-import { Field, Repeater, SectionTitle } from './fields';
+import { Field, ImageField, Repeater, SectionTitle } from './fields';
 
 const SOCIAL_FIELDS: { key: keyof Socials; label: string; placeholder: string }[] = [
   { key: 'github', label: 'GitHub', placeholder: 'https://github.com/username' },
@@ -22,6 +23,33 @@ export function InfoStep() {
         <Field label="University / department" value={info.university} onChange={(university) => setInfo({ university })} />
         <Field label="Location" value={info.location} onChange={(location) => setInfo({ location })} />
         <Field label="Short bio" textarea value={info.bio} onChange={(bio) => setInfo({ bio })} />
+      </section>
+
+      <section className="space-y-3">
+        <SectionTitle>Photos</SectionTitle>
+        <ImageField
+          label="Profile photo"
+          value={info.avatar}
+          hint="A clear photo of you. Square works best."
+          onPick={async (f) => setInfo({ avatar: await resizeImage(f, IMAGE_LIMITS.avatar.maxWidth, IMAGE_LIMITS.avatar.maxHeight) })}
+          onRemove={() => setInfo({ avatar: '' })}
+        />
+        <ImageField
+          label="Cover image"
+          aspect="wide"
+          value={info.cover}
+          hint="A wide picture of your work or your world. Used by the Creative layout."
+          onPick={async (f) => setInfo({ cover: await resizeImage(f, IMAGE_LIMITS.cover.maxWidth, IMAGE_LIMITS.cover.maxHeight) })}
+          onRemove={() => setInfo({ cover: '' })}
+        />
+        <p className="text-xs text-slate-500">
+          Photos are resized and stay in your browser. Use only photos you took or have permission to use.
+          {storageStatus.full && ' Your browser is out of space to save the draft: remove a photo or use smaller ones.'}
+        </p>
+      </section>
+
+      <section className="space-y-3">
+        <SectionTitle>Skills</SectionTitle>
         <Field
           label="Skills"
           hint="Separate with commas"
@@ -57,6 +85,19 @@ export function InfoStep() {
             { key: 'description', label: 'One-line description', textarea: true },
             { key: 'url', label: 'Link (optional)', placeholder: 'https://' },
           ]}
+          renderExtra={(item, i) => (
+            <ImageField
+              label="Image"
+              aspect="wide"
+              value={item.image}
+              hint="A screenshot or photo of the project."
+              onPick={async (f) => {
+                const image = await resizeImage(f, IMAGE_LIMITS.project.maxWidth, IMAGE_LIMITS.project.maxHeight);
+                setInfo({ projects: info.projects.map((p, j) => (j === i ? { ...p, image } : p)) });
+              }}
+              onRemove={() => setInfo({ projects: info.projects.map((p, j) => (j === i ? { ...p, image: '' } : p)) })}
+            />
+          )}
           onChange={(projects) => setInfo({ projects })}
         />
       </section>

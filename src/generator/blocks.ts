@@ -213,3 +213,49 @@ export function badge(html: string, radius: string): string {
     `<p class="has-accent-5-background-color has-background has-small-font-size" style="${css.join(';')}">${html}</p>`,
   );
 }
+
+type ImageOpts = {
+  /** CSS aspect ratio, e.g. "3/2", "1", "4/5", "21/9". Crops with object-fit: cover. */
+  aspectRatio?: string;
+  /** Fixed width, e.g. "160px". */
+  width?: string;
+  align?: 'center' | 'wide' | 'full';
+  /** A circle (for square images), via a 9999px corner radius on the block. */
+  rounded?: boolean;
+};
+
+/**
+ * A core Image block, saved the way the editor saves it. `src` and `alt` may
+ * hold PHP (a theme file URL, translated alt text). Corner radius comes from
+ * theme.json, not the block, as Ipsum recommends.
+ */
+export function image(src: string, alt: string, opts: ImageOpts = {}): string {
+  const attrs: Attrs = {};
+  const classes = ['wp-block-image'];
+  const styles: string[] = [];
+  if (opts.rounded) {
+    // A block-level radius, saved inline, so it wins over the theme.json image radius.
+    attrs.style = { border: { radius: '9999px' } };
+    styles.push('border-radius:9999px');
+  }
+  if (opts.width) {
+    attrs.width = opts.width;
+  }
+  if (opts.aspectRatio) {
+    attrs.aspectRatio = opts.aspectRatio;
+    attrs.scale = 'cover';
+    styles.push(`aspect-ratio:${opts.aspectRatio}`, 'object-fit:cover');
+  }
+  if (opts.width) styles.push(`width:${opts.width}`);
+  attrs.sizeSlug = 'large';
+  attrs.linkDestination = 'none';
+  if (opts.align) {
+    attrs.align = opts.align;
+    classes.push(`align${opts.align}`);
+  }
+  classes.push('size-large');
+  if (opts.width) classes.push('is-resized');
+  if (opts.rounded) classes.push('has-custom-border');
+  const style = styles.length ? ` style="${styles.join(';')}"` : '';
+  return block('image', attrs, `<figure class="${classes.join(' ')}"><img src="${src}" alt="${alt}"${style}/></figure>`);
+}

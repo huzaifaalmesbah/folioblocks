@@ -61,7 +61,7 @@ describe('fonts', () => {
   it('bundles font files with fontFace and lists their licence', () => {
     const state = fromPreset('creative');
     const { files, assets } = generateTheme(state);
-    expect(assets.map((a) => a.path).sort()).toEqual([
+    expect(assets.map((a) => a.path).filter((p) => p.includes('/fonts/')).sort()).toEqual([
       'assets/fonts/dm-sans/dm-sans-var-normal.woff2',
       'assets/fonts/playfair-display/playfair-display-var-normal.woff2',
     ]);
@@ -80,7 +80,7 @@ describe('fonts', () => {
       ...defaultState,
       style: { ...defaultState.style, fonts: { heading: 'system-serif', body: 'system-sans' } },
     });
-    expect(assets).toEqual([]);
+    expect(assets.filter((a) => a.path.includes('/fonts/'))).toEqual([]);
     expect(files['readme.txt']).toContain('bundles no font files');
   });
 
@@ -99,7 +99,7 @@ describe('fonts', () => {
       path: string;
       data: { url: string };
     }[];
-    expect(writes.map((w) => w.data.url).sort()).toEqual([
+    expect(writes.map((w) => w.data.url).filter((u) => u.includes('/fonts/')).sort()).toEqual([
       'https://example.org/app/fonts/inter.woff2',
       'https://example.org/app/fonts/jetbrains-mono.woff2',
     ]);
@@ -108,7 +108,10 @@ describe('fonts', () => {
     // The folder must be created before any file is written into it.
     const steps = bp.steps.map((s) => s.step);
     const mkdir = bp.steps.findIndex((s) => s.step === 'mkdir');
-    const dirs = bp.steps.filter((s) => s.step === 'mkdir').map((s) => (s as unknown as { path: string }).path);
+    const dirs = bp.steps
+      .filter((s) => s.step === 'mkdir')
+      .map((s) => (s as unknown as { path: string }).path)
+      .filter((p) => p.includes('/fonts/'));
     expect(dirs.sort()).toEqual([
       `/wordpress/wp-content/themes/${slug}/assets/fonts/inter`,
       `/wordpress/wp-content/themes/${slug}/assets/fonts/jetbrains-mono`,

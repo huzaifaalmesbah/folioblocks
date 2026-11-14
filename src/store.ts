@@ -1,8 +1,39 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { createJSONStorage, persist } from 'zustand/middleware';
 import { defaultState } from './defaults';
 import { presetByKey } from './presets';
 import type { BuilderState, FooterVariant, HeaderVariant, Info, PageKey, Palette, Style } from './types';
+
+/** Set when the browser refused to save (photos can fill localStorage). */
+export const storageStatus = { full: false };
+
+/**
+ * localStorage that never throws: photos can push a draft past the
+ * browser's quota, and a failed save must not break the app.
+ */
+const safeStorage: Storage = {
+  get length() {
+    return localStorage.length;
+  },
+  clear: () => localStorage.clear(),
+  key: (i) => localStorage.key(i),
+  getItem: (k) => {
+    try {
+      return localStorage.getItem(k);
+    } catch {
+      return null;
+    }
+  },
+  removeItem: (k) => localStorage.removeItem(k),
+  setItem: (k, v) => {
+    try {
+      localStorage.setItem(k, v);
+      storageStatus.full = false;
+    } catch {
+      storageStatus.full = true;
+    }
+  },
+};
 
 type Store = BuilderState & {
   setInfo: (patch: Partial<Info>) => void;
@@ -46,8 +77,9 @@ export const useBuilder = create<Store>()(
     }),
     {
       name: 'folioblocks-state',
-      version: 2,
-      // v1 had no header/footer and only system fonts: fill in the new fields from the defaults.
+      version: 3,
+      storage: createJSONStorage(() => safeStorage),
+      // Older drafts lack newer fields (v2: header/footer, v3: photos): fill them in from the defaults.
       migrate: (persisted) => {
         const old = (persisted ?? {}) as Partial<BuilderState>;
         return {

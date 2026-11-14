@@ -49,11 +49,14 @@ function stringArgs(src: string): string[] {
 }
 
 function safeUrl(url: string): string {
-  return /^(https?:|mailto:|#|\/)/i.test(url) ? url : '';
+  return /^(https?:|mailto:|#|\/|data:image\/|blob:)/i.test(url) ? url : '';
 }
 
+/** Maps a theme-relative path (assets/images/avatar.webp) to a URL the preview can load. */
+export type FileUrl = (path: string) => string;
+
 /** Evaluate one PHP span's code (without the tags). Returns HTML-safe output. */
-export function evalPhp(code: string): string {
+export function evalPhp(code: string, fileUrl: FileUrl = () => ''): string {
   const m = /^(?:echo\s+)?([a-z_]+)\(([\s\S]*)\);?$/i.exec(code.trim());
   if (!m) return '';
   const [, fn, rest] = m;
@@ -67,6 +70,7 @@ export function evalPhp(code: string): string {
     case 'esc_attr_e':
       return escapeHtml(args[0] ?? '');
     case 'esc_url':
+      if (/get_(parent_)?theme_file_uri\(/.test(rest)) return escapeHtml(safeUrl(fileUrl(args[0] ?? '')));
       return escapeHtml(safeUrl(args[0] ?? ''));
     case 'esc_html':
       return /gmdate\(\s*'Y'\s*\)/.test(rest) ? String(new Date().getFullYear()) : escapeHtml(args[0] ?? '');
@@ -113,11 +117,11 @@ function jsonEscape(s: string): string {
  * comments (attributes) are JSON-escaped; the rest are already HTML-safe.
  * The PHP file header (the leading <?php … ?> docblock) is dropped.
  */
-export function renderPhp(source: string): string {
+export function renderPhp(source: string, fileUrl?: FileUrl): string {
   // Drop the pattern header: everything up to the first "?>" of the opening docblock.
   const body = source.replace(/^<\?php\s*\/\*\*[\s\S]*?\*\/\s*\?>\n?/, '');
   const outputs: string[] = [];
-  const tokenized = replacePhpSpans(body, (code) => `\uE000${outputs.push(evalPhp(code)) - 1}\uE000`);
+  const tokenized = replacePhpSpans(body, (code) => `\uE000${outputs.push(evalPhp(code, fileUrl)) - 1}\uE000`);
   return tokenized
     .replace(/<!--[\s\S]*?-->/g, (comment) =>
       comment.replace(/\uE000(\d+)\uE000/g, (_m, i) => jsonEscape(outputs[Number(i)])),

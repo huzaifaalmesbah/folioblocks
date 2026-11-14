@@ -58,8 +58,12 @@ export function fontDef(key: FontKey): FontDef {
   return FONTS[key] ?? FONTS['system-sans'];
 }
 
-/** A binary file the theme ships: where it goes in the theme, and where the app serves it (public/). */
-export type ThemeAsset = { path: string; src: string };
+/**
+ * A binary file the theme ships: where it goes in the theme, and where its
+ * bytes come from: a file the app serves from public/ (`src`), or a data URL
+ * the student uploaded (`data`).
+ */
+export type ThemeAsset = { path: string; src?: string; data?: string };
 
 /**
  * Font files a set of fonts needs. Like Ipsum, each family gets its own

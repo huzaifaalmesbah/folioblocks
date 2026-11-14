@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type { ThemeAsset } from '../fonts';
 import type { BuilderState, ThemeFiles } from '../types';
-import { publicUrl } from '../zip/assets';
+import { SAMPLE_POST_IMAGES } from '../generator/images';
+import { assetUrl, publicUrl } from '../zip/assets';
 import { BLOCK_LIBRARY_CSS, themeCss } from './css';
 import { patternMap, renderPage, type PreviewPage } from './render';
 
@@ -22,13 +23,17 @@ export function QuickPreview(props: { state: BuilderState; files: ThemeFiles; as
   const [ready, setReady] = useState(false);
   const [page, setPage] = useState<PreviewPage>('home');
 
-  const patterns = useMemo(() => patternMap(files), [files]);
-  const rendered = useMemo(() => renderPage(state, files, page, patterns), [state, files, page, patterns]);
-  const css = useMemo(() => {
-    // Fonts are served by the app itself: map their theme paths to public URLs.
-    const byPath = new Map(assets.map((a) => [a.path, publicUrl(a.src)]));
-    return themeCss(files['theme.json'], (p) => byPath.get(p) ?? '');
-  }, [files, assets]);
+  // Theme files (fonts, images) load from the app or from the student's data URLs.
+  const fileUrl = useMemo(() => {
+    const byPath = new Map(assets.map((a) => [a.path, assetUrl(a)]));
+    return (path: string) => byPath.get(path) ?? '';
+  }, [assets]);
+  const patterns = useMemo(() => patternMap(files, fileUrl), [files, fileUrl]);
+  const rendered = useMemo(
+    () => renderPage(state, files, page, { patterns, fileUrl, sampleImage: (i) => publicUrl(SAMPLE_POST_IMAGES[i]) }),
+    [state, files, page, patterns, fileUrl],
+  );
+  const css = useMemo(() => themeCss(files['theme.json'], fileUrl), [files, fileUrl]);
 
   // Swap content in place so the scroll position survives each edit.
   useEffect(() => {

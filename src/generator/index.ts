@@ -1,5 +1,6 @@
 import { fontAssets, fontDef, type ThemeAsset } from '../fonts';
 import type { BuilderState, ThemeFiles } from '../types';
+import { hasOwnImages, imageAssets } from './images';
 import { patterns } from './patterns';
 import { colorVariations, themeJson } from './themeJson';
 import { headerSafe, themeSlug } from './utils';
@@ -29,6 +30,20 @@ Text Domain: ${slug}
 Tags: portfolio, blog, one-column, custom-colors, full-site-editing, block-patterns, style-variations, translation-ready, wide-blocks
 */
 `;
+}
+
+/** Credits for assets/images/: our placeholders are CC0; the student's photos are theirs. */
+function imageCredits(state: BuilderState): string {
+  const placeholders = `Title: assets/images/*.webp (placeholders)
+Abstract placeholder images drawn by FolioBlocks.
+License: CC0 1.0 Universal - dedicated to the public domain.
+License URL: https://creativecommons.org/publicdomain/zero/1.0/`;
+  if (!hasOwnImages(state.info)) return placeholders;
+  const name = headerSafe(state.info.name) || 'the theme author';
+  return `${placeholders}
+
+Title: assets/images/*.webp (photos added by ${name})
+Photos by ${name}, who holds their copyright. Replace or remove them if you reuse this theme.`;
 }
 
 /** The == Fonts == section, in Ipsum's format: name, copyright, license, source. */
@@ -95,6 +110,8 @@ Title: screenshot.png
 Drawn by FolioBlocks from the theme's own colours and text.
 License: GPLv2 or later, the same as the theme.
 
+${imageCredits(state)}
+
 == Fonts ==
 
 ${fontCredits(state)}
@@ -155,6 +172,6 @@ export function generateTheme(state: BuilderState): { slug: string; files: Theme
     ...p.templates,
     ...p.patterns,
   };
-  const assets = fontAssets([state.style.fonts.heading, state.style.fonts.body]);
+  const assets = [...fontAssets([state.style.fonts.heading, state.style.fonts.body]), ...imageAssets(state.info, files)];
   return { slug, files, assets };
 }
