@@ -17,8 +17,8 @@ Nothing is sent to a server. Everything stays in the browser.
 | 2.5 | "Open in WordPress Playground" button (theme embedded in a Blueprint) | ✅ done |
 | 3 | Quick preview that updates as you type (any browser), Open in WordPress Playground | ✅ done |
 | 3.5 | Photos (profile, projects), featured images, four distinct designs | ✅ done |
-| 4 | Drag-and-drop layout customizer, custom presets, JSON import/export | ⏳ next |
-| 5 | Tests, accessibility, docs, GitHub Pages deploy, beta with students | |
+| 4 | Drag-and-drop layout customizer, saved layouts, draft import/export | ✅ done |
+| 5 | Tests, accessibility, docs, GitHub Pages deploy, beta with students | ⏳ next |
 
 ## Development
 
@@ -75,7 +75,8 @@ src/generator/   pure functions → { "style.css": "...", "theme.json": "...", .
 | `src/generator/themeJson.ts` | `theme.json` v3: palette, fluid type, layout, custom templates |
 | `src/presets.ts` | Colour palettes and the 4 layout presets (Minimal, Creative, Developer, Academic) |
 | `src/fonts.ts` | Font registry: system stacks plus OFL fonts bundled into the theme |
-| `src/ui/` | Wizard steps: Info, Style, Layout |
+| `src/ui/` | Wizard steps: Info, Style, Layout (sortable section lists in `SectionList.tsx`) |
+| `src/layout.ts` | Section list edits, saved layouts, and the settings file format (export / validated import) |
 | `src/zip/` | Zip builder, bundled asset fetching and canvas-rendered `screenshot.png` |
 | `src/playground/` | Blueprint builder for "Open in WordPress Playground" |
 
@@ -87,6 +88,12 @@ src/generator/   pure functions → { "style.css": "...", "theme.json": "...", .
 ### Images
 
 Students can add a profile photo and a picture per project. They are resized to WebP in the browser (`src/images.ts`) and shipped in the theme's `assets/images/`, referenced with `get_parent_theme_file_uri()` and translated alt text, as Ipsum does. Without a photo, the theme uses a placeholder: CC0 photos from Openverse, and a drawn silhouette for the avatar (see Image credits). Only images the chosen layout uses are shipped. Sample posts get placeholder featured images in Playground and the preview.
+
+### Layout editing and drafts
+
+- In the Layout step, each page's sections can be dragged into a new order (with `@dnd-kit`; keyboard dragging and the ↑ ↓ buttons work too), given a different design, removed, or added.
+- **My layouts** saves the current colours, fonts, header, footer and sections (not the student's info) under a name, to switch back to later.
+- **Save draft / Load draft** downloads everything (info, photos, design, saved layouts) as a `.json` file and loads it back, for example on another computer. Imports are validated field by field: unknown sections, bad colours, non-image data and unexpected values fall back to defaults. Loading a draft keeps the saved layouts already in the browser.
 
 ### Image credits
 

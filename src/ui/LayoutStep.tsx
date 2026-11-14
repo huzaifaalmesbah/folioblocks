@@ -1,9 +1,10 @@
-import { SECTION_LABELS, SECTIONS } from '../generator/sections';
+import { useState } from 'react';
 import { fontDef } from '../fonts';
 import { PRESETS } from '../presets';
 import { useBuilder } from '../store';
 import type { FooterVariant, HeaderVariant, PageKey } from '../types';
-import { SectionTitle, Select } from './fields';
+import { inputCls, SectionTitle, Select } from './fields';
+import { SectionList } from './SectionList';
 
 const PAGE_LABELS: Record<PageKey, string> = { home: 'Home page', about: 'About page', contact: 'Contact page' };
 
@@ -11,8 +12,16 @@ export function LayoutStep() {
   const preset = useBuilder((s) => s.preset);
   const header = useBuilder((s) => s.header);
   const footer = useBuilder((s) => s.footer);
-  const pages = useBuilder((s) => s.pages);
-  const { applyPreset, setHeader, setFooter, setSectionVariant } = useBuilder.getState();
+  const savedLayouts = useBuilder((s) => s.savedLayouts);
+  const { applyPreset, applyLayout, saveLayout, deleteLayout, setHeader, setFooter } = useBuilder.getState();
+  const [layoutName, setLayoutName] = useState('');
+
+  function chooseSaved(key: string) {
+    if (key === preset) return;
+    if (confirm('Switch to this saved layout? This replaces your colours, fonts and sections. Your info stays.')) {
+      applyLayout(key);
+    }
+  }
 
   function choosePreset(key: string) {
     if (key === preset) return;
@@ -62,6 +71,71 @@ export function LayoutStep() {
       </section>
 
       <section className="space-y-3">
+        <SectionTitle>My layouts</SectionTitle>
+        {savedLayouts.length > 0 && (
+          <ul className="space-y-2">
+            {savedLayouts.map((l) => (
+              <li
+                key={l.key}
+                className={`flex items-center gap-2 rounded-lg border p-2 ${
+                  l.key === preset ? 'border-blue-600 ring-2 ring-blue-600/30' : 'border-slate-200'
+                }`}
+              >
+                <span aria-hidden className="flex h-8 w-8 shrink-0 overflow-hidden rounded">
+                  {(['base', 'primary', 'accent'] as const).map((k) => (
+                    <span key={k} className="flex-1" style={{ background: l.style.palette[k] }} />
+                  ))}
+                </span>
+                <span className="flex-1 truncate text-sm font-medium text-slate-800">{l.label}</span>
+                <button
+                  type="button"
+                  onClick={() => chooseSaved(l.key)}
+                  disabled={l.key === preset}
+                  className="rounded-md border border-slate-300 px-2 py-1 text-xs text-slate-800 hover:bg-slate-100 disabled:opacity-50"
+                >
+                  {l.key === preset ? 'In use' : 'Use'}
+                </button>
+                <button
+                  type="button"
+                  aria-label={`Delete saved layout ${l.label}`}
+                  onClick={() => confirm(`Delete the saved layout "${l.label}"?`) && deleteLayout(l.key)}
+                  className="rounded-md px-2 py-1 text-xs text-red-700 hover:bg-red-50"
+                >
+                  Delete
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
+        <form
+          className="flex gap-2"
+          onSubmit={(e) => {
+            e.preventDefault();
+            saveLayout(layoutName);
+            setLayoutName('');
+          }}
+        >
+          <label className="flex-1">
+            <span className="sr-only">Name for this layout</span>
+            <input
+              className={`${inputCls} mt-0`}
+              placeholder="Name this layout, e.g. Night mode"
+              value={layoutName}
+              maxLength={60}
+              onChange={(e) => setLayoutName(e.target.value)}
+            />
+          </label>
+          <button
+            type="submit"
+            className="shrink-0 rounded-md bg-slate-900 px-3 text-sm font-medium text-white hover:bg-slate-700"
+          >
+            Save current
+          </button>
+        </form>
+        <p className="text-xs text-slate-500">Saves your colours, fonts and sections (not your info) so you can switch back later.</p>
+      </section>
+
+      <section className="space-y-3">
         <SectionTitle>Header & footer</SectionTitle>
         <Select<HeaderVariant>
           label="Header"
@@ -86,31 +160,9 @@ export function LayoutStep() {
       {(Object.keys(PAGE_LABELS) as PageKey[]).map((page) => (
         <section key={page} className="space-y-3">
           <SectionTitle>{PAGE_LABELS[page]}</SectionTitle>
-          <ol className="space-y-2">
-            {pages[page].map((sec, i) => {
-              const variants = SECTIONS[sec.type];
-              const options = Object.entries(variants).map(([value, v]) => ({ value, label: v.label }));
-              return (
-                <li key={sec.id} className="rounded-lg border border-slate-200 bg-slate-50 p-3">
-                  {options.length > 1 ? (
-                    <Select
-                      label={`${i + 1}. ${SECTION_LABELS[sec.type]}`}
-                      value={sec.variant}
-                      options={options}
-                      onChange={(v) => setSectionVariant(page, sec.id, v)}
-                    />
-                  ) : (
-                    <span className="text-sm font-medium text-slate-700">
-                      {i + 1}. {SECTION_LABELS[sec.type]}
-                    </span>
-                  )}
-                </li>
-              );
-            })}
-          </ol>
+          <SectionList page={page} />
         </section>
       ))}
-      <p className="text-xs text-slate-500">Adding, removing and reordering sections comes in a later update.</p>
     </div>
   );
 }

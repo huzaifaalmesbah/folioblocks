@@ -1,8 +1,9 @@
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 import { defaultState } from './defaults';
+import { addSection, layoutFromState, moveSection, removeSection, type SavedLayout } from './layout';
 import { presetByKey } from './presets';
-import type { BuilderState, FooterVariant, HeaderVariant, Info, PageKey, Palette, Style } from './types';
+import type { BuilderState, FooterVariant, HeaderVariant, Info, PageKey, Palette, SectionType, Style } from './types';
 
 /** Set when the browser refused to save (photos can fill localStorage). */
 export const storageStatus = { full: false };
@@ -44,6 +45,16 @@ type Store = BuilderState & {
   setHeader: (v: HeaderVariant) => void;
   setFooter: (v: FooterVariant) => void;
   setSectionVariant: (page: PageKey, id: string, variant: string) => void;
+  addSection: (page: PageKey, type: SectionType) => void;
+  removeSection: (page: PageKey, id: string) => void;
+  moveSection: (page: PageKey, from: number, to: number) => void;
+  /** Layouts the student saved, to switch between or reuse. */
+  savedLayouts: SavedLayout[];
+  saveLayout: (label: string) => void;
+  applyLayout: (key: string) => void;
+  deleteLayout: (key: string) => void;
+  /** Replace everything with an imported settings file. */
+  importSettings: (state: BuilderState, layouts: SavedLayout[]) => void;
   reset: () => void;
 };
 
@@ -73,6 +84,36 @@ export const useBuilder = create<Store>()(
         set((s) => ({
           pages: { ...s.pages, [page]: s.pages[page].map((sec) => (sec.id === id ? { ...sec, variant } : sec)) },
         })),
+      addSection: (page, type) => set((s) => ({ pages: { ...s.pages, [page]: addSection(s.pages[page], type) } })),
+      removeSection: (page, id) => set((s) => ({ pages: { ...s.pages, [page]: removeSection(s.pages[page], id) } })),
+      moveSection: (page, from, to) =>
+        set((s) => ({ pages: { ...s.pages, [page]: moveSection(s.pages[page], from, to) } })),
+      savedLayouts: [],
+      saveLayout: (label) =>
+        set((s) => {
+          const layout = layoutFromState(s, label);
+          return { savedLayouts: [...s.savedLayouts, layout], preset: layout.key };
+        }),
+      applyLayout: (key) =>
+        set((s) => {
+          const l = s.savedLayouts.find((x) => x.key === key);
+          if (!l) return {};
+          return {
+            preset: l.key,
+            style: structuredClone(l.style),
+            header: l.header,
+            footer: l.footer,
+            pages: structuredClone(l.pages),
+          };
+        }),
+      deleteLayout: (key) => set((s) => ({ savedLayouts: s.savedLayouts.filter((l) => l.key !== key) })),
+      // Imported layouts join the saved ones (same key: the file wins), so loading a draft never loses a layout.
+      importSettings: (state, layouts) =>
+        set((s) => ({
+          ...structuredClone(state),
+          savedLayouts: [...s.savedLayouts.filter((l) => !layouts.some((x) => x.key === l.key)), ...layouts],
+        })),
+      // Reset clears the draft but keeps saved layouts: they are the student's own work.
       reset: () => set(structuredClone(defaultState)),
     }),
     {

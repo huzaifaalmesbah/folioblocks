@@ -6,6 +6,7 @@ import { buildZip } from './zip/buildZip';
 import { renderScreenshot } from './zip/screenshot';
 import { fetchAssets } from './zip/assets';
 import { buildBlueprint, playgroundUrl } from './playground/blueprint';
+import { exportSettings, parseSettings } from './layout';
 import { InfoStep } from './ui/InfoStep';
 import { StyleStep } from './ui/StyleStep';
 import { LayoutStep } from './ui/LayoutStep';
@@ -47,12 +48,35 @@ export default function App() {
   const [view, setView] = useState<View>('preview');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
+  const [notice, setNotice] = useState('');
 
   const Current = STEPS.find((s) => s.key === step)!.Component;
   const stepIndex = STEPS.findIndex((s) => s.key === step);
 
   function openInPlayground() {
     window.open(playgroundUrl(buildBlueprint(state, slug, files, assets)), '_blank', 'noopener');
+  }
+
+  /** Everything needed to continue on another computer: info, photos, design and saved layouts. */
+  function exportDraft() {
+    const json = exportSettings(state, useBuilder.getState().savedLayouts);
+    saveAs(new Blob([json], { type: 'application/json' }), `${slug}-folioblocks.json`);
+  }
+
+  async function importDraft(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    e.target.value = '';
+    if (!file) return;
+    setError('');
+    setNotice('');
+    try {
+      const parsed = parseSettings(await file.text());
+      if (!confirm('Load this draft? It replaces your info and design. Your saved layouts are kept.')) return;
+      useBuilder.getState().importSettings(parsed.state, parsed.layouts);
+      setNotice(`Loaded ${file.name}.`);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : String(err));
+    }
   }
 
   function downloadBlueprint() {
@@ -152,12 +176,23 @@ export default function App() {
               {error}
             </p>
           )}
-          <p className="text-xs text-slate-500">
-            Open the same site full screen in a new tab.{' '}
+          <p className="flex flex-wrap gap-x-3 gap-y-1 text-xs text-slate-500">
+            <button type="button" onClick={exportDraft} className="underline hover:text-slate-700">
+              Save draft (.json)
+            </button>
+            <label className="cursor-pointer underline hover:text-slate-700 focus-within:ring-2 focus-within:ring-blue-600/30">
+              Load draft
+              <input type="file" accept="application/json,.json" className="sr-only" onChange={importDraft} />
+            </label>
             <button type="button" onClick={downloadBlueprint} className="underline hover:text-slate-700">
               Download blueprint.json
             </button>
           </p>
+          {notice && (
+            <p role="status" className="text-xs text-green-700">
+              {notice}
+            </p>
+          )}
         </footer>
       </aside>
 
