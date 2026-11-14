@@ -2,7 +2,7 @@
 
 **Build your WordPress portfolio theme, no code needed.**
 
-**Live:** https://huzaifaalmesbah.github.io/folioblocks/
+**Live:** https://huzaifaalmesbah.github.io/folioblocks/ (home page and guides) · **Builder:** https://huzaifaalmesbah.github.io/folioblocks/#/build
 
 FolioBlocks is a browser-only theme builder for students in the WordPress Credits and WP Campus Connect programs. A student fills in their info and picks colours, and FolioBlocks generates a valid WordPress **block theme** that they download as a `.zip` and install with **Appearance → Themes → Add New Theme → Upload Theme**.
 
@@ -66,6 +66,9 @@ src/generator/   pure functions → { "style.css": "...", "theme.json": "...", .
 
 | Path | What it does |
 |---|---|
+| `src/App.tsx` | Hash routing: the home page at `/`, the builder at `#/build` (GitHub Pages has no server routing) |
+| `src/landing/` | Home page: designs, the AI agent guide (skills, setup, copyable prompts) and WordPress.com publishing steps (`content.ts`) |
+| `src/Builder.tsx` | The builder: wizard, preview, code view, downloads |
 | `src/types.ts` | `BuilderState` and related types |
 | `src/store.ts` | Zustand store, autosaved to localStorage |
 | `src/generator/blocks.ts` | Helpers that print core block markup exactly as the editor serializes it |
