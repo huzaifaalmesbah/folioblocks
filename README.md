@@ -15,7 +15,7 @@ Nothing is sent to a server. Everything stays in the browser.
 | 1 | Project setup, BuilderState, theme generator core, zip download | ✅ done |
 | 2 | Section library + 4 layout presets, Info / Style / Layout wizard, bundled fonts | ✅ done |
 | 2.5 | "Open in WordPress Playground" button (theme embedded in a Blueprint) | ✅ done |
-| 3 | Quick preview that updates as you type (any browser), Real WordPress (beta) tab, device toggle | ✅ done |
+| 3 | Quick preview that updates as you type (any browser), Open in WordPress Playground | ✅ done |
 | 4 | Drag-and-drop layout customizer, custom presets, JSON import/export | |
 | 5 | Tests, accessibility, docs, GitHub Pages deploy, beta with students | |
 
@@ -60,7 +60,7 @@ src/generator/   pure functions → { "style.css": "...", "theme.json": "...", .
       │
       ├──► src/zip/      JSZip → <slug>.zip (theme folder at the zip root) + screenshot.png
       ├──► src/preview/     Quick preview: block markup rendered in the browser, theme.json turned into CSS
-      └──► src/playground/  Blueprint for "Open in WordPress Playground", and the Real WordPress (beta) tab
+      └──► src/playground/  Blueprint for "Open in WordPress Playground"
 ```
 
 | Path | What it does |
@@ -80,9 +80,8 @@ src/generator/   pure functions → { "style.css": "...", "theme.json": "...", .
 
 ### Previews
 
-- **Preview** (default) renders the generated block markup in the browser: it evaluates the few PHP calls our patterns use, parses the blocks with `@wordpress/block-serialization-default-parser`, fills dynamic blocks (site title, navigation, query loops, post fields) with sample content, and turns `theme.json` into CSS on top of WordPress' block-library styles. It works in every browser and updates as you type. It is a close approximation, not WordPress.
-- **Open in WordPress Playground** opens the real site in a new tab.
-- **Real WordPress (beta)** embeds Playground in the page. Some browsers won't start an embedded Playground (for example when third-party storage is blocked), so it only boots when the tab is opened and shows a message if it can't start.
+- **Preview** (default) renders the generated block markup in the browser: it evaluates the few PHP calls our patterns use, parses the blocks with `@wordpress/block-serialization-default-parser`, fills dynamic blocks (site title, navigation, query loops, post fields) with sample content, and turns `theme.json` into CSS on top of WordPress' block-library styles. It works in every browser and updates as you type; links inside it (menu, post titles) switch pages. It is a close approximation, not WordPress.
+- **Open in WordPress Playground** opens the real site in a new tab. (An embedded Playground was tried and dropped: some browsers won't start Playground inside an iframe.)
 
 ### Fonts
 

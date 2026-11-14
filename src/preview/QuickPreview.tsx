@@ -3,10 +3,7 @@ import type { ThemeAsset } from '../fonts';
 import type { BuilderState, ThemeFiles } from '../types';
 import { publicUrl } from '../zip/assets';
 import { BLOCK_LIBRARY_CSS, themeCss } from './css';
-import { patternMap, PREVIEW_PAGES, renderPage, type PreviewPage } from './render';
-
-type Device = 'desktop' | 'tablet' | 'mobile';
-const WIDTHS: Record<Device, string> = { desktop: '100%', tablet: '768px', mobile: '390px' };
+import { patternMap, renderPage, type PreviewPage } from './render';
 
 /** The iframe's starting document. Content and styles are swapped in place afterwards. */
 const SHELL = `<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
@@ -24,7 +21,6 @@ export function QuickPreview(props: { state: BuilderState; files: ThemeFiles; as
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const [ready, setReady] = useState(false);
   const [page, setPage] = useState<PreviewPage>('home');
-  const [device, setDevice] = useState<Device>('desktop');
 
   const patterns = useMemo(() => patternMap(files), [files]);
   const rendered = useMemo(() => renderPage(state, files, page, patterns), [state, files, page, patterns]);
@@ -63,54 +59,16 @@ export function QuickPreview(props: { state: BuilderState; files: ThemeFiles; as
     return () => doc.removeEventListener('click', onClick);
   }, [ready]);
 
-  function go(p: PreviewPage) {
-    setPage(p);
-    iframeRef.current?.contentWindow?.scrollTo(0, 0);
-  }
-
   return (
     <div className="flex min-h-0 flex-1 flex-col">
-      <div className="flex flex-wrap items-center gap-2 border-b border-slate-200 bg-white px-4 py-2">
-        <nav className="flex flex-wrap gap-1" aria-label="Preview pages">
-          {PREVIEW_PAGES.map((p) => (
-            <button
-              key={p.key}
-              type="button"
-              aria-current={page === p.key ? 'page' : undefined}
-              onClick={() => go(p.key)}
-              className={`rounded-md px-2.5 py-1 text-xs font-medium ${
-                page === p.key ? 'bg-slate-900 text-white' : 'text-slate-700 hover:bg-slate-100'
-              }`}
-            >
-              {p.label}
-            </button>
-          ))}
-        </nav>
-        <div className="ml-auto flex items-center gap-1" role="radiogroup" aria-label="Device width">
-          {(['desktop', 'tablet', 'mobile'] as Device[]).map((d) => (
-            <button
-              key={d}
-              type="button"
-              role="radio"
-              aria-checked={device === d}
-              onClick={() => setDevice(d)}
-              className={`rounded-md px-2.5 py-1 text-xs capitalize ${
-                device === d ? 'bg-blue-50 font-semibold text-blue-800' : 'text-slate-600 hover:bg-slate-100'
-              }`}
-            >
-              {d}
-            </button>
-          ))}
-        </div>
-      </div>
-      <div className="flex min-h-0 flex-1 justify-center overflow-auto bg-slate-200">
+      {/* Links inside the preview (menu, post titles) switch pages. */}
+      <div className="flex min-h-0 flex-1">
         <iframe
           ref={iframeRef}
           title="Quick preview of your theme"
           srcDoc={SHELL}
           onLoad={() => setReady(true)}
-          className="h-full min-h-[60vh] border-0 bg-white shadow-sm transition-[width]"
-          style={{ width: WIDTHS[device] }}
+          className="h-full min-h-[60vh] w-full border-0 bg-white"
         />
       </div>
     </div>

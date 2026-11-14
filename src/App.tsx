@@ -9,14 +9,12 @@ import { buildBlueprint, playgroundUrl } from './playground/blueprint';
 import { InfoStep } from './ui/InfoStep';
 import { StyleStep } from './ui/StyleStep';
 import { LayoutStep } from './ui/LayoutStep';
-import { LivePreview } from './playground/LivePreview';
 import { QuickPreview } from './preview/QuickPreview';
 
-type View = 'preview' | 'wordpress' | 'code';
+type View = 'preview' | 'code';
 
 const VIEWS: { key: View; label: string }[] = [
   { key: 'preview', label: 'Preview' },
-  { key: 'wordpress', label: 'Real WordPress (beta)' },
   { key: 'code', label: 'Code' },
 ];
 
@@ -47,8 +45,6 @@ export default function App() {
   const [step, setStep] = useState<StepKey>('info');
   const [selected, setSelected] = useState('theme.json');
   const [view, setView] = useState<View>('preview');
-  // The embedded WordPress is heavy and doesn't start in every browser, so it only boots when asked for.
-  const [wpStarted, setWpStarted] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
 
@@ -174,10 +170,7 @@ export default function App() {
                 type="button"
                 role="tab"
                 aria-selected={view === v.key}
-                onClick={() => {
-                  setView(v.key);
-                  if (v.key === 'wordpress') setWpStarted(true);
-                }}
+                onClick={() => setView(v.key)}
                 className={`rounded-md px-3 py-1 text-sm font-medium ${
                   view === v.key ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-600 hover:text-slate-900'
                 }`}
@@ -187,22 +180,18 @@ export default function App() {
             ))}
           </div>
           <p className="hidden text-xs text-slate-500 xl:block">
-            {view === 'preview'
-              ? 'Updates as you type. For the real site, use “Open in WordPress Playground”.'
-              : view === 'wordpress'
-                ? 'WordPress running inside this page. It may not start in every browser.'
-                : 'The theme files that go into your zip.'}
+            {view === 'preview' ? 'Updates as you type.' : 'The theme files that go into your zip.'}
           </p>
+          <button
+            type="button"
+            onClick={openInPlayground}
+            className="ml-auto shrink-0 rounded-md border border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-800 hover:bg-slate-100"
+          >
+            Open in WordPress Playground ↗
+          </button>
         </div>
 
         {view === 'preview' && <QuickPreview state={state} files={files} assets={assets} />}
-
-        {/* Once started, WordPress stays mounted while other tabs are shown, so it doesn't restart. */}
-        {wpStarted && (
-          <div className={view === 'wordpress' ? 'flex min-h-0 flex-1 flex-col' : 'hidden'}>
-            <LivePreview state={state} slug={slug} files={files} assets={assets} />
-          </div>
-        )}
 
         {view === 'code' && (
           <div className="flex min-h-0 flex-1 flex-col md:flex-row">
