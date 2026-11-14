@@ -2,6 +2,8 @@
 
 **Build your WordPress portfolio theme, no code needed.**
 
+**Live:** https://huzaifaalmesbah.github.io/folioblocks/
+
 FolioBlocks is a browser-only theme builder for students in the WordPress Credits and WP Campus Connect programs. A student fills in their info and picks colours, and FolioBlocks generates a valid WordPress **block theme** that they download as a `.zip` and install with **Appearance → Themes → Add New Theme → Upload Theme**.
 
 Nothing is sent to a server. Everything stays in the browser.
