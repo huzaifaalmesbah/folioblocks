@@ -10,6 +10,15 @@ import { InfoStep } from './ui/InfoStep';
 import { StyleStep } from './ui/StyleStep';
 import { LayoutStep } from './ui/LayoutStep';
 import { LivePreview } from './playground/LivePreview';
+import { QuickPreview } from './preview/QuickPreview';
+
+type View = 'preview' | 'wordpress' | 'code';
+
+const VIEWS: { key: View; label: string }[] = [
+  { key: 'preview', label: 'Preview' },
+  { key: 'wordpress', label: 'Real WordPress (beta)' },
+  { key: 'code', label: 'Code' },
+];
 
 const STEPS = [
   { key: 'info', label: '1. Info', Component: InfoStep },
@@ -37,7 +46,9 @@ export default function App() {
 
   const [step, setStep] = useState<StepKey>('info');
   const [selected, setSelected] = useState('theme.json');
-  const [view, setView] = useState<'preview' | 'code'>('preview');
+  const [view, setView] = useState<View>('preview');
+  // The embedded WordPress is heavy and doesn't start in every browser, so it only boots when asked for.
+  const [wpStarted, setWpStarted] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
 
@@ -157,32 +168,41 @@ export default function App() {
       <main className="flex min-h-[70vh] min-w-0 flex-1 flex-col lg:min-h-0">
         <div className="flex items-center gap-3 border-b border-slate-200 bg-white px-4 py-2">
           <div className="flex gap-1 rounded-lg bg-slate-100 p-1" role="tablist" aria-label="Right panel">
-            {(['preview', 'code'] as const).map((v) => (
+            {VIEWS.map((v) => (
               <button
-                key={v}
+                key={v.key}
                 type="button"
                 role="tab"
-                aria-selected={view === v}
-                onClick={() => setView(v)}
+                aria-selected={view === v.key}
+                onClick={() => {
+                  setView(v.key);
+                  if (v.key === 'wordpress') setWpStarted(true);
+                }}
                 className={`rounded-md px-3 py-1 text-sm font-medium ${
-                  view === v ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-600 hover:text-slate-900'
+                  view === v.key ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
-                {v === 'preview' ? 'Live preview' : `Code (${paths.length} files)`}
+                {v.key === 'code' ? `Code (${paths.length} files)` : v.label}
               </button>
             ))}
           </div>
           <p className="hidden text-xs text-slate-500 xl:block">
             {view === 'preview'
-              ? 'A real WordPress running in your browser. Your changes appear in a moment.'
-              : 'The theme files that go into your zip.'}
+              ? 'Updates as you type. For the real site, use “Open in WordPress Playground”.'
+              : view === 'wordpress'
+                ? 'WordPress running inside this page. It may not start in every browser.'
+                : 'The theme files that go into your zip.'}
           </p>
         </div>
 
-        {/* The preview stays mounted while the code is shown, so WordPress doesn't restart. */}
-        <div className={view === 'preview' ? 'flex min-h-0 flex-1 flex-col' : 'hidden'}>
-          <LivePreview state={state} slug={slug} files={files} assets={assets} />
-        </div>
+        {view === 'preview' && <QuickPreview state={state} files={files} assets={assets} />}
+
+        {/* Once started, WordPress stays mounted while other tabs are shown, so it doesn't restart. */}
+        {wpStarted && (
+          <div className={view === 'wordpress' ? 'flex min-h-0 flex-1 flex-col' : 'hidden'}>
+            <LivePreview state={state} slug={slug} files={files} assets={assets} />
+          </div>
+        )}
 
         {view === 'code' && (
           <div className="flex min-h-0 flex-1 flex-col md:flex-row">
