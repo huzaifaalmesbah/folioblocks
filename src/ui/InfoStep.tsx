@@ -34,14 +34,6 @@ export function InfoStep() {
           onPick={async (f) => setInfo({ avatar: await resizeImage(f, IMAGE_LIMITS.avatar.maxWidth, IMAGE_LIMITS.avatar.maxHeight) })}
           onRemove={() => setInfo({ avatar: '' })}
         />
-        <ImageField
-          label="Cover image"
-          aspect="wide"
-          value={info.cover}
-          hint="A wide picture of your work or your world. Used by the Creative layout."
-          onPick={async (f) => setInfo({ cover: await resizeImage(f, IMAGE_LIMITS.cover.maxWidth, IMAGE_LIMITS.cover.maxHeight) })}
-          onRemove={() => setInfo({ cover: '' })}
-        />
         <p className="text-xs text-slate-500">
           Photos are resized and stay in your browser. Use only photos you took or have permission to use.
           {storageStatus.full && ' Your browser is out of space to save the draft: remove a photo or use smaller ones.'}

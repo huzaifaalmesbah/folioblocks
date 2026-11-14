@@ -31,7 +31,6 @@ UA = {'User-Agent': 'FolioBlocks image fetcher (https://github.com/huzaifaalmesb
 
 # file name → (Openverse id, width, height)
 SLOTS = {
-    'cover.webp': ('a70e6871-70d4-48b1-a78d-9ba5e04f5f8e', 1600, 900),
     'project-1.webp': ('4754c62f-38ec-42c9-870d-2f1b22d2930c', 1200, 800),
     'project-2.webp': ('f4a0cabe-4e2d-4018-8700-9bd267beaa73', 1200, 800),
     'project-3.webp': ('71963d42-1ca9-4229-81c1-f7ef13e9a6b6', 1200, 800),

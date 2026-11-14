@@ -1,3 +1,4 @@
+import { SITE_URL } from '../config';
 import type { BuilderState, PageKey } from '../types';
 import { block, group, join, pattern } from './blocks';
 import { renderSection, socialLinks, type Ctx } from './sections';
@@ -51,15 +52,35 @@ function footerContent(state: BuilderState, php: Php): string {
       `<p class="${center ? 'has-text-align-center ' : ''}has-small-font-size">© ${year} ${php.t(state.info.name)}</p>`,
     );
 
+  // The credit line: WordPress, and the tool that made the theme. Students can remove it in the Site Editor.
+  const credit = (center: boolean) =>
+    block(
+      'paragraph',
+      center
+        ? { metadata: { name: php.name('Credit') }, align: 'center', fontSize: 'small' }
+        : { metadata: { name: php.name('Credit') }, fontSize: 'small' },
+      `<p class="${center ? 'has-text-align-center ' : ''}has-small-font-size">${php.html(
+        `Built with <a href="https://wordpress.org">WordPress</a> · Theme made with <a href="${SITE_URL}">FolioBlocks</a>`,
+      )}</p>`,
+    );
+
   if (state.footer === 'split') {
-    const row = group(join(copy(false), socialLinks(state.info, php, 'right')), {
+    const text = group(join(copy(false), credit(false)), {
+      name: php.name('Copyright and Credit'),
+      layout: { type: 'flex', orientation: 'vertical' },
+    });
+    const row = group(join(text, socialLinks(state.info, php, 'right')), {
       name: php.name('Footer Row'),
       align: 'wide',
       layout: { type: 'flex', justifyContent: 'space-between', flexWrap: 'wrap' },
     });
     return group(row, { name: php.name('Footer'), padY: 50, noMargin: true });
   }
-  return group(join(socialLinks(state.info, php), copy(true)), { name: php.name('Footer'), padY: 50, noMargin: true });
+  return group(join(socialLinks(state.info, php), copy(true), credit(true)), {
+    name: php.name('Footer'),
+    padY: 50,
+    noMargin: true,
+  });
 }
 
 const PAGES: Record<PageKey, { title: string; category: string; description: string }> = {

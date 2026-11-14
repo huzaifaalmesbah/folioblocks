@@ -7,7 +7,7 @@ import type { BuilderState } from '../types';
 import { generateTheme } from './index';
 import { checkBlockMarkup } from './testUtils';
 
-const PNG = 'data:image/webp;base64,UklGRhYAAABXRUJQVlA4IAoAAAAwAQCdASoBAAEAAUAmJaQAA3AA/v89WAAAAA==';
+const WEBP = 'data:image/webp;base64,UklGRhYAAABXRUJQVlA4IAoAAAAwAQCdASoBAAEAAUAmJaQAA3AA/v89WAAAAA==';
 
 function withPreset(key: string, info: Partial<BuilderState['info']> = {}): BuilderState {
   const p = PRESETS.find((x) => x.key === key)!;
@@ -25,8 +25,8 @@ describe('images', () => {
       'assets/images/project-3.webp',
     ]);
     expect(images.every((a) => a.src && !a.data)).toBe(true);
-    // Minimal has no cover image, so it isn't shipped.
-    expect(images.some((a) => a.path.endsWith('cover.webp'))).toBe(false);
+    // Only the photo and project slots exist (there is no cover image).
+    expect(images.every((a) => /\/(avatar|project-\d)\.webp$/.test(a.path))).toBe(true);
     // Openverse photos are credited one by one, with their CC0 licence.
     const readme = files['readme.txt'];
     expect(readme).toContain('Title: assets/images/project-1.webp\nPhoto "Office Work" by Negative Space');
@@ -34,22 +34,22 @@ describe('images', () => {
     expect(readme).toContain('License: CC0 1.0 Universal');
     expect(readme).toContain('Title: assets/images/avatar.webp\nPlaceholder drawn by FolioBlocks.');
     expect(readme).not.toContain('cover.webp');
+    expect(readme).toContain('Title: assets/images/project-3.webp');
   });
 
   it("ships the student's own photos and credits them", () => {
     const state = withPreset('creative', {
       name: 'Jane Doe',
-      avatar: PNG,
-      cover: PNG,
-      projects: [{ title: 'A', description: 'B', url: '', image: PNG }],
+      avatar: WEBP,
+      projects: [{ title: 'A', description: 'B', url: '', image: WEBP }],
     });
     const { assets, files } = generateTheme(state);
     const byPath = Object.fromEntries(assets.map((a) => [a.path, a]));
-    expect(byPath['assets/images/cover.webp'].data).toBe(PNG);
-    expect(byPath['assets/images/project-1.webp'].data).toBe(PNG);
+    expect(byPath['assets/images/avatar.webp'].data).toBe(WEBP);
+    expect(byPath['assets/images/project-1.webp'].data).toBe(WEBP);
     // Placeholders still fill the grid's remaining slots.
-    expect(byPath['assets/images/project-2.webp']?.src ?? 'unused').not.toBe(PNG);
-    expect(files['readme.txt']).toContain('Title: assets/images/cover.webp\nPhoto by Jane Doe, who holds its copyright.');
+    expect(byPath['assets/images/project-2.webp']?.src ?? 'unused').not.toBe(WEBP);
+    expect(files['readme.txt']).toContain('Title: assets/images/avatar.webp\nPhoto by Jane Doe, who holds its copyright.');
   });
 
   it('references images through get_parent_theme_file_uri with translated alt text', () => {
@@ -68,7 +68,7 @@ describe('images', () => {
   });
 
   it('writes uploaded photos and sample thumbnails in Playground', () => {
-    const state = withPreset('minimal', { avatar: PNG });
+    const state = withPreset('minimal', { avatar: WEBP });
     const { slug, files, assets } = generateTheme(state);
     const bp = buildBlueprint(state, slug, files, assets);
     const php = bp.steps.filter((s) => s.step === 'runPHP').map((s) => (s as { code: string }).code);
@@ -79,13 +79,29 @@ describe('images', () => {
   });
 
   it('renders images in the quick preview', () => {
-    const state = withPreset('creative', { avatar: PNG });
+    const state = withPreset('creative', { avatar: WEBP });
     const { files } = generateTheme(state);
     const { html } = renderPage(state, files, 'home', {
-      fileUrl: (p) => (p.endsWith('avatar.webp') ? PNG : `https://x.test/${p}`),
+      fileUrl: (p) => (p.endsWith('avatar.webp') ? WEBP : `https://x.test/${p}`),
       sampleImage: (i) => `https://x.test/post-${i}.webp`,
     });
-    expect(html).toContain('src="https://x.test/assets/images/cover.webp"');
+    // Creative's hero shows the student's photo beside the big type.
+    expect(html).toContain(`src="${WEBP}"`);
+    expect(html).toContain('src="https://x.test/assets/images/project-1.webp"');
     expect(html).toContain('src="https://x.test/post-0.webp"');
+  });
+});
+
+describe('footer credit', () => {
+  it.each(['centered', 'split'] as const)('credits WordPress and FolioBlocks in the %s footer', (footer) => {
+    const state = { ...withPreset('minimal'), footer };
+    const { files } = generateTheme(state);
+    const pattern = files['patterns/footer.php'];
+    expect(pattern).toContain('wp_kses_post( __( \'Built with <a href="https://wordpress.org">WordPress</a> · Theme made with <a href="https://huzaifaalmesbah.github.io/folioblocks/">FolioBlocks</a>\'');
+    expect(checkBlockMarkup(pattern)).toEqual([]);
+
+    const { html } = renderPage(state, files, 'home');
+    expect(html).toContain('Built with <a href="https://wordpress.org">WordPress</a>');
+    expect(html).toContain('<a href="https://huzaifaalmesbah.github.io/folioblocks/">FolioBlocks</a>');
   });
 });

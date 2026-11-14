@@ -1,6 +1,6 @@
 import type { Info, Section, SectionType } from '../types';
 import { badge, block, buttons, columns, container, group, heading, image, join, list, paragraph, separator } from './blocks';
-import { AVATAR, COVER, projectImage } from './images';
+import { AVATAR, projectImage } from './images';
 import { cleanUrl, type Php } from './utils';
 
 export type Ctx = { info: Info; php: Php; /** Card/button corner radius as CSS, e.g. "10px". */ radius: string };
@@ -58,26 +58,24 @@ const heroSplit: Renderer = (ctx) => {
   });
 };
 
+/** Big type on the left, a tall portrait on the right. */
 const heroBig: Renderer = (ctx) => {
   const { info, php } = ctx;
   const meta = [info.university, info.location].filter(Boolean).join(' · ');
-  return group(
-    join(
-      paragraph(php.t("Hello, I'm")),
-      heading(php.t(info.name), 1),
-      paragraph(php.t(info.tagline)),
-      meta && paragraph(php.t(meta)),
-      buttons(heroCtas(ctx)),
-      image(php.themeFile(COVER), php.attr('Cover image'), { aspectRatio: '21/9', align: 'wide' }),
-    ),
-    {
-      name: php.name('Hero'),
-      tagName: 'section',
-      align: 'full',
-      padY: 80,
-      layout: { type: 'constrained', contentSize: '1000px' },
-    },
+  const text = join(
+    paragraph(php.t("Hello, I'm")),
+    heading(php.t(info.name), 1),
+    paragraph(php.t(info.tagline)),
+    meta && paragraph(php.t(meta)),
+    buttons(heroCtas(ctx)),
   );
+  return group(columns([text, avatar(ctx, { aspectRatio: '4/5' })], { verticalAlignment: 'center' }), {
+    name: php.name('Hero'),
+    tagName: 'section',
+    align: 'full',
+    padY: 80,
+    layout: { type: 'constrained', contentSize: '1100px' },
+  });
 };
 
 /** A research-profile start: portrait beside name, details and bio. */
@@ -410,7 +408,7 @@ export const SECTIONS: Record<SectionType, Record<string, Variant>> = {
     avatar: { label: 'Round photo, centered', render: heroAvatar },
     centered: { label: 'Centered text', render: heroCentered },
     split: { label: 'Text beside photo', render: heroSplit },
-    big: { label: 'Big type with cover image', render: heroBig },
+    big: { label: 'Big type beside a tall photo', render: heroBig },
     profile: { label: 'Profile: photo, details and bio', render: heroProfile },
   },
   about: {

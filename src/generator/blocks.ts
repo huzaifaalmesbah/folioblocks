@@ -168,8 +168,12 @@ export function list(itemsHtml: string[]): string {
   return block('list', undefined, wrap('<ul class="wp-block-list">', children, '</ul>'));
 }
 
-export function columns(cols: string[]): string {
+export function columns(cols: string[], opts: { verticalAlignment?: 'center' } = {}): string {
   const children = join(...cols.map((c) => block('column', undefined, wrap('<div class="wp-block-column">', c, '</div>'))));
+  if (opts.verticalAlignment) {
+    const cls = `wp-block-columns are-vertically-aligned-${opts.verticalAlignment}`;
+    return block('columns', { verticalAlignment: opts.verticalAlignment }, wrap(`<div class="${cls}">`, children, '</div>'));
+  }
   return block('columns', undefined, wrap('<div class="wp-block-columns">', children, '</div>'));
 }
 

@@ -8,7 +8,6 @@ import type { Info } from '../types';
  */
 
 export const AVATAR = 'assets/images/avatar.webp';
-export const COVER = 'assets/images/cover.webp';
 export const projectImage = (i: number) => `assets/images/project-${i + 1}.webp`;
 
 /** The three sample post thumbnails used in previews (not part of the theme). */
@@ -20,7 +19,6 @@ const PLACEHOLDER_PROJECTS = 3;
 function allImages(info: Info): ThemeAsset[] {
   const out: ThemeAsset[] = [
     info.avatar ? { path: AVATAR, data: info.avatar } : { path: AVATAR, src: 'images/avatar.webp' },
-    info.cover ? { path: COVER, data: info.cover } : { path: COVER, src: 'images/cover.webp' },
   ];
   const count = Math.max(info.projects.length, PLACEHOLDER_PROJECTS);
   for (let i = 0; i < count; i++) {
@@ -41,5 +39,5 @@ export function imageAssets(info: Info, files: Record<string, string>): ThemeAss
 
 /** Whether the student added any of their own images (credited differently in readme.txt). */
 export function hasOwnImages(info: Info): boolean {
-  return Boolean(info.avatar || info.cover || info.projects.some((p) => p.image));
+  return Boolean(info.avatar || info.projects.some((p) => p.image));
 }

@@ -35,6 +35,11 @@ export function makePhp(textDomain: string) {
     url: (url: string) => `<?php echo esc_url( ${phpString(cleanUrl(url))} ); ?>`,
     /** URL of a file in the theme, e.g. assets/images/avatar.webp (Ipsum's way: works from child themes too). */
     themeFile: (path: string) => `<?php echo esc_url( get_parent_theme_file_uri( ${phpString(path)} ) ); ?>`,
+    /**
+     * Translatable text with simple HTML (links) kept, as Ipsum recommends:
+     * clearer for translators than sprintf(), and they can drop the markup.
+     */
+    html: (text: string) => `<?php echo wp_kses_post( __( ${phpString(text)}, ${phpString(textDomain)} ) ); ?>`,
     /** Translatable text for an HTML attribute or a block attribute. */
     attr: (text: string) => `<?php echo esc_attr__( ${phpString(text)}, ${phpString(textDomain)} ); ?>`,
     /** Translatable block name, shown in the List View (metadata.name). */

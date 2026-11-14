@@ -72,6 +72,8 @@ export function evalPhp(code: string, fileUrl: FileUrl = () => ''): string {
     case 'esc_url':
       if (/get_(parent_)?theme_file_uri\(/.test(rest)) return escapeHtml(safeUrl(fileUrl(args[0] ?? '')));
       return escapeHtml(safeUrl(args[0] ?? ''));
+    case 'wp_kses_post':
+      return keepLinks(args[0] ?? '');
     case 'esc_html':
       return /gmdate\(\s*'Y'\s*\)/.test(rest) ? String(new Date().getFullYear()) : escapeHtml(args[0] ?? '');
     default:
@@ -105,6 +107,13 @@ function replacePhpSpans(src: string, fn: (code: string) => string): string {
     out += fn(src.slice(start + 5, end).trim());
     i = end + 2;
   }
+}
+
+/** Like wp_kses_post, for our own strings: escape everything, then allow plain <a href="https://…"> links back. */
+function keepLinks(html: string): string {
+  return escapeHtml(html)
+    .replace(/&lt;a href=&quot;(https?:\/\/[^"&<>]+)&quot;&gt;/g, '<a href="$1">')
+    .replace(/&lt;\/a&gt;/g, '</a>');
 }
 
 /** Escape a value for inside a JSON string in a block comment. */

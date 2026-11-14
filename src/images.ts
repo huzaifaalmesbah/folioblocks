@@ -19,7 +19,6 @@ export async function resizeImage(file: File, maxWidth: number, maxHeight: numbe
 
 /** Sizes per kind of image. */
 export const IMAGE_LIMITS = {
-  avatar: { maxWidth: 800, maxHeight: 800 },
-  cover: { maxWidth: 1600, maxHeight: 1000 },
+  avatar: { maxWidth: 800, maxHeight: 1000 },
   project: { maxWidth: 1200, maxHeight: 900 },
 } as const;

@@ -77,7 +77,7 @@ export const useBuilder = create<Store>()(
     }),
     {
       name: 'folioblocks-state',
-      version: 3,
+      version: 4,
       storage: createJSONStorage(() => safeStorage),
       // Older drafts lack newer fields (v2: header/footer, v3: photos): fill them in from the defaults.
       migrate: (persisted) => {
@@ -85,7 +85,8 @@ export const useBuilder = create<Store>()(
         return {
           ...structuredClone(defaultState),
           ...old,
-          info: { ...defaultState.info, ...old.info },
+          // v4 dropped the cover image: don't keep its data in storage.
+          info: { ...defaultState.info, ...old.info, cover: undefined } as BuilderState['info'],
           header: old.header ?? defaultState.header,
           footer: old.footer ?? defaultState.footer,
         } as Store;

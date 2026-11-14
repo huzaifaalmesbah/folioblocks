@@ -16,7 +16,7 @@ Nothing is sent to a server. Everything stays in the browser.
 | 2 | Section library + 4 layout presets, Info / Style / Layout wizard, bundled fonts | ✅ done |
 | 2.5 | "Open in WordPress Playground" button (theme embedded in a Blueprint) | ✅ done |
 | 3 | Quick preview that updates as you type (any browser), Open in WordPress Playground | ✅ done |
-| 3.5 | Photos (profile, cover, projects), featured images, four distinct designs | ✅ done |
+| 3.5 | Photos (profile, projects), featured images, four distinct designs | ✅ done |
 | 4 | Drag-and-drop layout customizer, custom presets, JSON import/export | ⏳ next |
 | 5 | Tests, accessibility, docs, GitHub Pages deploy, beta with students | |
 
@@ -86,7 +86,7 @@ src/generator/   pure functions → { "style.css": "...", "theme.json": "...", .
 
 ### Images
 
-Students can add a profile photo, a cover image and a picture per project. They are resized to WebP in the browser (`src/images.ts`) and shipped in the theme's `assets/images/`, referenced with `get_parent_theme_file_uri()` and translated alt text, as Ipsum does. Without a photo, the theme uses a placeholder: CC0 photos from Openverse, and a drawn silhouette for the avatar (see Image credits). Only images the chosen layout uses are shipped. Sample posts get placeholder featured images in Playground and the preview.
+Students can add a profile photo and a picture per project. They are resized to WebP in the browser (`src/images.ts`) and shipped in the theme's `assets/images/`, referenced with `get_parent_theme_file_uri()` and translated alt text, as Ipsum does. Without a photo, the theme uses a placeholder: CC0 photos from Openverse, and a drawn silhouette for the avatar (see Image credits). Only images the chosen layout uses are shipped. Sample posts get placeholder featured images in Playground and the preview.
 
 ### Image credits
 
@@ -94,7 +94,6 @@ The sample photos in `public/images/` come from [Openverse](https://openverse.or
 
 | File | Photo | Licence |
 |---|---|---|
-| `cover.webp` | [Mountains Landscape](https://stocksnap.io/photo/mountains-landscape-52TDQG1GNL) by Matt Flores ([Openverse](https://openverse.org/image/a70e6871-70d4-48b1-a78d-9ba5e04f5f8e)) | CC0 1.0 Universal |
 | `project-1.webp` | [Office Work](https://stocksnap.io/photo/office-work-8P6GFHP0LU) by Negative Space ([Openverse](https://openverse.org/image/4754c62f-38ec-42c9-870d-2f1b22d2930c)) | CC0 1.0 Universal |
 | `project-2.webp` | [Programming Code](https://stocksnap.io/photo/programming-code-1STVFMTBJY) by One Idea LLC ([Openverse](https://openverse.org/image/f4a0cabe-4e2d-4018-8700-9bd267beaa73)) | CC0 1.0 Universal |
 | `project-3.webp` | [Office Work](https://stocksnap.io/photo/office-work-Q6PIRY9O7M) by Nao Triponez ([Openverse](https://openverse.org/image/71963d42-1ca9-4229-81c1-f7ef13e9a6b6)) | CC0 1.0 Universal |

@@ -131,7 +131,6 @@ if __name__ == '__main__':
     # Pass --scenes to draw abstract ones instead (no network needed).
     save(avatar(800, 'sand', 7), 'avatar.webp')
     if '--scenes' in sys.argv:
-        save(scene(1600, 900, 'dusk', 11), 'cover.webp')
         for i, pal in enumerate(['dawn', 'sea', 'moss'], start=1):
             save(scene(1200, 800, pal, 20 + i), f'project-{i}.webp')
         for i, pal in enumerate(['slate', 'dawn', 'sea'], start=1):

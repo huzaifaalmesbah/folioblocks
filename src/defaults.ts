@@ -16,7 +16,6 @@ export const defaultState: BuilderState = {
     projects: [],
     socials: {},
     avatar: '',
-    cover: '',
   },
   style: minimal.style,
   preset: minimal.key,

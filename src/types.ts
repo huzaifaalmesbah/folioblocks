@@ -28,8 +28,6 @@ export type Info = {
   socials: Socials;
   /** Profile photo. Falls back to a placeholder. */
   avatar?: ImageDataUrl;
-  /** Wide cover image, used by heroes that show one. Falls back to a placeholder. */
-  cover?: ImageDataUrl;
 };
 
 export type Palette = {

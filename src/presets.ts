@@ -67,7 +67,7 @@ export const PRESETS: PresetDef[] = [
   {
     key: 'creative',
     label: 'Creative',
-    description: 'Big serif type, a wide cover image and large showcase rows. Warm colours.',
+    description: 'Big serif type beside your photo, large showcase rows. Warm colours.',
     style: { palette: palette('sunset'), fonts: { heading: 'playfair-display', body: 'dm-sans' }, radius: 'lg' },
     header: 'centered',
     footer: 'centered',
