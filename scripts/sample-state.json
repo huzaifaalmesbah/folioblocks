@@ -1,0 +1,35 @@
+{
+  "info": {
+    "name": "Jane Doe",
+    "tagline": "CSE Student & WordPress Contributor",
+    "university": "Example University",
+    "location": "Dhaka, Bangladesh",
+    "bio": "I am a student who loves building for the open web and contributing to WordPress.",
+    "email": "jane@example.com",
+    "skills": ["PHP", "JavaScript", "Gutenberg"],
+    "contributions": [{ "team": "Polyglots", "description": "Translated plugins into Bengali." }],
+    "projects": [{ "title": "Campus Events", "description": "A block plugin for university events.", "url": "https://example.com" }],
+    "socials": { "github": "https://github.com/example", "wordpress": "https://profiles.wordpress.org/example" }
+  },
+  "style": {
+    "palette": { "primary": "#3858e9", "secondary": "#1e1e1e", "base": "#ffffff", "contrast": "#1e1e1e", "accent": "#f0f3ff" },
+    "fonts": { "heading": "system-serif", "body": "system-sans" },
+    "radius": "md"
+  },
+  "preset": "minimal",
+  "pages": {
+    "home": [
+      { "id": "h1", "type": "hero", "variant": "split" },
+      { "id": "h2", "type": "about", "variant": "text" },
+      { "id": "h3", "type": "projects", "variant": "grid" },
+      { "id": "h4", "type": "posts", "variant": "grid" },
+      { "id": "h5", "type": "contact", "variant": "cta" }
+    ],
+    "about": [
+      { "id": "a1", "type": "about", "variant": "text" },
+      { "id": "a2", "type": "skills", "variant": "list" },
+      { "id": "a3", "type": "contributions", "variant": "list" }
+    ],
+    "contact": [{ "id": "c1", "type": "contact", "variant": "full" }]
+  }
+}

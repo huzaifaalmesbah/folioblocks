@@ -1,0 +1,10 @@
+{
+  "$schema": "https://playground.wordpress.net/blueprint-schema.json",
+  "landingPage": "/",
+  "login": true,
+  "steps": [
+    { "step": "activateTheme", "themeFolderName": "__SLUG__" },
+    { "step": "setSiteOptions", "options": { "blogname": "Jane Doe", "permalink_structure": "/%postname%/" } },
+    { "step": "runPHP", "code": "<?php require '/wordpress/wp-load.php';\n$home = wp_insert_post(['post_type'=>'page','post_status'=>'publish','post_title'=>'Home']);\n$blog = wp_insert_post(['post_type'=>'page','post_status'=>'publish','post_title'=>'Blog']);\n$about = wp_insert_post(['post_type'=>'page','post_status'=>'publish','post_title'=>'About','page_template'=>'page-about']);\n$contact = wp_insert_post(['post_type'=>'page','post_status'=>'publish','post_title'=>'Contact','page_template'=>'page-contact']);\nupdate_option('show_on_front','page'); update_option('page_on_front',$home); update_option('page_for_posts',$blog);\nflush_rewrite_rules();" }
+  ]
+}
