@@ -4,6 +4,7 @@ import { pickState, useBuilder } from './store';
 import { generateTheme } from './generator';
 import { buildZip } from './zip/buildZip';
 import { renderScreenshot } from './zip/screenshot';
+import { buildBlueprint, playgroundUrl } from './playground/blueprint';
 import type { Palette } from './types';
 
 const PALETTE_LABELS: Record<keyof Palette, string> = {
@@ -54,6 +55,16 @@ export default function App() {
   const paths = Object.keys(files).sort();
   const [selected, setSelected] = useState('theme.json');
   const [busy, setBusy] = useState(false);
+
+  function openInPlayground() {
+    const url = playgroundUrl(buildBlueprint(state, slug, files));
+    window.open(url, '_blank', 'noopener');
+  }
+
+  function downloadBlueprint() {
+    const json = JSON.stringify(buildBlueprint(state, slug, files), null, 2);
+    saveAs(new Blob([json], { type: 'application/json' }), 'blueprint.json');
+  }
 
   async function download() {
     setBusy(true);
@@ -118,6 +129,22 @@ export default function App() {
           </div>
         </section>
 
+        <div className="space-y-2">
+          <button
+            onClick={openInPlayground}
+            className="w-full rounded-md bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white hover:bg-slate-700"
+          >
+            Open in WordPress Playground ↗
+          </button>
+          <p className="text-xs text-slate-500">
+            Opens a real WordPress in a new tab with your theme installed, plus Home, About, Blog, Contact pages and
+            sample posts. Nothing to install.{' '}
+            <button onClick={downloadBlueprint} className="underline hover:text-slate-700">
+              Download blueprint.json
+            </button>
+          </p>
+        </div>
+
         <div className="flex gap-2">
           <button
             onClick={download}
@@ -137,7 +164,7 @@ export default function App() {
 
       <main className="flex min-h-[60vh] flex-1 flex-col lg:min-h-0">
         <div className="border-b border-slate-200 bg-white px-6 py-3 text-sm text-slate-600">
-          Generated theme files: <strong>{paths.length}</strong> · live WordPress preview comes in a later step
+          Generated theme files: <strong>{paths.length}</strong> · use “Open in WordPress Playground” to see it live
         </div>
         <div className="flex min-h-0 flex-1 flex-col md:flex-row">
           <nav className="max-h-48 overflow-y-auto border-slate-200 bg-white p-3 md:max-h-none md:w-64 md:border-r">

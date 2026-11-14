@@ -14,6 +14,7 @@ Nothing is sent to a server. Everything stays in the browser.
 |---|---|---|
 | 1 | Project setup, BuilderState, theme generator core, zip download | ✅ done |
 | 2 | Section library + 4 layout presets, Info and Style wizard steps | ⏳ next |
+| 2.5 | "Open in WordPress Playground" button (theme embedded in a Blueprint) | ✅ done |
 | 3 | Live WordPress Playground preview, seed content, device toggle | |
 | 4 | Drag-and-drop layout customizer, custom presets, JSON import/export | |
 | 5 | Tests, accessibility, docs, GitHub Pages deploy, beta with students | |
@@ -35,6 +36,12 @@ npm run try
 ```
 
 This exports a sample theme (from `scripts/sample-state.json`) to `out/` and opens it in a local [WordPress Playground](https://wordpress.github.io/wordpress-playground/) with Home, About, Blog and Contact pages already set up. It only needs Node, not wp-env or Docker.
+
+To print a playground.wordpress.net link that installs the sample theme (no local WordPress at all):
+
+```bash
+npm run link -- scripts/sample-state.json
+```
 
 To export a theme folder without starting WordPress:
 

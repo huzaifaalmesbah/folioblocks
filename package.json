@@ -10,7 +10,8 @@
     "preview": "vite preview",
     "test": "vitest run",
     "export": "tsx scripts/export-theme.ts",
-    "try": "bash scripts/try-in-playground.sh"
+    "try": "bash scripts/try-in-playground.sh",
+    "link": "tsx scripts/playground-link.ts"
   },
   "dependencies": {
     "file-saver": "^2.0.5",
