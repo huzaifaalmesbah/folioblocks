@@ -81,6 +81,8 @@ const BLOCK_SELECTORS: Record<string, string> = {
   'core/post-date': '.wp-block-post-date',
   'core/post-terms': '.wp-block-post-terms',
   'core/separator': '.wp-block-separator',
+  'core/image': '.wp-block-image img',
+  'core/post-featured-image': '.wp-block-post-featured-image img',
 };
 
 export function themeCss(themeJsonText: string, fontUrl: (themePath: string) => string): string {

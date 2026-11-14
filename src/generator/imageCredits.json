@@ -1,0 +1,58 @@
+{
+  "cover.webp": {
+    "title": "Mountains Landscape",
+    "creator": "Matt Flores",
+    "source": "https://stocksnap.io/photo/mountains-landscape-52TDQG1GNL",
+    "openverse": "https://openverse.org/image/a70e6871-70d4-48b1-a78d-9ba5e04f5f8e",
+    "license": "CC0 1.0 Universal",
+    "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/"
+  },
+  "project-1.webp": {
+    "title": "Office Work",
+    "creator": "Negative Space",
+    "source": "https://stocksnap.io/photo/office-work-8P6GFHP0LU",
+    "openverse": "https://openverse.org/image/4754c62f-38ec-42c9-870d-2f1b22d2930c",
+    "license": "CC0 1.0 Universal",
+    "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/"
+  },
+  "project-2.webp": {
+    "title": "Programming Code",
+    "creator": "One Idea LLC",
+    "source": "https://stocksnap.io/photo/programming-code-1STVFMTBJY",
+    "openverse": "https://openverse.org/image/f4a0cabe-4e2d-4018-8700-9bd267beaa73",
+    "license": "CC0 1.0 Universal",
+    "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/"
+  },
+  "project-3.webp": {
+    "title": "Office Work",
+    "creator": "Nao Triponez",
+    "source": "https://stocksnap.io/photo/office-work-Q6PIRY9O7M",
+    "openverse": "https://openverse.org/image/71963d42-1ca9-4229-81c1-f7ef13e9a6b6",
+    "license": "CC0 1.0 Universal",
+    "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/"
+  },
+  "post-1.webp": {
+    "title": "Laptop Mac",
+    "creator": "Matthew Henry",
+    "source": "https://stocksnap.io/photo/laptop-mac-OR7D4PANCK",
+    "openverse": "https://openverse.org/image/b90b48bd-5f3a-4adb-a018-45afa6c4db8b",
+    "license": "CC0 1.0 Universal",
+    "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/"
+  },
+  "post-2.webp": {
+    "title": "Journal Notepad",
+    "creator": "Cathryn Lavery",
+    "source": "https://stocksnap.io/photo/journal-notepad-DPKNIIN5X3",
+    "openverse": "https://openverse.org/image/6d55483a-ac31-4291-bf17-5e4d52b6e34c",
+    "license": "CC0 1.0 Universal",
+    "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/"
+  },
+  "post-3.webp": {
+    "title": "Computer Office",
+    "creator": "Lukas",
+    "source": "https://stocksnap.io/photo/computer-office-XGXORJWZIX",
+    "openverse": "https://openverse.org/image/6231a349-7ccd-4c98-bbca-13adc7562f0c",
+    "license": "CC0 1.0 Universal",
+    "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/"
+  }
+}

@@ -1,6 +1,9 @@
 import { fontAssets, fontDef, type ThemeAsset } from '../fonts';
 import type { BuilderState, ThemeFiles } from '../types';
-import { hasOwnImages, imageAssets } from './images';
+import IMAGE_CREDITS from './imageCredits.json';
+import { imageAssets } from './images';
+
+type ImageCredit = { title: string; creator: string; source: string; openverse: string; license: string; licenseUrl: string };
 import { patterns } from './patterns';
 import { colorVariations, themeJson } from './themeJson';
 import { headerSafe, themeSlug } from './utils';
@@ -32,18 +35,31 @@ Tags: portfolio, blog, one-column, custom-colors, full-site-editing, block-patte
 `;
 }
 
-/** Credits for assets/images/: our placeholders are CC0; the student's photos are theirs. */
-function imageCredits(state: BuilderState): string {
-  const placeholders = `Title: assets/images/*.webp (placeholders)
-Abstract placeholder images drawn by FolioBlocks.
-License: CC0 1.0 Universal - dedicated to the public domain.
-License URL: https://creativecommons.org/publicdomain/zero/1.0/`;
-  if (!hasOwnImages(state.info)) return placeholders;
+/**
+ * Credits for assets/images/, one entry per shipped image, in Ipsum's format:
+ * Openverse photos (CC0 / public domain) with their creator and source, our
+ * own drawn avatar, and the student's own photos.
+ */
+function imageCredits(state: BuilderState, images: ThemeAsset[]): string {
   const name = headerSafe(state.info.name) || 'the theme author';
-  return `${placeholders}
-
-Title: assets/images/*.webp (photos added by ${name})
-Photos by ${name}, who holds their copyright. Replace or remove them if you reuse this theme.`;
+  return images
+    .map((a) => {
+      if (a.data) {
+        return `Title: ${a.path}\nPhoto by ${name}, who holds its copyright. Replace or remove it if you reuse this theme.`;
+      }
+      const file = (a.src ?? '').replace(/^images\//, '');
+      const credit = (IMAGE_CREDITS as Record<string, ImageCredit>)[file];
+      if (!credit) {
+        return `Title: ${a.path}\nPlaceholder drawn by FolioBlocks.\nLicense: CC0 1.0 Universal\nLicense URL: https://creativecommons.org/publicdomain/zero/1.0/`;
+      }
+      return [
+        `Title: ${a.path}`,
+        `Photo "${headerSafe(credit.title)}" by ${headerSafe(credit.creator)}, ${credit.source}, found on Openverse: ${credit.openverse}`,
+        `License: ${credit.license}`,
+        `License URL: ${credit.licenseUrl}`,
+      ].join('\n');
+    })
+    .join('\n\n');
 }
 
 /** The == Fonts == section, in Ipsum's format: name, copyright, license, source. */
@@ -59,7 +75,7 @@ function fontCredits(state: BuilderState): string {
   return credits.length ? credits.join('\n\n') : 'The theme uses system fonts and bundles no font files.';
 }
 
-function readme(state: BuilderState, slug: string): string {
+function readme(state: BuilderState, slug: string, images: ThemeAsset[]): string {
   const name = headerSafe(state.info.name) || 'My';
   const year = new Date().getFullYear();
   return `=== ${name} Portfolio ===
@@ -110,7 +126,7 @@ Title: screenshot.png
 Drawn by FolioBlocks from the theme's own colours and text.
 License: GPLv2 or later, the same as the theme.
 
-${imageCredits(state)}
+${imageCredits(state, images)}
 
 == Fonts ==
 
@@ -168,10 +184,12 @@ export function generateTheme(state: BuilderState): { slug: string; files: Theme
     'theme.json': themeJson(state.style),
     ...colorVariations(state.style),
     'functions.php': functionsPhp(slug),
-    'readme.txt': readme(state, slug),
     ...p.templates,
     ...p.patterns,
   };
-  const assets = [...fontAssets([state.style.fonts.heading, state.style.fonts.body]), ...imageAssets(state.info, files)];
+  // The readme credits exactly the images the patterns use, so work those out first.
+  const images = imageAssets(state.info, files);
+  files['readme.txt'] = readme(state, slug, images);
+  const assets = [...fontAssets([state.style.fonts.heading, state.style.fonts.body]), ...images];
   return { slug, files, assets };
 }

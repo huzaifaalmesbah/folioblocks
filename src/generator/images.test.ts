@@ -27,7 +27,13 @@ describe('images', () => {
     expect(images.every((a) => a.src && !a.data)).toBe(true);
     // Minimal has no cover image, so it isn't shipped.
     expect(images.some((a) => a.path.endsWith('cover.webp'))).toBe(false);
-    expect(files['readme.txt']).toContain('Abstract placeholder images drawn by FolioBlocks');
+    // Openverse photos are credited one by one, with their CC0 licence.
+    const readme = files['readme.txt'];
+    expect(readme).toContain('Title: assets/images/project-1.webp\nPhoto "Office Work" by Negative Space');
+    expect(readme).toContain('found on Openverse: https://openverse.org/image/');
+    expect(readme).toContain('License: CC0 1.0 Universal');
+    expect(readme).toContain('Title: assets/images/avatar.webp\nPlaceholder drawn by FolioBlocks.');
+    expect(readme).not.toContain('cover.webp');
   });
 
   it("ships the student's own photos and credits them", () => {
@@ -43,7 +49,7 @@ describe('images', () => {
     expect(byPath['assets/images/project-1.webp'].data).toBe(PNG);
     // Placeholders still fill the grid's remaining slots.
     expect(byPath['assets/images/project-2.webp']?.src ?? 'unused').not.toBe(PNG);
-    expect(files['readme.txt']).toContain('Photos by Jane Doe');
+    expect(files['readme.txt']).toContain('Title: assets/images/cover.webp\nPhoto by Jane Doe, who holds its copyright.');
   });
 
   it('references images through get_parent_theme_file_uri with translated alt text', () => {

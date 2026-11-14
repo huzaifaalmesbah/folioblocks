@@ -1,15 +1,17 @@
 """
-Draw FolioBlocks' placeholder images: soft abstract compositions used until a
-student adds their own photos, and as sample post thumbnails in previews.
+Draw FolioBlocks' placeholder avatar: a generic silhouette used until a
+student adds their own photo. (Project, cover and sample post images are CC0
+photos from Openverse; see fetch-openverse.py.)
 
 They are generated, not photographed, so they are our own work and released
 under CC0 (credited in each theme's readme.txt).
 
-Usage: python3 scripts/make-placeholders.py   (writes public/images/*.webp)
+Usage: python3 scripts/make-placeholders.py [--scenes]   (writes public/images/)
 """
 import math
 import os
 import random
+import sys
 
 from PIL import Image, ImageDraw, ImageFilter
 
@@ -125,9 +127,12 @@ def save(img, name, quality=78):
 
 
 if __name__ == '__main__':
+    # The other placeholders are CC0 photos from Openverse: see fetch-openverse.py.
+    # Pass --scenes to draw abstract ones instead (no network needed).
     save(avatar(800, 'sand', 7), 'avatar.webp')
-    save(scene(1600, 900, 'dusk', 11), 'cover.webp')
-    for i, pal in enumerate(['dawn', 'sea', 'moss'], start=1):
-        save(scene(1200, 800, pal, 20 + i), f'project-{i}.webp')
-    for i, pal in enumerate(['slate', 'dawn', 'sea'], start=1):
-        save(scene(1200, 800, pal, 40 + i), f'post-{i}.webp')
+    if '--scenes' in sys.argv:
+        save(scene(1600, 900, 'dusk', 11), 'cover.webp')
+        for i, pal in enumerate(['dawn', 'sea', 'moss'], start=1):
+            save(scene(1200, 800, pal, 20 + i), f'project-{i}.webp')
+        for i, pal in enumerate(['slate', 'dawn', 'sea'], start=1):
+            save(scene(1200, 800, pal, 40 + i), f'post-{i}.webp')

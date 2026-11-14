@@ -86,7 +86,21 @@ src/generator/   pure functions → { "style.css": "...", "theme.json": "...", .
 
 ### Images
 
-Students can add a profile photo, a cover image and a picture per project. They are resized to WebP in the browser (`src/images.ts`) and shipped in the theme's `assets/images/`, referenced with `get_parent_theme_file_uri()` and translated alt text, as Ipsum does. Without a photo, the theme uses one of our placeholders (`public/images/`, drawn by `scripts/make-placeholders.py`, CC0). Only images the chosen layout uses are shipped. Sample posts get placeholder featured images in Playground and the preview.
+Students can add a profile photo, a cover image and a picture per project. They are resized to WebP in the browser (`src/images.ts`) and shipped in the theme's `assets/images/`, referenced with `get_parent_theme_file_uri()` and translated alt text, as Ipsum does. Without a photo, the theme uses a placeholder: CC0 photos from Openverse, and a drawn silhouette for the avatar (see Image credits). Only images the chosen layout uses are shipped. Sample posts get placeholder featured images in Playground and the preview.
+
+### Image credits
+
+The sample photos in `public/images/` come from [Openverse](https://openverse.org) and are all CC0 or public domain, so they can ship in GPL themes. `scripts/fetch-openverse.py` downloads them, checks each licence with the Openverse API, crops them and writes `src/generator/imageCredits.json`; generated themes credit every one they ship under `== Images ==` in `readme.txt`. The avatar placeholder is our own drawing (`scripts/make-placeholders.py`, CC0).
+
+| File | Photo | Licence |
+|---|---|---|
+| `cover.webp` | [Mountains Landscape](https://stocksnap.io/photo/mountains-landscape-52TDQG1GNL) by Matt Flores ([Openverse](https://openverse.org/image/a70e6871-70d4-48b1-a78d-9ba5e04f5f8e)) | CC0 1.0 Universal |
+| `project-1.webp` | [Office Work](https://stocksnap.io/photo/office-work-8P6GFHP0LU) by Negative Space ([Openverse](https://openverse.org/image/4754c62f-38ec-42c9-870d-2f1b22d2930c)) | CC0 1.0 Universal |
+| `project-2.webp` | [Programming Code](https://stocksnap.io/photo/programming-code-1STVFMTBJY) by One Idea LLC ([Openverse](https://openverse.org/image/f4a0cabe-4e2d-4018-8700-9bd267beaa73)) | CC0 1.0 Universal |
+| `project-3.webp` | [Office Work](https://stocksnap.io/photo/office-work-Q6PIRY9O7M) by Nao Triponez ([Openverse](https://openverse.org/image/71963d42-1ca9-4229-81c1-f7ef13e9a6b6)) | CC0 1.0 Universal |
+| `post-1.webp` | [Laptop Mac](https://stocksnap.io/photo/laptop-mac-OR7D4PANCK) by Matthew Henry ([Openverse](https://openverse.org/image/b90b48bd-5f3a-4adb-a018-45afa6c4db8b)) | CC0 1.0 Universal |
+| `post-2.webp` | [Journal Notepad](https://stocksnap.io/photo/journal-notepad-DPKNIIN5X3) by Cathryn Lavery ([Openverse](https://openverse.org/image/6d55483a-ac31-4291-bf17-5e4d52b6e34c)) | CC0 1.0 Universal |
+| `post-3.webp` | [Computer Office](https://stocksnap.io/photo/computer-office-XGXORJWZIX) by Lukas ([Openverse](https://openverse.org/image/6231a349-7ccd-4c98-bbca-13adc7562f0c)) | CC0 1.0 Universal |
 
 ### Fonts
 
