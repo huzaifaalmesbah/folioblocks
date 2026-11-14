@@ -143,4 +143,6 @@ export const WPCOM_LINKS = {
   pricing: 'https://wordpress.com/pricing/',
   studio: 'https://wordpress.studio/',
   studioSync: 'https://wordpress.studio/docs/sync/',
+  studentPlan: 'https://wordpress.com/support/plan-features/student-plan/',
+  edu: 'https://wordpress.com/edu/',
 };
