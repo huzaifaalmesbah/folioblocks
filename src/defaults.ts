@@ -1,4 +1,7 @@
+import { presetByKey } from './presets';
 import type { BuilderState } from './types';
+
+const minimal = presetByKey('minimal');
 
 export const defaultState: BuilderState = {
   info: {
@@ -13,31 +16,9 @@ export const defaultState: BuilderState = {
     projects: [],
     socials: {},
   },
-  style: {
-    palette: {
-      primary: '#3858e9',
-      secondary: '#1e1e1e',
-      base: '#ffffff',
-      contrast: '#1e1e1e',
-      accent: '#f0f3ff',
-    },
-    fonts: { heading: 'system-sans', body: 'system-sans' },
-    radius: 'md',
-  },
-  preset: 'minimal',
-  pages: {
-    home: [
-      { id: 'h1', type: 'hero', variant: 'centered' },
-      { id: 'h2', type: 'about', variant: 'text' },
-      { id: 'h3', type: 'projects', variant: 'grid' },
-      { id: 'h4', type: 'posts', variant: 'grid' },
-      { id: 'h5', type: 'contact', variant: 'cta' },
-    ],
-    about: [
-      { id: 'a1', type: 'about', variant: 'text' },
-      { id: 'a2', type: 'skills', variant: 'list' },
-      { id: 'a3', type: 'contributions', variant: 'list' },
-    ],
-    contact: [{ id: 'c1', type: 'contact', variant: 'full' }],
-  },
+  style: minimal.style,
+  preset: minimal.key,
+  header: minimal.header,
+  footer: minimal.footer,
+  pages: minimal.pages,
 };

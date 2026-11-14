@@ -13,9 +13,9 @@ Nothing is sent to a server. Everything stays in the browser.
 | Week | Scope | Status |
 |---|---|---|
 | 1 | Project setup, BuilderState, theme generator core, zip download | ✅ done |
-| 2 | Section library + 4 layout presets, Info and Style wizard steps | ⏳ next |
+| 2 | Section library + 4 layout presets, Info / Style / Layout wizard, bundled fonts | ✅ done |
 | 2.5 | "Open in WordPress Playground" button (theme embedded in a Blueprint) | ✅ done |
-| 3 | Live WordPress Playground preview, seed content, device toggle | |
+| 3 | Live WordPress Playground preview, seed content, device toggle | ⏳ next |
 | 4 | Drag-and-drop layout customizer, custom presets, JSON import/export | |
 | 5 | Tests, accessibility, docs, GitHub Pages deploy, beta with students | |
 
@@ -70,7 +70,15 @@ src/generator/   pure functions → { "style.css": "...", "theme.json": "...", .
 | `src/generator/patterns.ts` | PHP pattern files. All student text goes through `esc_html__()` / `esc_url()` |
 | `src/generator/templates.ts` | Block templates: index, home, front-page, single, page, about, contact, archive, search, 404 |
 | `src/generator/themeJson.ts` | `theme.json` v3: palette, fluid type, layout, custom templates |
-| `src/zip/` | Zip builder and canvas-rendered `screenshot.png` |
+| `src/presets.ts` | Colour palettes and the 4 layout presets (Minimal, Creative, Developer, Academic) |
+| `src/fonts.ts` | Font registry: system stacks plus OFL fonts bundled into the theme |
+| `src/ui/` | Wizard steps: Info, Style, Layout |
+| `src/zip/` | Zip builder, bundled asset fetching and canvas-rendered `screenshot.png` |
+| `src/playground/` | Blueprint builder for "Open in WordPress Playground" |
+
+### Fonts
+
+Bundled fonts are OFL variable fonts from [Fontsource](https://fontsource.org), copied into `public/fonts/` with `npm run fonts`. The theme ships them in `assets/fonts/` and registers them with `fontFace` in `theme.json`, so it never loads fonts from a CDN. In Playground they are downloaded from the published FolioBlocks site (`src/config.ts`).
 
 ### Adding a section variant
 

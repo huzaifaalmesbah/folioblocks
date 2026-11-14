@@ -1,3 +1,4 @@
+import { SITE_URL } from '../config';
 import type { BuilderState, ThemeFiles } from '../types';
 
 type FileTree = { [name: string]: string | FileTree };
@@ -72,7 +73,21 @@ flush_rewrite_rules( false );
  * A Blueprint that installs the generated theme straight from its files
  * (no zip hosting needed) and sets up a ready-to-browse portfolio site.
  */
-export function buildBlueprint(state: BuilderState, slug: string, files: ThemeFiles) {
+export function buildBlueprint(
+  state: BuilderState,
+  slug: string,
+  files: ThemeFiles,
+  /** Binary theme files (e.g. assets/fonts/inter.woff2), fetched by Playground from `assetBaseUrl`. */
+  assets: string[] = [],
+  /** Public URL where the app serves those files, e.g. https://example.github.io/folioblocks/. */
+  assetBaseUrl = SITE_URL,
+) {
+  // Binary files can't travel inside the JSON, so Playground downloads them from the FolioBlocks site.
+  const assetSteps = assets.map((path) => ({
+    step: 'writeFile',
+    path: `/wordpress/wp-content/themes/${slug}/${path}`,
+    data: { resource: 'url', url: new URL(path.replace(/^assets\//, ''), assetBaseUrl).href },
+  }));
   return {
     $schema: 'https://playground.wordpress.net/blueprint-schema.json',
     meta: {
@@ -89,6 +104,7 @@ export function buildBlueprint(state: BuilderState, slug: string, files: ThemeFi
         themeData: { resource: 'literal:directory', name: slug, files: toFileTree(files) },
         options: { activate: true },
       },
+      ...assetSteps,
       {
         step: 'setSiteOptions',
         options: {

@@ -1,7 +1,8 @@
 import type { BuilderState, PageKey } from '../types';
 import { block, group, heading, paragraph } from './blocks';
-import { renderSection, socialLinks } from './sections';
-import { headerSafe, makePhp, phpString } from './utils';
+import { renderSection, socialLinks, type Ctx } from './sections';
+import { RADIUS } from './themeJson';
+import { headerSafe, makePhp, phpString, type Php } from './utils';
 
 type PatternDef = { slug: string; title: string; content: string; categories?: string; inserter?: boolean };
 
@@ -18,11 +19,30 @@ function patternFile(textDomain: string, p: PatternDef): string {
   return `${lines.join('\n')}\n${p.content}\n`;
 }
 
+function footerContent(state: BuilderState, php: Php): string {
+  const year = "<?php echo esc_html( gmdate( 'Y' ) ); ?>";
+  const copy = (center: boolean) =>
+    block(
+      'paragraph',
+      center ? { align: 'center', fontSize: 'small' } : { fontSize: 'small' },
+      `<p class="${center ? 'has-text-align-center ' : ''}has-small-font-size">© ${year} ${php.t(state.info.name)}</p>`,
+    );
+
+  if (state.footer === 'split') {
+    const row = group([copy(false), socialLinks(state.info, 'right')].filter(Boolean).join('\n'), {
+      align: 'wide',
+      layout: { type: 'flex', justifyContent: 'space-between', flexWrap: 'wrap' },
+    });
+    return group(row, { padY: 50 });
+  }
+  return group([socialLinks(state.info), copy(true)].filter(Boolean).join('\n'), { padY: 50 });
+}
+
 const PAGE_TITLES: Record<PageKey, string> = { home: 'Home page', about: 'About page', contact: 'Contact page' };
 
 export function patterns(state: BuilderState, slug: string): Record<string, string> {
   const php = makePhp(slug);
-  const ctx = { info: state.info, php };
+  const ctx: Ctx = { info: state.info, php, radius: RADIUS[state.style.radius] };
   /** Attribute-safe translatable label (goes inside block JSON). */
   const attr = (text: string) => `<?php echo esc_attr__( ${phpString(text)}, ${phpString(slug)} ); ?>`;
 
@@ -37,25 +57,12 @@ export function patterns(state: BuilderState, slug: string): Record<string, stri
     });
   });
 
-  const socials = socialLinks(state.info);
   defs.push({
     slug: 'footer',
     title: 'Footer',
     categories: 'footer',
     inserter: false,
-    content: group(
-      [
-        socials,
-        block(
-          'paragraph',
-          { align: 'center', fontSize: 'small' },
-          `<p class="has-text-align-center has-small-font-size">© <?php echo esc_html( gmdate( 'Y' ) ); ?> ${php.t(state.info.name)}</p>`,
-        ),
-      ]
-        .filter(Boolean)
-        .join('\n'),
-      { tagName: 'div', padY: 50 },
-    ),
+    content: footerContent(state, php),
   });
 
   defs.push(

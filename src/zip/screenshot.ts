@@ -1,5 +1,6 @@
 import type { BuilderState } from '../types';
-import { FONT_STACKS } from '../generator/themeJson';
+import { fontDef } from '../fonts';
+import { loadFonts } from './assets';
 
 /** Render a 1200×900 screenshot.png for the theme from the student's colours and info. */
 export async function renderScreenshot(state: BuilderState): Promise<Blob> {
@@ -8,8 +9,9 @@ export async function renderScreenshot(state: BuilderState): Promise<Blob> {
   canvas.height = 900;
   const ctx = canvas.getContext('2d')!;
   const { palette, fonts } = state.style;
-  const headingFont = FONT_STACKS[fonts.heading].stack;
-  const bodyFont = FONT_STACKS[fonts.body].stack;
+  await loadFonts([fonts.heading, fonts.body]);
+  const headingFont = fontDef(fonts.heading).stack;
+  const bodyFont = fontDef(fonts.body).stack;
 
   ctx.fillStyle = palette.base;
   ctx.fillRect(0, 0, 1200, 900);

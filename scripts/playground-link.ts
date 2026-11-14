@@ -10,5 +10,5 @@ import type { BuilderState } from '../src/types';
 
 const stateFile = process.argv[2];
 const state: BuilderState = stateFile ? JSON.parse(readFileSync(stateFile, 'utf8')) : defaultState;
-const { slug, files } = generateTheme(state);
-console.log(playgroundUrl(buildBlueprint(state, slug, files)));
+const { slug, files, assets } = generateTheme(state);
+console.log(playgroundUrl(buildBlueprint(state, slug, files, assets)));

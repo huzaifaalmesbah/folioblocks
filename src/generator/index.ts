@@ -1,3 +1,4 @@
+import { fontAssets, fontDef } from '../fonts';
 import type { BuilderState, ThemeFiles } from '../types';
 import { block, group, pattern } from './blocks';
 import { patterns } from './patterns';
@@ -23,6 +24,15 @@ Text Domain: ${slug}
 Tags: portfolio, blog, block-patterns, full-site-editing, one-column, custom-colors
 */
 `;
+}
+
+function resources(state: BuilderState): string {
+  const keys = [...new Set([state.style.fonts.heading, state.style.fonts.body])];
+  const lines = keys
+    .map(fontDef)
+    .filter((f) => f.file)
+    .map((f) => `* ${f.name}, SIL Open Font License 1.1, https://openfontlicense.org, source: https://fontsource.org`);
+  return lines.length ? `${lines.join('\n')}\n` : '* No bundled third-party resources.\n';
 }
 
 function readme(state: BuilderState, slug: string): string {
@@ -54,6 +64,8 @@ A block theme with home, about, contact, blog and single post layouts.
 = 1.0.0 =
 * Initial release.
 
+== Resources ==
+${resources(state)}
 == Copyright ==
 
 ${name} Portfolio WordPress Theme, (C) ${new Date().getFullYear()} ${name}
@@ -93,28 +105,37 @@ add_action( 'wp_enqueue_scripts', '${fn}_enqueue_styles' );
 `;
 }
 
-function parts(slug: string): ThemeFiles {
-  const headerInner = group(
-    [block('site-title'), block('navigation', { overlayMenu: 'mobile', layout: { type: 'flex', justifyContent: 'right' } })].join('\n'),
-    { align: 'wide', layout: { type: 'flex', justifyContent: 'space-between', flexWrap: 'wrap' } },
-  );
+function parts(state: BuilderState, slug: string): ThemeFiles {
+  const nav = (justify: string) =>
+    block('navigation', { overlayMenu: 'mobile', layout: { type: 'flex', justifyContent: justify } });
+  const inner =
+    state.header === 'centered'
+      ? group([block('site-title', { textAlign: 'center' }), nav('center')].join('\n'), {
+          layout: { type: 'flex', orientation: 'vertical', justifyContent: 'center' },
+        })
+      : group([block('site-title'), nav('right')].join('\n'), {
+          align: 'wide',
+          layout: { type: 'flex', justifyContent: 'space-between', flexWrap: 'wrap' },
+        });
   return {
-    'parts/header.html': group(headerInner, { padY: 30 }) + '\n',
+    'parts/header.html': group(inner, { padY: 30 }) + '\n',
     'parts/footer.html': pattern(`${slug}/footer`) + '\n',
   };
 }
 
 /** Generate every text file of the theme. Binary files (screenshot) are added by the zip step. */
-export function generateTheme(state: BuilderState): { slug: string; files: ThemeFiles } {
+export function generateTheme(state: BuilderState): { slug: string; files: ThemeFiles; assets: string[] } {
   const slug = themeSlug(state.info.name);
   const files: ThemeFiles = {
     'style.css': styleCss(state, slug),
     'theme.json': themeJson(state.style),
     'functions.php': functionsPhp(slug),
     'readme.txt': readme(state, slug),
-    ...parts(slug),
+    ...parts(state, slug),
     ...templates(slug),
     ...patterns(state, slug),
   };
-  return { slug, files };
+  // Binary files the zip and Playground steps must add (bundled fonts).
+  const assets = fontAssets([state.style.fonts.heading, state.style.fonts.body]);
+  return { slug, files, assets };
 }

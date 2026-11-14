@@ -1,21 +1,7 @@
-import type { FontKey, Style } from '../types';
+import { fontDef, type FontKey } from '../fonts';
+import type { Style } from '../types';
 
-export const FONT_STACKS: Record<FontKey, { name: string; stack: string }> = {
-  'system-sans': {
-    name: 'System Sans',
-    stack: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif',
-  },
-  'system-serif': {
-    name: 'System Serif',
-    stack: 'Iowan Old Style, "Apple Garamond", Baskerville, "Times New Roman", "Droid Serif", Times, serif',
-  },
-  'system-mono': {
-    name: 'System Mono',
-    stack: 'ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace',
-  },
-};
-
-const RADIUS: Record<Style['radius'], string> = { none: '0', sm: '4px', md: '8px', lg: '24px' };
+export const RADIUS: Record<Style['radius'], string> = { none: '0', sm: '4px', md: '8px', lg: '24px' };
 
 export function themeJson(style: Style): string {
   const { palette, fonts } = style;
@@ -42,11 +28,25 @@ export function themeJson(style: Style): string {
       typography: {
         fluid: true,
         defaultFontSizes: false,
-        fontFamilies: fontKeys.map((k) => ({
-          slug: k,
-          name: FONT_STACKS[k].name,
-          fontFamily: FONT_STACKS[k].stack,
-        })),
+        fontFamilies: fontKeys.map((k) => {
+          const f = fontDef(k);
+          return {
+            slug: k,
+            name: f.name,
+            fontFamily: f.stack,
+            ...(f.file && {
+              fontFace: [
+                {
+                  fontFamily: f.name,
+                  fontStyle: 'normal',
+                  fontWeight: f.weight,
+                  fontDisplay: 'swap',
+                  src: [`file:./assets/fonts/${f.file}`],
+                },
+              ],
+            }),
+          };
+        }),
         fontSizes: [
           { slug: 'small', name: 'Small', size: '0.9rem', fluid: false },
           { slug: 'medium', name: 'Medium', size: '1.05rem', fluid: { min: '1rem', max: '1.125rem' } },

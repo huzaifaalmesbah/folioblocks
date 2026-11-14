@@ -4,74 +4,62 @@ import { pickState, useBuilder } from './store';
 import { generateTheme } from './generator';
 import { buildZip } from './zip/buildZip';
 import { renderScreenshot } from './zip/screenshot';
+import { fetchAssets } from './zip/assets';
 import { buildBlueprint, playgroundUrl } from './playground/blueprint';
-import type { Palette } from './types';
+import { InfoStep } from './ui/InfoStep';
+import { StyleStep } from './ui/StyleStep';
+import { LayoutStep } from './ui/LayoutStep';
 
-const PALETTE_LABELS: Record<keyof Palette, string> = {
-  primary: 'Primary',
-  secondary: 'Secondary',
-  base: 'Background',
-  contrast: 'Text',
-  accent: 'Accent',
-};
+const STEPS = [
+  { key: 'info', label: '1. Info', Component: InfoStep },
+  { key: 'style', label: '2. Style', Component: StyleStep },
+  { key: 'layout', label: '3. Layout', Component: LayoutStep },
+] as const;
 
-function Field(props: {
-  label: string;
-  value: string;
-  onChange: (v: string) => void;
-  textarea?: boolean;
-  type?: string;
-  hint?: string;
-}) {
-  const cls =
-    'mt-1 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-600/30';
-  return (
-    <label className="block text-sm font-medium text-slate-700">
-      {props.label}
-      {props.textarea ? (
-        <textarea className={cls} rows={3} value={props.value} onChange={(e) => props.onChange(e.target.value)} />
-      ) : (
-        <input
-          className={cls}
-          type={props.type ?? 'text'}
-          value={props.value}
-          onChange={(e) => props.onChange(e.target.value)}
-        />
-      )}
-      {props.hint && <span className="mt-1 block text-xs font-normal text-slate-500">{props.hint}</span>}
-    </label>
-  );
-}
+type StepKey = (typeof STEPS)[number]['key'];
 
 export default function App() {
-  const store = useBuilder();
-  const { info, style } = store;
-  const state = pickState(store);
-  const { preset, pages } = store;
-  const { slug, files } = useMemo(
-    () => generateTheme({ info, style, preset, pages }),
-    [info, style, preset, pages],
+  const info = useBuilder((s) => s.info);
+  const style = useBuilder((s) => s.style);
+  const preset = useBuilder((s) => s.preset);
+  const header = useBuilder((s) => s.header);
+  const footer = useBuilder((s) => s.footer);
+  const pages = useBuilder((s) => s.pages);
+  const reset = useBuilder((s) => s.reset);
+
+  const state = useMemo(
+    () => pickState({ info, style, preset, header, footer, pages }),
+    [info, style, preset, header, footer, pages],
   );
-  const paths = Object.keys(files).sort();
+  const { slug, files, assets } = useMemo(() => generateTheme(state), [state]);
+  const paths = [...Object.keys(files), ...assets].sort();
+
+  const [step, setStep] = useState<StepKey>('info');
   const [selected, setSelected] = useState('theme.json');
   const [busy, setBusy] = useState(false);
+  const [error, setError] = useState('');
+
+  const Current = STEPS.find((s) => s.key === step)!.Component;
+  const stepIndex = STEPS.findIndex((s) => s.key === step);
 
   function openInPlayground() {
-    const url = playgroundUrl(buildBlueprint(state, slug, files));
-    window.open(url, '_blank', 'noopener');
+    window.open(playgroundUrl(buildBlueprint(state, slug, files, assets)), '_blank', 'noopener');
   }
 
   function downloadBlueprint() {
-    const json = JSON.stringify(buildBlueprint(state, slug, files), null, 2);
+    const json = JSON.stringify(buildBlueprint(state, slug, files, assets), null, 2);
     saveAs(new Blob([json], { type: 'application/json' }), 'blueprint.json');
   }
 
   async function download() {
     setBusy(true);
+    setError('');
     try {
-      const screenshot = await renderScreenshot(state);
-      const zip = await buildZip(slug, files, { 'screenshot.png': screenshot });
+      const [screenshot, binaries] = await Promise.all([renderScreenshot(state), fetchAssets(assets)]);
+      const zip = await buildZip(slug, files, { ...binaries, 'screenshot.png': screenshot });
       saveAs(zip, `${slug}.zip`);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : String(e));
     } finally {
       setBusy(false);
     }
@@ -79,87 +67,89 @@ export default function App() {
 
   return (
     <div className="flex min-h-screen flex-col bg-slate-50 text-slate-900 lg:h-screen lg:flex-row">
-      <aside className="w-full space-y-6 overflow-y-auto border-slate-200 bg-white p-6 lg:w-[420px] lg:border-r">
-        <header>
-          <h1 className="text-2xl font-bold">FolioBlocks</h1>
-          <p className="text-sm text-slate-600">Build your WordPress portfolio theme, no code needed.</p>
+      <aside className="flex w-full flex-col border-slate-200 bg-white lg:w-[440px] lg:border-r">
+        <header className="space-y-3 border-b border-slate-200 p-6 pb-4">
+          <div>
+            <h1 className="text-2xl font-bold">FolioBlocks</h1>
+            <p className="text-sm text-slate-600">Build your WordPress portfolio theme, no code needed.</p>
+          </div>
+          <nav className="grid grid-cols-3 gap-1 rounded-lg bg-slate-100 p-1" aria-label="Steps">
+            {STEPS.map((s) => (
+              <button
+                key={s.key}
+                type="button"
+                aria-current={s.key === step ? 'step' : undefined}
+                onClick={() => setStep(s.key)}
+                className={`rounded-md px-2 py-1.5 text-sm font-medium ${
+                  s.key === step ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-600 hover:text-slate-900'
+                }`}
+              >
+                {s.label}
+              </button>
+            ))}
+          </nav>
         </header>
 
-        <section className="space-y-3">
-          <h2 className="text-xs font-semibold uppercase tracking-wide text-slate-500">Your info</h2>
-          <Field label="Full name" value={info.name} onChange={(name) => store.setInfo({ name })} />
-          <Field label="Tagline" value={info.tagline} onChange={(tagline) => store.setInfo({ tagline })} />
-          <Field label="University" value={info.university} onChange={(university) => store.setInfo({ university })} />
-          <Field label="Location" value={info.location} onChange={(location) => store.setInfo({ location })} />
-          <Field label="Short bio" textarea value={info.bio} onChange={(bio) => store.setInfo({ bio })} />
-          <Field label="Email" type="email" value={info.email} onChange={(email) => store.setInfo({ email })} />
-          <Field
-            label="Skills"
-            hint="Separate with commas"
-            value={info.skills.join(', ')}
-            onChange={(v) => store.setInfo({ skills: v.split(',').map((s) => s.trim()).filter(Boolean) })}
-          />
-          <Field
-            label="GitHub URL"
-            value={info.socials.github ?? ''}
-            onChange={(github) => store.setInfo({ socials: { ...info.socials, github } })}
-          />
-          <Field
-            label="WordPress.org profile URL"
-            value={info.socials.wordpress ?? ''}
-            onChange={(wordpress) => store.setInfo({ socials: { ...info.socials, wordpress } })}
-          />
-        </section>
-
-        <section className="space-y-3">
-          <h2 className="text-xs font-semibold uppercase tracking-wide text-slate-500">Colours</h2>
-          <div className="grid grid-cols-5 gap-2">
-            {(Object.keys(PALETTE_LABELS) as (keyof Palette)[]).map((key) => (
-              <label key={key} className="flex flex-col items-center gap-1 text-xs text-slate-600">
-                <input
-                  type="color"
-                  aria-label={PALETTE_LABELS[key]}
-                  className="h-10 w-10 cursor-pointer rounded border border-slate-300"
-                  value={style.palette[key]}
-                  onChange={(e) => store.setPalette(key, e.target.value)}
-                />
-                {PALETTE_LABELS[key]}
-              </label>
-            ))}
+        {/* key={step} remounts the panel so each step starts scrolled to the top. */}
+        <div key={step} className="flex-1 overflow-y-auto p-6">
+          <Current />
+          <div className="mt-6 flex justify-between">
+            <button
+              type="button"
+              disabled={stepIndex === 0}
+              onClick={() => setStep(STEPS[stepIndex - 1].key)}
+              className="text-sm font-medium text-slate-600 hover:text-slate-900 disabled:invisible"
+            >
+              ← Back
+            </button>
+            <button
+              type="button"
+              disabled={stepIndex === STEPS.length - 1}
+              onClick={() => setStep(STEPS[stepIndex + 1].key)}
+              className="text-sm font-medium text-blue-700 hover:text-blue-900 disabled:invisible"
+            >
+              Next →
+            </button>
           </div>
-        </section>
+        </div>
 
-        <div className="space-y-2">
+        <footer className="space-y-2 border-t border-slate-200 bg-white p-4">
           <button
+            type="button"
             onClick={openInPlayground}
             className="w-full rounded-md bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white hover:bg-slate-700"
           >
             Open in WordPress Playground ↗
           </button>
+          <div className="flex gap-2">
+            <button
+              type="button"
+              onClick={download}
+              disabled={busy}
+              className="flex-1 rounded-md bg-blue-700 px-4 py-2.5 text-sm font-semibold text-white hover:bg-blue-800 disabled:opacity-60"
+            >
+              {busy ? 'Building…' : `Download ${slug}.zip`}
+            </button>
+            <button
+              type="button"
+              onClick={() => confirm('Reset everything to the defaults?') && reset()}
+              className="rounded-md border border-slate-300 px-3 py-2.5 text-sm text-slate-700 hover:bg-slate-100"
+            >
+              Reset
+            </button>
+          </div>
+          {error && (
+            <p role="alert" className="text-xs text-red-700">
+              {error}
+            </p>
+          )}
           <p className="text-xs text-slate-500">
-            Opens a real WordPress in a new tab with your theme installed, plus Home, About, Blog, Contact pages and
-            sample posts. Nothing to install.{' '}
-            <button onClick={downloadBlueprint} className="underline hover:text-slate-700">
+            Playground opens a real WordPress in a new tab with your theme, pages and sample posts.{' '}
+            <button type="button" onClick={downloadBlueprint} className="underline hover:text-slate-700">
               Download blueprint.json
             </button>
           </p>
-        </div>
-
-        <div className="flex gap-2">
-          <button
-            onClick={download}
-            disabled={busy}
-            className="flex-1 rounded-md bg-blue-700 px-4 py-2.5 text-sm font-semibold text-white hover:bg-blue-800 disabled:opacity-60"
-          >
-            {busy ? 'Building…' : `Download ${slug}.zip`}
-          </button>
-          <button
-            onClick={() => confirm('Reset everything to the defaults?') && store.reset()}
-            className="rounded-md border border-slate-300 px-3 py-2.5 text-sm text-slate-700 hover:bg-slate-100"
-          >
-            Reset
-          </button>
-        </div>
+        </footer>
       </aside>
 
       <main className="flex min-h-[60vh] flex-1 flex-col lg:min-h-0">
@@ -171,6 +161,7 @@ export default function App() {
             {paths.map((p) => (
               <button
                 key={p}
+                type="button"
                 onClick={() => setSelected(p)}
                 className={`block w-full truncate rounded px-2 py-1 text-left font-mono text-xs ${
                   p === selected ? 'bg-blue-50 text-blue-800' : 'text-slate-700 hover:bg-slate-100'
@@ -181,7 +172,7 @@ export default function App() {
             ))}
           </nav>
           <pre className="min-h-0 flex-1 overflow-auto bg-slate-900 p-4 text-xs leading-relaxed text-slate-100">
-            {files[selected] ?? ''}
+            {files[selected] ?? (assets.includes(selected) ? '(binary font file, bundled in the zip)' : '')}
           </pre>
         </div>
       </main>

@@ -32,6 +32,10 @@ type GroupOpts = {
   background?: string;
   layout?: Attrs;
   anchor?: string;
+  /** Padding on all four sides (spacing preset number). Overrides padY. */
+  pad?: number;
+  /** Border radius CSS value, e.g. "8px". */
+  radius?: string;
 };
 
 export function group(inner: string, opts: GroupOpts = {}): string {
@@ -46,27 +50,32 @@ export function group(inner: string, opts: GroupOpts = {}): string {
     attrs.align = opts.align;
     classes.push(`align${opts.align}`);
   }
-  if (opts.padY) {
-    attrs.style = {
-      spacing: { padding: { top: spacing(opts.padY), bottom: spacing(opts.padY) } },
-    };
-    styles.push(
-      `padding-top:${spacingCss(opts.padY)}`,
-      `padding-bottom:${spacingCss(opts.padY)}`,
-    );
+  const style: Attrs = {};
+  if (opts.radius && opts.radius !== '0') {
+    style.border = { radius: opts.radius };
+    styles.push(`border-radius:${opts.radius}`);
   }
+  if (opts.pad) {
+    const v = spacing(opts.pad);
+    style.spacing = { padding: { top: v, right: v, bottom: v, left: v } };
+    for (const side of ['top', 'right', 'bottom', 'left']) styles.push(`padding-${side}:${spacingCss(opts.pad)}`);
+  } else if (opts.padY) {
+    style.spacing = { padding: { top: spacing(opts.padY), bottom: spacing(opts.padY) } };
+    styles.push(`padding-top:${spacingCss(opts.padY)}`, `padding-bottom:${spacingCss(opts.padY)}`);
+  }
+  if (Object.keys(style).length) attrs.style = style;
   if (opts.background) {
     attrs.backgroundColor = opts.background;
     classes.push(`has-${opts.background}-background-color`, 'has-background');
   }
   attrs.layout = opts.layout ?? { type: 'constrained' };
 
-  const style = styles.length ? ` style="${styles.join(';')}"` : '';
+  const styleAttr = styles.length ? ` style="${styles.join(';')}"` : '';
   const id = opts.anchor ? ` id="${opts.anchor}"` : '';
   return block(
     'group',
     attrs,
-    `<${tag}${id} class="${classes.join(' ')}"${style}>\n${inner}\n</${tag}>`,
+    `<${tag}${id} class="${classes.join(' ')}"${styleAttr}>\n${inner}\n</${tag}>`,
   );
 }
 
@@ -121,4 +130,26 @@ export function pattern(slug: string): string {
 
 export function templatePart(slug: string, tagName: 'header' | 'footer'): string {
   return block('template-part', { slug, tagName });
+}
+
+/** A small pill-shaped label, e.g. for a skill. */
+export function badge(html: string, radius: string): string {
+  const pad = { top: spacing(20), right: spacing(30), bottom: spacing(20), left: spacing(30) };
+  const style: Attrs = { spacing: { padding: pad } };
+  const css: string[] = [];
+  if (radius !== '0') {
+    style.border = { radius };
+    css.push(`border-radius:${radius}`);
+  }
+  css.push(
+    `padding-top:${spacingCss(20)}`,
+    `padding-right:${spacingCss(30)}`,
+    `padding-bottom:${spacingCss(20)}`,
+    `padding-left:${spacingCss(30)}`,
+  );
+  return block(
+    'paragraph',
+    { backgroundColor: 'accent', fontSize: 'small', style },
+    `<p class="has-accent-background-color has-background has-small-font-size" style="${css.join(';')}">${html}</p>`,
+  );
 }

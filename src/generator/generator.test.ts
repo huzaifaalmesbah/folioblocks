@@ -5,6 +5,7 @@ import type { BuilderState } from '../types';
 import { buildZip } from '../zip/buildZip';
 import { generateTheme, themeSlug } from './index';
 import { SECTIONS } from './sections';
+import { checkBlockMarkup } from './testUtils';
 
 const REQUIRED = [
   'style.css',
@@ -24,31 +25,6 @@ const REQUIRED = [
   'templates/search.html',
   'templates/404.html',
 ];
-
-const BLOCK_RE = /<!--\s+(\/)?wp:([a-z][a-z0-9-]*(?:\/[a-z0-9-]+)?)\s+(\{[\s\S]*?\}\s+)?(\/)?-->/g;
-
-/** Check every block comment is balanced and its JSON attributes parse. */
-function checkBlockMarkup(markup: string): string[] {
-  const errors: string[] = [];
-  const stack: string[] = [];
-  for (const m of markup.matchAll(BLOCK_RE)) {
-    const [, closing, name, attrs, selfClosing] = m;
-    if (attrs && !attrs.includes('<?php')) {
-      try {
-        JSON.parse(attrs);
-      } catch {
-        errors.push(`bad JSON in ${name}: ${attrs}`);
-      }
-    }
-    if (selfClosing) continue;
-    if (closing) {
-      const open = stack.pop();
-      if (open !== name) errors.push(`closing ${name} but open was ${open}`);
-    } else stack.push(name);
-  }
-  if (stack.length) errors.push(`unclosed: ${stack.join(', ')}`);
-  return errors;
-}
 
 function withInfo(patch: Partial<BuilderState['info']>): BuilderState {
   return { ...defaultState, info: { ...defaultState.info, ...patch } };
