@@ -32,7 +32,7 @@ export default function App() {
     [info, style, preset, header, footer, pages],
   );
   const { slug, files, assets } = useMemo(() => generateTheme(state), [state]);
-  const paths = [...Object.keys(files), ...assets].sort();
+  const paths = [...Object.keys(files), ...assets.map((a) => a.path)].sort();
 
   const [step, setStep] = useState<StepKey>('info');
   const [selected, setSelected] = useState('theme.json');
@@ -172,7 +172,7 @@ export default function App() {
             ))}
           </nav>
           <pre className="min-h-0 flex-1 overflow-auto bg-slate-900 p-4 text-xs leading-relaxed text-slate-100">
-            {files[selected] ?? (assets.includes(selected) ? '(binary font file, bundled in the zip)' : '')}
+            {files[selected] ?? (assets.some((a) => a.path === selected) ? '(binary font file, bundled in the zip)' : '')}
           </pre>
         </div>
       </main>

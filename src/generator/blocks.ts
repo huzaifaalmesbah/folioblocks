@@ -1,44 +1,79 @@
 /**
- * Tiny helpers that print core block markup exactly the way the block
- * editor serializes it, so the editor never flags blocks as invalid.
+ * Tiny helpers that print core block markup the way the block editor
+ * serializes it (Gutenberg's own format, as Ipsum keeps it): one delimiter
+ * per line, a blank line between sibling blocks, and a wrapper element on
+ * the same line as its first child. Matching the serializer keeps blocks
+ * valid and means an editor round-trip changes nothing.
  */
 
 type Attrs = Record<string, unknown>;
 
-/** Serialize block attributes like WordPress does (escapes `--`, `<`, `>`, `&`). */
+const PHP_SPAN = /<\?php[\s\S]*?\?>/g;
+
+/**
+ * Serialize block attributes like WordPress does (escapes `--`, `<`, `>`, `&`),
+ * but keep PHP spans such as `<?php echo esc_html_x( … ); ?>` intact, so
+ * attributes like a block name or a URL can still be translated or escaped.
+ */
 function serializeAttrs(attrs?: Attrs): string {
   if (!attrs || Object.keys(attrs).length === 0) return '';
-  const json = JSON.stringify(attrs)
+  const spans: string[] = [];
+  const tokenized = JSON.stringify(attrs, (_key, value) =>
+    typeof value === 'string'
+      ? value.replace(PHP_SPAN, (php) => `\u0001${spans.push(php) - 1}\u0001`)
+      : value,
+  );
+  const json = tokenized
     .replace(/--/g, '\\u002d\\u002d')
     .replace(/</g, '\\u003c')
     .replace(/>/g, '\\u003e')
-    .replace(/&/g, '\\u0026');
+    .replace(/&/g, '\\u0026')
+    .replace(/\\u0001(\d+)\\u0001/g, (_m, i) => spans[Number(i)]);
   return ` ${json}`;
 }
 
-export function block(name: string, attrs?: Attrs, inner?: string): string {
+/** Join sibling blocks the way the serializer does: a blank line between them. */
+export function join(...parts: (string | false | undefined | null)[]): string {
+  return parts.filter(Boolean).join('\n\n');
+}
+
+/**
+ * A block. `html` is the saved HTML of a leaf block, or for a container its
+ * wrapper with the children already inside (see `wrap`).
+ */
+export function block(name: string, attrs?: Attrs, html?: string): string {
   const a = serializeAttrs(attrs);
-  if (inner === undefined) return `<!-- wp:${name}${a} /-->`;
-  return `<!-- wp:${name}${a} -->\n${inner}\n<!-- /wp:${name} -->`;
+  if (html === undefined) return `<!-- wp:${name}${a} /-->`;
+  return `<!-- wp:${name}${a} -->\n${html}\n<!-- /wp:${name} -->`;
+}
+
+/** Wrap child blocks in an element: `<div class="…"><!-- wp:child -->…</div>`. */
+function wrap(open: string, children: string, close: string): string {
+  return `${open}${children}${close}`;
 }
 
 const spacing = (size: number) => `var:preset|spacing|${size}`;
 const spacingCss = (size: number) => `var(--wp--preset--spacing--${size})`;
 
 type GroupOpts = {
+  /** List View name. May hold PHP (e.g. a translated string). */
+  name?: string;
   tagName?: 'div' | 'section' | 'main' | 'header' | 'footer';
   align?: 'full' | 'wide';
   padY?: number;
   background?: string;
   layout?: Attrs;
   anchor?: string;
+  className?: string;
   /** Padding on all four sides (spacing preset number). Overrides padY. */
   pad?: number;
-  /** Border radius CSS value, e.g. "8px". */
+  /** Border radius CSS value, e.g. "10px". */
   radius?: string;
+  /** Zero the top and bottom margin, as templates do for <main>. */
+  noMargin?: boolean;
 };
 
-export function group(inner: string, opts: GroupOpts = {}): string {
+export function group(children: string, opts: GroupOpts = {}): string {
   const tag = opts.tagName ?? 'div';
   const attrs: Attrs = {};
   const classes = ['wp-block-group'];
@@ -46,23 +81,35 @@ export function group(inner: string, opts: GroupOpts = {}): string {
 
   if (opts.anchor) attrs.anchor = opts.anchor;
   if (tag !== 'div') attrs.tagName = tag;
+  if (opts.name) attrs.metadata = { name: opts.name };
+  if (opts.className) {
+    attrs.className = opts.className;
+    classes.push(opts.className);
+  }
   if (opts.align) {
     attrs.align = opts.align;
     classes.push(`align${opts.align}`);
   }
+
   const style: Attrs = {};
   if (opts.radius && opts.radius !== '0') {
     style.border = { radius: opts.radius };
     styles.push(`border-radius:${opts.radius}`);
   }
+  const spacingStyle: Attrs = {};
+  if (opts.noMargin) {
+    spacingStyle.margin = { top: '0', bottom: '0' };
+    styles.push('margin-top:0', 'margin-bottom:0');
+  }
   if (opts.pad) {
     const v = spacing(opts.pad);
-    style.spacing = { padding: { top: v, right: v, bottom: v, left: v } };
+    spacingStyle.padding = { top: v, right: v, bottom: v, left: v };
     for (const side of ['top', 'right', 'bottom', 'left']) styles.push(`padding-${side}:${spacingCss(opts.pad)}`);
   } else if (opts.padY) {
-    style.spacing = { padding: { top: spacing(opts.padY), bottom: spacing(opts.padY) } };
+    spacingStyle.padding = { top: spacing(opts.padY), bottom: spacing(opts.padY) };
     styles.push(`padding-top:${spacingCss(opts.padY)}`, `padding-bottom:${spacingCss(opts.padY)}`);
   }
+  if (Object.keys(spacingStyle).length) style.spacing = spacingStyle;
   if (Object.keys(style).length) attrs.style = style;
   if (opts.background) {
     attrs.backgroundColor = opts.background;
@@ -72,11 +119,7 @@ export function group(inner: string, opts: GroupOpts = {}): string {
 
   const styleAttr = styles.length ? ` style="${styles.join(';')}"` : '';
   const id = opts.anchor ? ` id="${opts.anchor}"` : '';
-  return block(
-    'group',
-    attrs,
-    `<${tag}${id} class="${classes.join(' ')}"${styleAttr}>\n${inner}\n</${tag}>`,
-  );
+  return block('group', attrs, wrap(`<${tag}${id} class="${classes.join(' ')}"${styleAttr}>`, children, `</${tag}>`));
 }
 
 export function heading(html: string, level = 2, center = false): string {
@@ -97,30 +140,41 @@ export function paragraph(html: string, center = false): string {
   return block('paragraph', undefined, `<p>${html}</p>`);
 }
 
+/** Small, weight-600 text, as Ipsum's "meta voice" (dates, labels, separators). */
+export function metaText(html: string, name?: string): string {
+  const attrs: Attrs = {};
+  if (name) attrs.metadata = { name };
+  attrs.style = { typography: { fontStyle: 'normal', fontWeight: '600' } };
+  attrs.fontSize = 'small';
+  return block('paragraph', attrs, `<p class="has-small-font-size" style="font-style:normal;font-weight:600">${html}</p>`);
+}
+
 export function buttons(items: { label: string; href: string }[], center = false): string {
-  const inner = items
-    .map((b) =>
+  const children = join(
+    ...items.map((b) =>
       block(
         'button',
         undefined,
         `<div class="wp-block-button"><a class="wp-block-button__link wp-element-button" href="${b.href}">${b.label}</a></div>`,
       ),
-    )
-    .join('\n');
+    ),
+  );
   const attrs = center ? { layout: { type: 'flex', justifyContent: 'center' } } : undefined;
-  return block('buttons', attrs, `<div class="wp-block-buttons">\n${inner}\n</div>`);
+  return block('buttons', attrs, wrap('<div class="wp-block-buttons">', children, '</div>'));
 }
 
 export function list(itemsHtml: string[]): string {
-  const inner = itemsHtml.map((i) => block('list-item', undefined, `<li>${i}</li>`)).join('\n');
-  return block('list', undefined, `<ul class="wp-block-list">\n${inner}\n</ul>`);
+  const children = join(...itemsHtml.map((i) => block('list-item', undefined, `<li>${i}</li>`)));
+  return block('list', undefined, wrap('<ul class="wp-block-list">', children, '</ul>'));
 }
 
 export function columns(cols: string[]): string {
-  const inner = cols
-    .map((c) => block('column', undefined, `<div class="wp-block-column">\n${c}\n</div>`))
-    .join('\n');
-  return block('columns', undefined, `<div class="wp-block-columns">\n${inner}\n</div>`);
+  const children = join(...cols.map((c) => block('column', undefined, wrap('<div class="wp-block-column">', c, '</div>'))));
+  return block('columns', undefined, wrap('<div class="wp-block-columns">', children, '</div>'));
+}
+
+export function separator(): string {
+  return block('separator', undefined, '<hr class="wp-block-separator has-alpha-channel-opacity"/>');
 }
 
 /** A pattern reference, e.g. inside a template. */
@@ -128,11 +182,17 @@ export function pattern(slug: string): string {
   return block('pattern', { slug });
 }
 
-export function templatePart(slug: string, tagName: 'header' | 'footer'): string {
-  return block('template-part', { slug, tagName });
+/** A template part. The area comes from `templateParts` in theme.json, so the slug is enough. */
+export function templatePart(slug: string): string {
+  return block('template-part', { slug });
 }
 
-/** A small pill-shaped label, e.g. for a skill. */
+/** A container whose saved HTML is just a wrapper around its children (query, comments…). */
+export function container(name: string, attrs: Attrs | undefined, tag: string, className: string, children: string): string {
+  return block(name, attrs, wrap(`<${tag} class="${className}">`, children, `</${tag}>`));
+}
+
+/** A small pill-shaped label, e.g. for a skill, on the Surface colour. */
 export function badge(html: string, radius: string): string {
   const pad = { top: spacing(20), right: spacing(30), bottom: spacing(20), left: spacing(30) };
   const style: Attrs = { spacing: { padding: pad } };
@@ -149,7 +209,7 @@ export function badge(html: string, radius: string): string {
   );
   return block(
     'paragraph',
-    { backgroundColor: 'accent', fontSize: 'small', style },
-    `<p class="has-accent-background-color has-background has-small-font-size" style="${css.join(';')}">${html}</p>`,
+    { backgroundColor: 'accent-5', fontSize: 'small', style },
+    `<p class="has-accent-5-background-color has-background has-small-font-size" style="${css.join(';')}">${html}</p>`,
   );
 }

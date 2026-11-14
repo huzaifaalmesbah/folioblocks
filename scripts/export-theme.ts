@@ -18,9 +18,9 @@ for (const [path, content] of Object.entries(files)) {
   mkdirSync(dirname(full), { recursive: true });
   writeFileSync(full, content);
 }
-for (const path of assets) {
-  const full = join(outDir, slug, path);
+for (const asset of assets) {
+  const full = join(outDir, slug, asset.path);
   mkdirSync(dirname(full), { recursive: true });
-  copyFileSync(join('public', path.replace(/^assets\//, '')), full);
+  copyFileSync(join('public', asset.src), full);
 }
 console.log(join(outDir, slug));

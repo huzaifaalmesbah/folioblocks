@@ -1,22 +1,43 @@
 import type { BuilderState, PageKey } from '../types';
-import { block, group, heading, paragraph } from './blocks';
+import { block, group, join, pattern } from './blocks';
 import { renderSection, socialLinks, type Ctx } from './sections';
+import { templates, type PatternDef } from './templates';
 import { RADIUS } from './themeJson';
-import { headerSafe, makePhp, phpString, type Php } from './utils';
+import { headerSafe, makePhp, type Php } from './utils';
 
-type PatternDef = { slug: string; title: string; content: string; categories?: string; inserter?: boolean };
-
+/** A pattern file with Ipsum's header: Title, Slug, the optional keys, Description, then @package and @since. */
 function patternFile(textDomain: string, p: PatternDef): string {
-  const lines = [
-    '<?php',
-    '/**',
-    ` * Title: ${headerSafe(p.title)}`,
-    ` * Slug: ${textDomain}/${p.slug}`,
-  ];
+  const lines = ['<?php', '/**', ` * Title: ${headerSafe(p.title)}`, ` * Slug: ${textDomain}/${p.slug}`];
   if (p.categories) lines.push(` * Categories: ${p.categories}`);
+  if (p.templateTypes) lines.push(` * Template Types: ${p.templateTypes}`);
+  if (p.blockTypes) lines.push(` * Block Types: ${p.blockTypes}`);
+  if (p.postTypes) lines.push(` * Post Types: ${p.postTypes}`);
+  if (p.viewportWidth) lines.push(` * Viewport width: ${p.viewportWidth}`);
   if (p.inserter === false) lines.push(' * Inserter: no');
-  lines.push(' *', ` * @package ${textDomain}`, ' */', '', "defined( 'ABSPATH' ) || exit;", '?>');
+  lines.push(` * Description: ${headerSafe(p.description)}`);
+  lines.push(' *', ` * @package ${textDomain}`, ' * @since 1.0.0', ' */', '', '?>');
   return `${lines.join('\n')}\n${p.content}\n`;
+}
+
+function headerContent(state: BuilderState, php: Php): string {
+  const nav = (justify: string) =>
+    block('navigation', {
+      metadata: { name: php.name('Navigation') },
+      overlayMenu: 'mobile',
+      layout: { type: 'flex', justifyContent: justify },
+    });
+  const row =
+    state.header === 'centered'
+      ? group(join(block('site-title', { textAlign: 'center' }), nav('center')), {
+          name: php.name('Header Row'),
+          layout: { type: 'flex', orientation: 'vertical', justifyContent: 'center' },
+        })
+      : group(join(block('site-title'), nav('right')), {
+          name: php.name('Header Row'),
+          align: 'wide',
+          layout: { type: 'flex', justifyContent: 'space-between', flexWrap: 'wrap' },
+        });
+  return group(row, { name: php.name('Header'), padY: 30, noMargin: true });
 }
 
 function footerContent(state: BuilderState, php: Php): string {
@@ -24,98 +45,92 @@ function footerContent(state: BuilderState, php: Php): string {
   const copy = (center: boolean) =>
     block(
       'paragraph',
-      center ? { align: 'center', fontSize: 'small' } : { fontSize: 'small' },
+      center
+        ? { metadata: { name: php.name('Copyright') }, align: 'center', fontSize: 'small' }
+        : { metadata: { name: php.name('Copyright') }, fontSize: 'small' },
       `<p class="${center ? 'has-text-align-center ' : ''}has-small-font-size">© ${year} ${php.t(state.info.name)}</p>`,
     );
 
   if (state.footer === 'split') {
-    const row = group([copy(false), socialLinks(state.info, 'right')].filter(Boolean).join('\n'), {
+    const row = group(join(copy(false), socialLinks(state.info, php, 'right')), {
+      name: php.name('Footer Row'),
       align: 'wide',
       layout: { type: 'flex', justifyContent: 'space-between', flexWrap: 'wrap' },
     });
-    return group(row, { padY: 50 });
+    return group(row, { name: php.name('Footer'), padY: 50, noMargin: true });
   }
-  return group([socialLinks(state.info), copy(true)].filter(Boolean).join('\n'), { padY: 50 });
+  return group(join(socialLinks(state.info, php), copy(true)), { name: php.name('Footer'), padY: 50, noMargin: true });
 }
 
-const PAGE_TITLES: Record<PageKey, string> = { home: 'Home page', about: 'About page', contact: 'Contact page' };
+const PAGES: Record<PageKey, { title: string; category: string; description: string }> = {
+  home: {
+    title: 'Home page',
+    category: 'featured',
+    description: 'The portfolio home page. It introduces you, then shows your work, latest posts and a way to get in touch.',
+  },
+  about: {
+    title: 'About page',
+    category: 'about',
+    description: 'The portfolio about page. It tells your story, then lists your skills and your WordPress journey.',
+  },
+  contact: {
+    title: 'Contact page',
+    category: 'contact',
+    description: 'The portfolio contact page. It shows your email, location and social links.',
+  },
+};
 
-export function patterns(state: BuilderState, slug: string): Record<string, string> {
+export function patterns(state: BuilderState, slug: string): { patterns: Record<string, string>; templates: Record<string, string> } {
   const php = makePhp(slug);
   const ctx: Ctx = { info: state.info, php, radius: RADIUS[state.style.radius] };
-  /** Attribute-safe translatable label (goes inside block JSON). */
-  const attr = (text: string) => `<?php echo esc_attr__( ${phpString(text)}, ${phpString(slug)} ); ?>`;
-
   const defs: PatternDef[] = [];
 
-  (Object.keys(PAGE_TITLES) as PageKey[]).forEach((page) => {
+  // Full page layouts take the page- prefix and are offered as starter content for new pages.
+  (Object.keys(PAGES) as PageKey[]).forEach((page) => {
     defs.push({
-      slug: page,
-      title: PAGE_TITLES[page],
-      categories: 'featured',
-      content: state.pages[page].map((s) => renderSection(s, ctx)).join('\n\n'),
+      slug: `page-${page}`,
+      title: PAGES[page].title,
+      description: PAGES[page].description,
+      categories: PAGES[page].category,
+      blockTypes: 'core/post-content',
+      postTypes: 'page',
+      viewportWidth: 1280,
+      content: join(...state.pages[page].map((s) => renderSection(s, ctx))),
     });
-  });
-
-  defs.push({
-    slug: 'footer',
-    title: 'Footer',
-    categories: 'footer',
-    inserter: false,
-    content: footerContent(state, php),
   });
 
   defs.push(
     {
-      slug: 'blog-heading',
-      title: 'Blog heading',
-      inserter: false,
-      content: [heading(php.t('Blog'), 1), paragraph(php.t('Notes on what I am learning and building.'))].join('\n'),
+      slug: 'header',
+      title: 'Header',
+      description: 'The theme header, with the site title and the navigation.',
+      categories: 'header',
+      blockTypes: 'core/template-part/header',
+      viewportWidth: 1280,
+      content: headerContent(state, php),
     },
     {
-      slug: 'search-form',
-      title: 'Search form',
-      inserter: false,
-      content: `<!-- wp:search {"label":"${attr('Search')}","showLabel":false,"buttonText":"${attr('Search')}"} /-->`,
-    },
-    {
-      slug: 'no-results',
-      title: 'No results',
-      inserter: false,
-      content: paragraph(php.t('Nothing found. Try a different search.')),
-    },
-    {
-      slug: 'post-meta',
-      title: 'Post meta',
-      inserter: false,
-      content: group(
-        [block('post-date'), paragraph(php.t('by')), block('post-author-name'), block('post-terms', { term: 'category' })].join('\n'),
-        { layout: { type: 'flex', flexWrap: 'wrap' } },
-      ),
-    },
-    {
-      slug: 'post-navigation',
-      title: 'Post navigation',
-      inserter: false,
-      content: group(
-        [
-          `<!-- wp:post-navigation-link {"type":"previous","label":"${attr('Previous post')}"} /-->`,
-          `<!-- wp:post-navigation-link {"label":"${attr('Next post')}"} /-->`,
-        ].join('\n'),
-        { layout: { type: 'flex', justifyContent: 'space-between' } },
-      ),
-    },
-    {
-      slug: '404',
-      title: 'Page not found',
-      inserter: false,
-      content: [
-        heading(php.t('Page not found'), 1),
-        paragraph(php.t('The page you are looking for does not exist. Try searching instead.')),
-        `<!-- wp:search {"label":"${attr('Search')}","showLabel":false,"buttonText":"${attr('Search')}"} /-->`,
-      ].join('\n'),
+      slug: 'footer',
+      title: 'Footer',
+      description: 'The theme footer, with the copyright line and social links.',
+      categories: 'footer',
+      blockTypes: 'core/template-part/footer',
+      viewportWidth: 1280,
+      content: footerContent(state, php),
     },
   );
 
-  return Object.fromEntries(defs.map((d) => [`patterns/${d.slug}.php`, patternFile(slug, d)]));
+  const t = templates(php, slug);
+  defs.push(...t.patterns);
+
+  return {
+    patterns: Object.fromEntries(defs.map((d) => [`patterns/${d.slug}.php`, patternFile(slug, d)])),
+    templates: {
+      ...t.files,
+      // Parts delegate to their patterns too.
+      'parts/header.html': `${pattern(`${slug}/header`)}\n`,
+      'parts/footer.html': `${pattern(`${slug}/footer`)}\n`,
+    },
+  };
 }
+

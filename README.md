@@ -25,6 +25,7 @@ Nothing is sent to a server. Everything stays in the browser.
 npm install
 npm run dev       # start the app
 npm test          # generator unit tests
+npm run validate  # check every preset's theme with Ipsum's validator
 npm run build     # type-check + production build
 npm run lint
 ```
@@ -88,9 +89,19 @@ Bundled fonts are OFL variable fonts from [Fontsource](https://fontsource.org), 
 
 ## Generated theme rules
 
-- Core blocks only: no plugins, no custom JS, no external requests
-- `theme.json` version 3, GPLv2-or-later, every string escaped and translatable
-- The theme folder sits at the root of the zip, so "Upload Theme" works the first time
+Generated themes follow the conventions of [Ipsum](https://github.com/WordPress/ipsum), WordPress' default theme in the making (see its AGENTS.md and DESIGN.md):
+
+- **The pattern is the source of truth.** Every `templates/*.html` and `parts/*.html` is a one-line delegate to a pattern. Template patterns are `hidden-*`, with `Inserter: no` and `Template Types`, so every string in a template is translatable.
+- **Pattern headers:** every pattern has a Title and a Description. Full page layouts take the `page-` prefix with `Post Types: page` and `Block Types: core/post-content`; header and footer patterns take `Block Types: core/template-part/<area>`.
+- **Block names** (`metadata.name`) are set and translated, so the List View shows what each block is.
+- **theme.json** points `$schema` at trunk, uses Twenty Twenty-Five's colour slugs (`base`, `contrast`, `accent-1`, `accent-3`, `accent-5`, `accent-6`), Ipsum's spacing scale, and `settings.custom.controlScheme`.
+- **Colour style variations** in `styles/colors/`, one per other FolioBlocks palette.
+- **Fonts** live in one folder per family and are credited under `== Fonts ==` in `readme.txt`.
+- No editor leftovers (`queryId`, `theme`, `area`, `patternName`), and block markup in the serializer's format.
+- Core blocks only: no plugins, no custom JS, no external requests. GPLv2 or later.
+- The theme folder sits at the root of the zip, so "Upload Theme" works the first time.
+
+`npm run validate` exports a theme for every preset and checks it with Ipsum's own validator (`scripts/validate-theme.mjs`, adapted): theme.json and variations against the schema for "Requires at least", pattern headers, block markup, editor leftovers and untranslated text. CI runs it before every deploy.
 
 ## License
 

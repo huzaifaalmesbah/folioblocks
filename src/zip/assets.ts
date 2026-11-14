@@ -1,17 +1,17 @@
-import { fontDef, type FontKey } from '../fonts';
+import { fontDef, type FontKey, type ThemeAsset } from '../fonts';
 
 /** Absolute URL of a file the app serves from public/ (works on GitHub Pages and in dev). */
 export function publicUrl(path: string): string {
   return new URL(`${import.meta.env.BASE_URL}${path}`, window.location.href).href;
 }
 
-/** Fetch theme asset files (e.g. assets/fonts/inter.woff2) from the app's public/ folder. */
-export async function fetchAssets(paths: string[]): Promise<Record<string, Uint8Array>> {
+/** Fetch theme asset files (fonts) from the app's public/ folder, keyed by their path in the theme. */
+export async function fetchAssets(assets: ThemeAsset[]): Promise<Record<string, Uint8Array>> {
   const entries = await Promise.all(
-    paths.map(async (p) => {
-      const res = await fetch(publicUrl(p.replace(/^assets\//, '')));
-      if (!res.ok) throw new Error(`Could not load ${p} (${res.status})`);
-      return [p, new Uint8Array(await res.arrayBuffer())] as const;
+    assets.map(async (a) => {
+      const res = await fetch(publicUrl(a.src));
+      if (!res.ok) throw new Error(`Could not load ${a.src} (${res.status})`);
+      return [a.path, new Uint8Array(await res.arrayBuffer())] as const;
     }),
   );
   return Object.fromEntries(entries);

@@ -2,7 +2,7 @@ import { FONT_KEYS, FONTS, type FontKey } from '../fonts';
 import { PALETTES } from '../presets';
 import { useBuilder } from '../store';
 import type { Palette, Radius } from '../types';
-import { contrastRatio } from './contrast';
+import { contrastRatio } from '../color';
 import { SectionTitle, Select } from './fields';
 
 const PALETTE_LABELS: Record<keyof Palette, string> = {

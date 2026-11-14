@@ -1,5 +1,5 @@
 /** WCAG relative luminance of a #rrggbb colour. */
-function luminance(hex: string): number {
+export function luminance(hex: string): number {
   const m = /^#?([0-9a-f]{6})$/i.exec(hex.trim());
   if (!m) return 0;
   const n = parseInt(m[1], 16);

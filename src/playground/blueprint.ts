@@ -1,4 +1,5 @@
 import { SITE_URL } from '../config';
+import type { ThemeAsset } from '../fonts';
 import type { BuilderState, ThemeFiles } from '../types';
 
 type FileTree = { [name: string]: string | FileTree };
@@ -77,21 +78,21 @@ export function buildBlueprint(
   state: BuilderState,
   slug: string,
   files: ThemeFiles,
-  /** Binary theme files (e.g. assets/fonts/inter.woff2), fetched by Playground from `assetBaseUrl`. */
-  assets: string[] = [],
+  /** Binary theme files (fonts), fetched by Playground from `assetBaseUrl`. */
+  assets: ThemeAsset[] = [],
   /** Public URL where the app serves those files, e.g. https://example.github.io/folioblocks/. */
   assetBaseUrl = SITE_URL,
 ) {
   // Binary files can't travel inside the JSON, so Playground downloads them from the FolioBlocks site.
   // writeFile does not create folders, so make each asset folder first.
   const themeDir = `/wordpress/wp-content/themes/${slug}`;
-  const dirs = [...new Set(assets.map((p) => p.slice(0, p.lastIndexOf('/'))))];
+  const dirs = [...new Set(assets.map((a) => a.path.slice(0, a.path.lastIndexOf('/'))))];
   const assetSteps = [
     ...dirs.map((dir) => ({ step: 'mkdir', path: `${themeDir}/${dir}` })),
-    ...assets.map((path) => ({
+    ...assets.map((a) => ({
       step: 'writeFile',
-      path: `${themeDir}/${path}`,
-      data: { resource: 'url', url: new URL(path.replace(/^assets\//, ''), assetBaseUrl).href },
+      path: `${themeDir}/${a.path}`,
+      data: { resource: 'url', url: new URL(a.src, assetBaseUrl).href },
     })),
   ];
   return {

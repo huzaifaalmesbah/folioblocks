@@ -61,13 +61,18 @@ describe('fonts', () => {
   it('bundles font files with fontFace and lists their licence', () => {
     const state = fromPreset('creative');
     const { files, assets } = generateTheme(state);
-    expect(assets.sort()).toEqual(['assets/fonts/dm-sans.woff2', 'assets/fonts/playfair-display.woff2']);
+    expect(assets.map((a) => a.path).sort()).toEqual([
+      'assets/fonts/dm-sans/dm-sans-var-normal.woff2',
+      'assets/fonts/playfair-display/playfair-display-var-normal.woff2',
+    ]);
 
     const families = JSON.parse(files['theme.json']).settings.typography.fontFamilies;
     const playfair = families.find((f: { slug: string }) => f.slug === 'playfair-display');
-    expect(playfair.fontFace[0].src).toEqual(['file:./assets/fonts/playfair-display.woff2']);
+    expect(playfair.fontFace[0].src).toEqual(['file:./assets/fonts/playfair-display/playfair-display-var-normal.woff2']);
 
-    expect(files['readme.txt']).toContain('Playfair Display, SIL Open Font License 1.1');
+    const credits = files['readme.txt'].split('== Fonts ==')[1];
+    expect(credits).toContain('Playfair Display\nCopyright 2017 The Playfair Display Project Authors');
+    expect(credits).toContain('SIL Open Font License, Version 1.1');
   });
 
   it('needs no files for system fonts', () => {
@@ -76,7 +81,7 @@ describe('fonts', () => {
       style: { ...defaultState.style, fonts: { heading: 'system-serif', body: 'system-sans' } },
     });
     expect(assets).toEqual([]);
-    expect(files['readme.txt']).toContain('No bundled third-party resources');
+    expect(files['readme.txt']).toContain('bundles no font files');
   });
 
   it('every bundled font has a weight range', () => {
@@ -103,7 +108,11 @@ describe('fonts', () => {
     // The folder must be created before any file is written into it.
     const steps = bp.steps.map((s) => s.step);
     const mkdir = bp.steps.findIndex((s) => s.step === 'mkdir');
-    expect((bp.steps[mkdir] as unknown as { path: string }).path).toBe(`/wordpress/wp-content/themes/${slug}/assets/fonts`);
+    const dirs = bp.steps.filter((s) => s.step === 'mkdir').map((s) => (s as unknown as { path: string }).path);
+    expect(dirs.sort()).toEqual([
+      `/wordpress/wp-content/themes/${slug}/assets/fonts/inter`,
+      `/wordpress/wp-content/themes/${slug}/assets/fonts/jetbrains-mono`,
+    ]);
     expect(mkdir).toBeLessThan(steps.indexOf('writeFile'));
     expect(steps.indexOf('installTheme')).toBeLessThan(mkdir);
   });

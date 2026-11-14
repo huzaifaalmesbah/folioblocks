@@ -1,12 +1,17 @@
-import { fontAssets, fontDef } from '../fonts';
+import { fontAssets, fontDef, type ThemeAsset } from '../fonts';
 import type { BuilderState, ThemeFiles } from '../types';
-import { block, group, pattern } from './blocks';
 import { patterns } from './patterns';
-import { templates } from './templates';
-import { themeJson } from './themeJson';
+import { colorVariations, themeJson } from './themeJson';
 import { headerSafe, themeSlug } from './utils';
 
 export { themeSlug };
+
+/**
+ * The WordPress versions generated themes support. Requires at least also
+ * picks the theme.json schema our validator checks against.
+ */
+export const REQUIRES_AT_LEAST = '6.8';
+export const TESTED_UP_TO = '7.1';
 
 function styleCss(state: BuilderState, slug: string): string {
   const name = headerSafe(state.info.name) || 'My';
@@ -14,43 +19,48 @@ function styleCss(state: BuilderState, slug: string): string {
 Theme Name: ${name} Portfolio
 Author: ${name}
 Description: A personal portfolio block theme for ${name}, made with FolioBlocks.
-Requires at least: 6.6
-Tested up to: 6.9
+Requires at least: ${REQUIRES_AT_LEAST}
+Tested up to: ${TESTED_UP_TO}
 Requires PHP: 7.4
 Version: 1.0.0
 License: GNU General Public License v2 or later
-License URI: https://www.gnu.org/licenses/gpl-2.0.html
+License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Text Domain: ${slug}
-Tags: portfolio, blog, block-patterns, full-site-editing, one-column, custom-colors
+Tags: portfolio, blog, one-column, custom-colors, full-site-editing, block-patterns, style-variations, translation-ready, wide-blocks
 */
 `;
 }
 
-function resources(state: BuilderState): string {
+/** The == Fonts == section, in Ipsum's format: name, copyright, license, source. */
+function fontCredits(state: BuilderState): string {
   const keys = [...new Set([state.style.fonts.heading, state.style.fonts.body])];
-  const lines = keys
+  const credits = keys
     .map(fontDef)
     .filter((f) => f.file)
-    .map((f) => `* ${f.name}, SIL Open Font License 1.1, https://openfontlicense.org, source: https://fontsource.org`);
-  return lines.length ? `${lines.join('\n')}\n` : '* No bundled third-party resources.\n';
+    .map(
+      (f) =>
+        `${f.name}\n${f.copyright}\nLicense: This Font Software is licensed under the SIL Open Font License, Version 1.1. This license is available with a FAQ at: https://openfontlicense.org\nSource: ${f.source}`,
+    );
+  return credits.length ? credits.join('\n\n') : 'The theme uses system fonts and bundles no font files.';
 }
 
 function readme(state: BuilderState, slug: string): string {
   const name = headerSafe(state.info.name) || 'My';
+  const year = new Date().getFullYear();
   return `=== ${name} Portfolio ===
 Contributors: ${slug.replace(/-portfolio$/, '').replace(/-/g, '')}
-Requires at least: 6.6
-Tested up to: 6.9
+Requires at least: ${REQUIRES_AT_LEAST}
+Tested up to: ${TESTED_UP_TO}
 Requires PHP: 7.4
 Stable tag: 1.0.0
 License: GPLv2 or later
-License URI: https://www.gnu.org/licenses/gpl-2.0.html
+License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
 A personal portfolio block theme, made with FolioBlocks.
 
 == Description ==
 
-A block theme with home, about, contact, blog and single post layouts.
+A block theme with home, about, contact, blog and single post layouts, and colour style variations you can switch in Appearance > Editor > Styles.
 
 == Installation ==
 
@@ -64,15 +74,34 @@ A block theme with home, about, contact, blog and single post layouts.
 = 1.0.0 =
 * Initial release.
 
-== Resources ==
-${resources(state)}
 == Copyright ==
 
-${name} Portfolio WordPress Theme, (C) ${new Date().getFullYear()} ${name}
-${name} Portfolio is distributed under the terms of the GNU GPL v2 or later.
+${name} Portfolio WordPress Theme, (C) ${year} ${name}.
+${name} Portfolio is distributed under the terms of the GNU GPL.
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 2 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
+
+== Images ==
+
+Title: screenshot.png
+Drawn by FolioBlocks from the theme's own colours and text.
+License: GPLv2 or later, the same as the theme.
+
+== Fonts ==
+
+${fontCredits(state)}
 `;
 }
 
+/** Ipsum-style functions.php: each function wrapped in function_exists, with @since. */
 function functionsPhp(slug: string): string {
   const fn = slug.replace(/-/g, '_');
   return `<?php
@@ -80,62 +109,52 @@ function functionsPhp(slug: string): string {
  * Theme functions.
  *
  * @package ${slug}
+ * @since 1.0.0
  */
 
-defined( 'ABSPATH' ) || exit;
-
-if ( ! function_exists( '${fn}_setup' ) ) {
+if ( ! function_exists( '${fn}_editor_styles' ) ) :
 	/**
-	 * Theme setup.
+	 * Loads style.css in the editors, so they match the front end.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @return void
 	 */
-	function ${fn}_setup() {
-		add_theme_support( 'editor-styles' );
+	function ${fn}_editor_styles() {
 		add_editor_style( 'style.css' );
 	}
-}
-add_action( 'after_setup_theme', '${fn}_setup' );
+endif;
+add_action( 'after_setup_theme', '${fn}_editor_styles' );
 
-/**
- * Enqueue the theme stylesheet.
- */
-function ${fn}_enqueue_styles() {
-	wp_enqueue_style( '${slug}-style', get_stylesheet_uri(), array(), wp_get_theme()->get( 'Version' ) );
-}
+if ( ! function_exists( '${fn}_enqueue_styles' ) ) :
+	/**
+	 * Enqueues style.css on the front end.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @return void
+	 */
+	function ${fn}_enqueue_styles() {
+		wp_enqueue_style( '${slug}-style', get_stylesheet_uri(), array(), wp_get_theme()->get( 'Version' ) );
+	}
+endif;
 add_action( 'wp_enqueue_scripts', '${fn}_enqueue_styles' );
 `;
 }
 
-function parts(state: BuilderState, slug: string): ThemeFiles {
-  const nav = (justify: string) =>
-    block('navigation', { overlayMenu: 'mobile', layout: { type: 'flex', justifyContent: justify } });
-  const inner =
-    state.header === 'centered'
-      ? group([block('site-title', { textAlign: 'center' }), nav('center')].join('\n'), {
-          layout: { type: 'flex', orientation: 'vertical', justifyContent: 'center' },
-        })
-      : group([block('site-title'), nav('right')].join('\n'), {
-          align: 'wide',
-          layout: { type: 'flex', justifyContent: 'space-between', flexWrap: 'wrap' },
-        });
-  return {
-    'parts/header.html': group(inner, { padY: 30 }) + '\n',
-    'parts/footer.html': pattern(`${slug}/footer`) + '\n',
-  };
-}
-
-/** Generate every text file of the theme. Binary files (screenshot) are added by the zip step. */
-export function generateTheme(state: BuilderState): { slug: string; files: ThemeFiles; assets: string[] } {
+/** Generate every text file of the theme. Binary files (fonts, screenshot) are listed in `assets` or added by the zip step. */
+export function generateTheme(state: BuilderState): { slug: string; files: ThemeFiles; assets: ThemeAsset[] } {
   const slug = themeSlug(state.info.name);
+  const p = patterns(state, slug);
   const files: ThemeFiles = {
     'style.css': styleCss(state, slug),
     'theme.json': themeJson(state.style),
+    ...colorVariations(state.style),
     'functions.php': functionsPhp(slug),
     'readme.txt': readme(state, slug),
-    ...parts(state, slug),
-    ...templates(slug),
-    ...patterns(state, slug),
+    ...p.templates,
+    ...p.patterns,
   };
-  // Binary files the zip and Playground steps must add (bundled fonts).
   const assets = fontAssets([state.style.fonts.heading, state.style.fonts.body]);
   return { slug, files, assets };
 }

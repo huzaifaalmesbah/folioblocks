@@ -33,6 +33,11 @@ export function makePhp(textDomain: string) {
       `<?php echo esc_html__( ${phpString(text)}, ${phpString(textDomain)} ); ?>`,
     /** Escaped URL. */
     url: (url: string) => `<?php echo esc_url( ${phpString(cleanUrl(url))} ); ?>`,
+    /** Translatable text for an HTML attribute or a block attribute. */
+    attr: (text: string) => `<?php echo esc_attr__( ${phpString(text)}, ${phpString(textDomain)} ); ?>`,
+    /** Translatable block name, shown in the List View (metadata.name). */
+    name: (text: string) =>
+      `<?php echo esc_html_x( ${phpString(text)}, 'Block name shown in the List View', ${phpString(textDomain)} ); ?>`,
   };
 }
 
