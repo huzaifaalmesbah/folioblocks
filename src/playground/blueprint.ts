@@ -80,12 +80,19 @@ export function buildBlueprint(
   files: ThemeFiles,
   /** Binary theme files (fonts), fetched by Playground from `assetBaseUrl`. */
   assets: ThemeAsset[] = [],
-  /** Public URL where the app serves those files, e.g. https://example.github.io/folioblocks/. */
-  assetBaseUrl = SITE_URL,
+  opts: {
+    /** Public URL where the app serves those files, e.g. https://example.github.io/folioblocks/. */
+    assetBaseUrl?: string;
+    /** Theme folder name. Defaults to the slug; the live preview uses a fixed one so renaming needs no reinstall. */
+    folder?: string;
+    /** Turn off WordPress' theme caches (patterns, theme.json), for a preview whose files keep changing. */
+    developmentMode?: boolean;
+  } = {},
 ) {
+  const { assetBaseUrl = SITE_URL, folder = slug, developmentMode = false } = opts;
   // Binary files can't travel inside the JSON, so Playground downloads them from the FolioBlocks site.
   // writeFile does not create folders, so make each asset folder first.
-  const themeDir = `/wordpress/wp-content/themes/${slug}`;
+  const themeDir = `/wordpress/wp-content/themes/${folder}`;
   const dirs = [...new Set(assets.map((a) => a.path.slice(0, a.path.lastIndexOf('/'))))];
   const assetSteps = [
     ...dirs.map((dir) => ({ step: 'mkdir', path: `${themeDir}/${dir}` })),
@@ -106,9 +113,10 @@ export function buildBlueprint(
     preferredVersions: { php: '8.3', wp: 'latest' },
     login: true,
     steps: [
+      ...(developmentMode ? [{ step: 'defineWpConfigConsts', consts: { WP_DEVELOPMENT_MODE: 'theme' } }] : []),
       {
         step: 'installTheme',
-        themeData: { resource: 'literal:directory', name: slug, files: toFileTree(files) },
+        themeData: { resource: 'literal:directory', name: folder, files: toFileTree(files) },
         options: { activate: true },
       },
       ...assetSteps,

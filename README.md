@@ -15,7 +15,7 @@ Nothing is sent to a server. Everything stays in the browser.
 | 1 | Project setup, BuilderState, theme generator core, zip download | ✅ done |
 | 2 | Section library + 4 layout presets, Info / Style / Layout wizard, bundled fonts | ✅ done |
 | 2.5 | "Open in WordPress Playground" button (theme embedded in a Blueprint) | ✅ done |
-| 3 | Live WordPress Playground preview, seed content, device toggle | ⏳ next |
+| 3 | Live WordPress Playground preview inside the app, live sync, device toggle | ✅ done |
 | 4 | Drag-and-drop layout customizer, custom presets, JSON import/export | |
 | 5 | Tests, accessibility, docs, GitHub Pages deploy, beta with students | |
 
@@ -59,7 +59,7 @@ BuilderState (one JSON object: info, style, preset, pages)
 src/generator/   pure functions → { "style.css": "...", "theme.json": "...", ... }
       │
       ├──► src/zip/      JSZip → <slug>.zip (theme folder at the zip root) + screenshot.png
-      └──► preview       WordPress Playground (week 3)
+      └──► src/playground/  Live preview (Playground in an iframe, changed files synced) + Blueprint for a new tab
 ```
 
 | Path | What it does |

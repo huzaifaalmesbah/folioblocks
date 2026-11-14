@@ -94,7 +94,7 @@ describe('fonts', () => {
   it('adds a Playground download step for each font', () => {
     const state = fromPreset('developer');
     const { slug, files, assets } = generateTheme(state);
-    const bp = buildBlueprint(state, slug, files, assets, 'https://example.org/app/');
+    const bp = buildBlueprint(state, slug, files, assets, { assetBaseUrl: 'https://example.org/app/' });
     const writes = bp.steps.filter((s) => s.step === 'writeFile') as unknown as {
       path: string;
       data: { url: string };

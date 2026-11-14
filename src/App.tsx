@@ -9,6 +9,7 @@ import { buildBlueprint, playgroundUrl } from './playground/blueprint';
 import { InfoStep } from './ui/InfoStep';
 import { StyleStep } from './ui/StyleStep';
 import { LayoutStep } from './ui/LayoutStep';
+import { LivePreview } from './playground/LivePreview';
 
 const STEPS = [
   { key: 'info', label: '1. Info', Component: InfoStep },
@@ -36,6 +37,7 @@ export default function App() {
 
   const [step, setStep] = useState<StepKey>('info');
   const [selected, setSelected] = useState('theme.json');
+  const [view, setView] = useState<'preview' | 'code'>('preview');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
 
@@ -67,7 +69,7 @@ export default function App() {
 
   return (
     <div className="flex min-h-screen flex-col bg-slate-50 text-slate-900 lg:h-screen lg:flex-row">
-      <aside className="flex w-full flex-col border-slate-200 bg-white lg:w-[440px] lg:border-r">
+      <aside className="flex w-full shrink-0 flex-col border-slate-200 bg-white lg:w-[440px] lg:border-r">
         <header className="space-y-3 border-b border-slate-200 p-6 pb-4">
           <div>
             <h1 className="text-2xl font-bold">FolioBlocks</h1>
@@ -144,7 +146,7 @@ export default function App() {
             </p>
           )}
           <p className="text-xs text-slate-500">
-            Playground opens a real WordPress in a new tab with your theme, pages and sample posts.{' '}
+            Open the same site full screen in a new tab.{' '}
             <button type="button" onClick={downloadBlueprint} className="underline hover:text-slate-700">
               Download blueprint.json
             </button>
@@ -152,29 +154,57 @@ export default function App() {
         </footer>
       </aside>
 
-      <main className="flex min-h-[60vh] flex-1 flex-col lg:min-h-0">
-        <div className="border-b border-slate-200 bg-white px-6 py-3 text-sm text-slate-600">
-          Generated theme files: <strong>{paths.length}</strong> · use “Open in WordPress Playground” to see it live
-        </div>
-        <div className="flex min-h-0 flex-1 flex-col md:flex-row">
-          <nav className="max-h-48 overflow-y-auto border-slate-200 bg-white p-3 md:max-h-none md:w-64 md:border-r">
-            {paths.map((p) => (
+      <main className="flex min-h-[70vh] min-w-0 flex-1 flex-col lg:min-h-0">
+        <div className="flex items-center gap-3 border-b border-slate-200 bg-white px-4 py-2">
+          <div className="flex gap-1 rounded-lg bg-slate-100 p-1" role="tablist" aria-label="Right panel">
+            {(['preview', 'code'] as const).map((v) => (
               <button
-                key={p}
+                key={v}
                 type="button"
-                onClick={() => setSelected(p)}
-                className={`block w-full truncate rounded px-2 py-1 text-left font-mono text-xs ${
-                  p === selected ? 'bg-blue-50 text-blue-800' : 'text-slate-700 hover:bg-slate-100'
+                role="tab"
+                aria-selected={view === v}
+                onClick={() => setView(v)}
+                className={`rounded-md px-3 py-1 text-sm font-medium ${
+                  view === v ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
-                {p}
+                {v === 'preview' ? 'Live preview' : `Code (${paths.length} files)`}
               </button>
             ))}
-          </nav>
-          <pre className="min-h-0 flex-1 overflow-auto bg-slate-900 p-4 text-xs leading-relaxed text-slate-100">
-            {files[selected] ?? (assets.some((a) => a.path === selected) ? '(binary font file, bundled in the zip)' : '')}
-          </pre>
+          </div>
+          <p className="hidden text-xs text-slate-500 xl:block">
+            {view === 'preview'
+              ? 'A real WordPress running in your browser. Your changes appear in a moment.'
+              : 'The theme files that go into your zip.'}
+          </p>
         </div>
+
+        {/* The preview stays mounted while the code is shown, so WordPress doesn't restart. */}
+        <div className={view === 'preview' ? 'flex min-h-0 flex-1 flex-col' : 'hidden'}>
+          <LivePreview state={state} slug={slug} files={files} assets={assets} />
+        </div>
+
+        {view === 'code' && (
+          <div className="flex min-h-0 flex-1 flex-col md:flex-row">
+            <nav className="max-h-48 overflow-y-auto border-slate-200 bg-white p-3 md:max-h-none md:w-64 md:border-r">
+              {paths.map((p) => (
+                <button
+                  key={p}
+                  type="button"
+                  onClick={() => setSelected(p)}
+                  className={`block w-full truncate rounded px-2 py-1 text-left font-mono text-xs ${
+                    p === selected ? 'bg-blue-50 text-blue-800' : 'text-slate-700 hover:bg-slate-100'
+                  }`}
+                >
+                  {p}
+                </button>
+              ))}
+            </nav>
+            <pre className="min-h-0 flex-1 overflow-auto bg-slate-900 p-4 text-xs leading-relaxed text-slate-100">
+              {files[selected] ?? (assets.some((a) => a.path === selected) ? '(binary font file, bundled in the zip)' : '')}
+            </pre>
+          </div>
+        )}
       </main>
     </div>
   );
