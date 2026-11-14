@@ -49,7 +49,8 @@ export type SavedLayout = {
 
 export function layoutFromState(state: BuilderState, label: string): SavedLayout {
   return {
-    key: `custom-${Date.now().toString(36)}`,
+    // Time plus randomness: two layouts made in the same millisecond must not share a key.
+    key: `custom-${newSectionId().slice(2)}`,
     label: label.trim() || 'My layout',
     style: structuredClone(state.style),
     header: state.header,
