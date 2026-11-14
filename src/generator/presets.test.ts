@@ -99,5 +99,12 @@ describe('fonts', () => {
       'https://example.org/app/fonts/jetbrains-mono.woff2',
     ]);
     expect(writes[0].path.startsWith(`/wordpress/wp-content/themes/${slug}/assets/fonts/`)).toBe(true);
+
+    // The folder must be created before any file is written into it.
+    const steps = bp.steps.map((s) => s.step);
+    const mkdir = bp.steps.findIndex((s) => s.step === 'mkdir');
+    expect((bp.steps[mkdir] as unknown as { path: string }).path).toBe(`/wordpress/wp-content/themes/${slug}/assets/fonts`);
+    expect(mkdir).toBeLessThan(steps.indexOf('writeFile'));
+    expect(steps.indexOf('installTheme')).toBeLessThan(mkdir);
   });
 });

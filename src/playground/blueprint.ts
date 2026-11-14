@@ -83,11 +83,17 @@ export function buildBlueprint(
   assetBaseUrl = SITE_URL,
 ) {
   // Binary files can't travel inside the JSON, so Playground downloads them from the FolioBlocks site.
-  const assetSteps = assets.map((path) => ({
-    step: 'writeFile',
-    path: `/wordpress/wp-content/themes/${slug}/${path}`,
-    data: { resource: 'url', url: new URL(path.replace(/^assets\//, ''), assetBaseUrl).href },
-  }));
+  // writeFile does not create folders, so make each asset folder first.
+  const themeDir = `/wordpress/wp-content/themes/${slug}`;
+  const dirs = [...new Set(assets.map((p) => p.slice(0, p.lastIndexOf('/'))))];
+  const assetSteps = [
+    ...dirs.map((dir) => ({ step: 'mkdir', path: `${themeDir}/${dir}` })),
+    ...assets.map((path) => ({
+      step: 'writeFile',
+      path: `${themeDir}/${path}`,
+      data: { resource: 'url', url: new URL(path.replace(/^assets\//, ''), assetBaseUrl).href },
+    })),
+  ];
   return {
     $schema: 'https://playground.wordpress.net/blueprint-schema.json',
     meta: {
