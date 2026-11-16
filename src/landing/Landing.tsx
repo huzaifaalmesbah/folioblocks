@@ -1,6 +1,7 @@
 import { useEffect, useState, type ReactNode } from 'react';
 import { fontDef } from '../fonts';
 import { PRESETS, type PresetDef } from '../presets';
+import { themeSlug } from '../generator/utils';
 import { useBuilder } from '../store';
 import {
   FROM_SCRATCH_PROMPT,
@@ -163,6 +164,17 @@ export function Landing() {
     const id = window.location.hash.slice(1);
     if (id && !id.startsWith('/')) document.getElementById(id)?.scrollIntoView();
   }, []);
+
+  // Put the student's own details into the prompts, so there is less to edit by hand.
+  const info = useBuilder((s) => s.info);
+  const named = info.name.trim() && info.name !== 'Your Name';
+  const personalise = (text: string) =>
+    named
+      ? text
+          .replaceAll('[theme-folder]', themeSlug(info.name))
+          .replaceAll('[Your Name]', info.name)
+          .replaceAll('[Your tagline]', info.tagline || '[Your tagline]')
+      : text;
 
   function startWith(key: string) {
     const label = PRESETS.find((p) => p.key === key)?.label ?? key;
@@ -368,7 +380,11 @@ export function Landing() {
             </div>
 
             <h3 className="mt-14 text-xl font-semibold">Prompts to copy</h3>
-            <p className="mt-2 text-slate-600">One at a time, in order. Replace the [brackets] with your own details.</p>
+            <p className="mt-2 text-slate-600">
+              One at a time, in order. Replace the [brackets] with your own details.
+              {named && ` Your theme folder (${themeSlug(info.name)}) and name are already filled in.`} Your zip also includes an AGENTS.md
+              file that tells the agent this theme's rules.
+            </p>
             <div className="mt-4 space-y-3">
               {PROMPTS.map((p) => (
                 <details key={p.title} className="group rounded-xl border border-slate-200 bg-white open:shadow-sm">
@@ -384,7 +400,7 @@ export function Landing() {
                     <span aria-hidden className="text-slate-400 transition group-open:rotate-90">›</span>
                   </summary>
                   <div className="px-5 pb-5">
-                    <Code>{p.text}</Code>
+                    <Code>{personalise(p.text)}</Code>
                   </div>
                 </details>
               ))}

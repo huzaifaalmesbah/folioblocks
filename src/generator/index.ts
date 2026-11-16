@@ -6,6 +6,7 @@ import { imageAssets } from './images';
 
 type ImageCredit = { title: string; creator: string; source: string; openverse: string; license: string; licenseUrl: string };
 import { patterns } from './patterns';
+import { agentsMd } from './agentsMd';
 import { colorVariations, themeJson } from './themeJson';
 import { headerSafe, themeSlug } from './utils';
 
@@ -190,6 +191,7 @@ export function generateTheme(
     'theme.json': themeJson(state.style),
     ...colorVariations(state.style),
     'functions.php': functionsPhp(slug),
+    'AGENTS.md': agentsMd(state, slug),
     ...p.templates,
     ...p.patterns,
   };

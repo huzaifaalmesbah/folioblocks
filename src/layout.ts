@@ -6,7 +6,7 @@
 import { defaultState } from './defaults';
 import { FONT_KEYS } from './fonts';
 import { SECTIONS } from './generator/sections';
-import type { BuilderState, FooterVariant, HeaderVariant, PageKey, Section, SectionType, Style } from './types';
+import type { BuilderState, FooterVariant, HeaderVariant, Info, PageKey, Section, SectionType, Style } from './types';
 
 /* ---------- Section lists ---------- */
 
@@ -124,6 +124,90 @@ function pages(v: unknown): Record<PageKey, Section[]> {
 const header = (v: unknown): HeaderVariant => (v === 'centered' ? 'centered' : 'inline');
 const footer = (v: unknown): FooterVariant => (v === 'split' ? 'split' : 'centered');
 
+/** Keep only known, well-formed profile fields; anything else falls back to empty or the default. */
+export function sanitizeInfo(raw: unknown): Info {
+  const i = isObj(raw) ? raw : {};
+  const d = defaultState.info;
+  return {
+    name: str(i.name, d.name),
+    tagline: str(i.tagline, d.tagline),
+    university: str(i.university),
+    location: str(i.location),
+    bio: str(i.bio),
+    email: str(i.email),
+    skills: Array.isArray(i.skills) ? i.skills.filter((x) => typeof x === 'string').map((x) => x.slice(0, 100)).slice(0, 50) : d.skills,
+    contributions: Array.isArray(i.contributions)
+      ? i.contributions
+          .filter(isObj)
+          .map((c) => ({ team: str(c.team), description: str(c.description), date: str(c.date), url: str(c.url) }))
+          .slice(0, 30)
+      : [],
+    experience: Array.isArray(i.experience)
+      ? i.experience
+          .filter(isObj)
+          .map((e) => ({ role: str(e.role), org: str(e.org), period: str(e.period), description: str(e.description) }))
+          .slice(0, 20)
+      : [],
+    education: Array.isArray(i.education)
+      ? i.education.filter(isObj).map((e) => ({ degree: str(e.degree), school: str(e.school), period: str(e.period) })).slice(0, 10)
+      : [],
+    achievements: Array.isArray(i.achievements)
+      ? i.achievements
+          .filter(isObj)
+          .map((a) => ({ title: str(a.title), issuer: str(a.issuer), year: str(a.year), url: str(a.url) }))
+          .slice(0, 30)
+      : [],
+    cvUrl: str(i.cvUrl),
+    projects: Array.isArray(i.projects)
+      ? i.projects
+          .filter(isObj)
+          .map((p) => ({ title: str(p.title), description: str(p.description), url: str(p.url), ...(image(p.image) && { image: image(p.image) }) }))
+          .slice(0, 12)
+      : [],
+    socials: isObj(i.socials)
+      ? Object.fromEntries(
+          ['github', 'linkedin', 'x', 'wordpress']
+            .map((k) => [k, str((i.socials as Obj)[k])])
+            .filter(([, url]) => url),
+        )
+      : {},
+    avatar: image(i.avatar),
+  };
+}
+
+/**
+ * Read a profile from an AI chat's answer. The answer may wrap the JSON in
+ * a code fence or a sentence, and may be a whole settings file, `{ "info": … }`
+ * or the profile object itself. Photos can't come from a chat, so the current
+ * ones are kept (project photos by matching title).
+ */
+export function parseProfile(text: string, current: Info): Info {
+  const start = text.indexOf('{');
+  const end = text.lastIndexOf('}');
+  if (start === -1 || end <= start) throw new Error('No JSON found. Paste the whole answer from the AI, including the { } block.');
+  let data: unknown;
+  try {
+    data = JSON.parse(text.slice(start, end + 1));
+  } catch {
+    throw new Error('The JSON is incomplete or broken. Ask the AI to "send the JSON again, complete and valid", then paste it here.');
+  }
+  const root = isObj(data) ? data : {};
+  const raw = isObj(root.state) && isObj(root.state.info) ? root.state.info : isObj(root.info) ? root.info : root;
+  if (!isObj(raw) || typeof raw.name !== 'string' || !raw.name.trim()) {
+    throw new Error('This JSON has no "name". Make sure you pasted the answer to the FolioBlocks prompt.');
+  }
+  const info = sanitizeInfo(raw);
+  return {
+    ...info,
+    skills: Array.isArray(raw.skills) ? info.skills : [],
+    avatar: current.avatar ?? '',
+    projects: info.projects.map((p) => {
+      const old = current.projects.find((c) => c.title.trim() && c.title.trim().toLowerCase() === p.title.trim().toLowerCase());
+      return old?.image ? { ...p, image: old.image } : { title: p.title, description: p.description, url: p.url };
+    }),
+  };
+}
+
 /**
  * Read a settings file, keeping only known, well-formed values: anything
  * missing or odd falls back to the defaults, so a hand-edited or older file
@@ -140,54 +224,8 @@ export function parseSettings(text: string): { state: BuilderState; layouts: Sav
     throw new Error('This is not a FolioBlocks settings file.');
   }
   const s = data.state;
-  const i = isObj(s.info) ? s.info : {};
-  const d = defaultState.info;
   const state: BuilderState = {
-    info: {
-      name: str(i.name, d.name),
-      tagline: str(i.tagline, d.tagline),
-      university: str(i.university),
-      location: str(i.location),
-      bio: str(i.bio),
-      email: str(i.email),
-      skills: Array.isArray(i.skills) ? i.skills.filter((x) => typeof x === 'string').map((x) => x.slice(0, 100)).slice(0, 50) : d.skills,
-      contributions: Array.isArray(i.contributions)
-        ? i.contributions
-            .filter(isObj)
-            .map((c) => ({ team: str(c.team), description: str(c.description), date: str(c.date), url: str(c.url) }))
-            .slice(0, 30)
-        : [],
-      experience: Array.isArray(i.experience)
-        ? i.experience
-            .filter(isObj)
-            .map((e) => ({ role: str(e.role), org: str(e.org), period: str(e.period), description: str(e.description) }))
-            .slice(0, 20)
-        : [],
-      education: Array.isArray(i.education)
-        ? i.education.filter(isObj).map((e) => ({ degree: str(e.degree), school: str(e.school), period: str(e.period) })).slice(0, 10)
-        : [],
-      achievements: Array.isArray(i.achievements)
-        ? i.achievements
-            .filter(isObj)
-            .map((a) => ({ title: str(a.title), issuer: str(a.issuer), year: str(a.year), url: str(a.url) }))
-            .slice(0, 30)
-        : [],
-      cvUrl: str(i.cvUrl),
-      projects: Array.isArray(i.projects)
-        ? i.projects
-            .filter(isObj)
-            .map((p) => ({ title: str(p.title), description: str(p.description), url: str(p.url), ...(image(p.image) && { image: image(p.image) }) }))
-            .slice(0, 12)
-        : [],
-      socials: isObj(i.socials)
-        ? Object.fromEntries(
-            ['github', 'linkedin', 'x', 'wordpress']
-              .map((k) => [k, str((i.socials as Obj)[k])])
-              .filter(([, url]) => url),
-          )
-        : {},
-      avatar: image(i.avatar),
-    },
+    info: sanitizeInfo(s.info),
     style: style(s.style),
     language: s.language === 'bn' ? 'bn' : 'en',
     preset: str(s.preset, defaultState.preset),

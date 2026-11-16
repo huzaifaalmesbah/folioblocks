@@ -178,3 +178,33 @@ export function ImageField(props: {
     </div>
   );
 }
+
+/** Copies text and says so. `children` is the button's label. */
+export function CopyButton(props: { text: string | (() => string); children: ReactNode; className?: string }) {
+  const [copied, setCopied] = useState(false);
+  async function copy() {
+    const text = typeof props.text === 'function' ? props.text() : props.text;
+    try {
+      await navigator.clipboard.writeText(text);
+    } catch {
+      // Older browsers, or no clipboard permission: copy through a hidden textarea.
+      const t = document.createElement('textarea');
+      t.value = text;
+      document.body.appendChild(t);
+      t.select();
+      document.execCommand('copy');
+      t.remove();
+    }
+    setCopied(true);
+    setTimeout(() => setCopied(false), 1800);
+  }
+  return (
+    <button
+      type="button"
+      onClick={copy}
+      className={props.className ?? 'text-xs font-medium text-blue-700 underline hover:text-blue-900'}
+    >
+      <span aria-live="polite">{copied ? 'Copied ✓ now paste it in your AI chat' : props.children}</span>
+    </button>
+  );
+}
