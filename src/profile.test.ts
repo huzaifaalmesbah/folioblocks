@@ -131,3 +131,34 @@ describe('templates and language', () => {
     expect(isSectionEmpty(stats, full)).toBe(false);
   });
 });
+
+describe('services, testimonials and the newest designs', () => {
+  const info: Info = {
+    ...full,
+    services: [{ title: 'Theme setup', description: 'Install and configure.' }],
+    testimonials: [
+      { quote: 'Careful and kind.', name: 'A. Rahman', role: 'Advisor' },
+      { quote: '   ', name: 'Nobody', role: '' },
+    ],
+  };
+
+  it('renders services as cards and only testimonials that have words', () => {
+    const home = generateTheme(withInfo(info, 'freelancer')).files['patterns/page-home.php'];
+    expect(home).toContain("'Theme setup'");
+    expect(home).toContain('<blockquote class="wp-block-quote">');
+    expect(home).toContain("'A. Rahman, Advisor'");
+    expect(home).not.toContain("'Nobody'");
+    expect(checkBlockMarkup(home)).toEqual([]);
+  });
+
+  it('the colour-band hero writes classes in the order the editor saves them', () => {
+    const home = generateTheme(withInfo(info, 'bold')).files['patterns/page-home.php'];
+    expect(home).toContain('class="wp-block-group alignfull has-base-color has-accent-3-background-color has-text-color has-background"');
+  });
+
+  it('has twelve templates, each with its own key and a best-for line', () => {
+    expect(PRESETS).toHaveLength(12);
+    expect(new Set(PRESETS.map((p) => p.key)).size).toBe(12);
+    for (const p of PRESETS) expect(p.bestFor.length, p.key).toBeGreaterThan(5);
+  });
+});

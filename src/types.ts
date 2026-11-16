@@ -9,6 +9,8 @@ export type Project = { title: string; description: string; url: string; image?:
 export type Contribution = { team: string; description: string; date?: string; url?: string };
 export type Experience = { role: string; org: string; period: string; description: string };
 export type Education = { degree: string; school: string; period: string };
+export type Service = { title: string; description: string };
+export type Testimonial = { quote: string; name: string; role: string };
 export type Achievement = { title: string; issuer: string; year: string; url: string };
 
 export type Socials = {
@@ -31,6 +33,10 @@ export type Info = {
   experience: Experience[];
   education: Education[];
   achievements: Achievement[];
+  /** What you offer (for freelancers). */
+  services: Service[];
+  /** Kind words from people you worked with. Only real quotes, used with permission. */
+  testimonials: Testimonial[];
   /** Link to a CV or résumé (PDF, Google Doc, LinkedIn…). */
   cvUrl: string;
   socials: Socials;
@@ -63,6 +69,8 @@ export type SectionType =
   | 'experience'
   | 'education'
   | 'achievements'
+  | 'services'
+  | 'testimonials'
   | 'projects'
   | 'posts'
   | 'contact';

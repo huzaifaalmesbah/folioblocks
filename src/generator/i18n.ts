@@ -36,6 +36,8 @@ const BN: Record<string, string> = {
   'Previous post': 'আগের লেখা',
   'Next post': 'পরের লেখা',
   'This page is empty for now. Add blocks to it in the Site Editor.': 'পাতাটি এখন খালি। সাইট এডিটরে ব্লক যোগ করুন।',
+  Services: 'সেবা',
+  'Kind words': 'অন্যরা যা বলেন',
   Home: 'হোম',
   About: 'পরিচিতি',
 };

@@ -17,6 +17,8 @@ export const defaultState: BuilderState = {
     experience: [],
     education: [],
     achievements: [],
+    services: [],
+    testimonials: [],
     cvUrl: '',
     socials: {},
     avatar: '',

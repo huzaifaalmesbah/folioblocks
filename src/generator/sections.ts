@@ -1,5 +1,5 @@
 import type { Info, Section, SectionType } from '../types';
-import { badge, block, buttons, columns, container, group, heading, image, join, list, metaText, paragraph, separator } from './blocks';
+import { badge, block, buttons, columns, container, group, heading, image, join, list, metaText, paragraph, quote, separator } from './blocks';
 import { portraitAlt, screenshotAlt } from './i18n';
 import { AVATAR, projectImage } from './images';
 import { cleanUrl, makePhp, type Php } from './utils';
@@ -44,6 +44,17 @@ function heroText(ctx: Ctx, center: boolean): string {
 
 const heroCentered: Renderer = (ctx) =>
   group(heroText(ctx, true), { name: ctx.php.name('Hero'), tagName: 'section', align: 'full', padY: 80 });
+
+/** A full-width band in the secondary colour with light text: loud and simple. */
+const heroBand: Renderer = (ctx) =>
+  group(heroText(ctx, true), {
+    name: ctx.php.name('Hero'),
+    tagName: 'section',
+    align: 'full',
+    padY: 80,
+    background: 'accent-3',
+    textColor: 'base',
+  });
 
 /** Round photo above a centered name: the friendliest start. */
 const heroAvatar: Renderer = (ctx) =>
@@ -330,6 +341,77 @@ const projectsCards: Renderer = (ctx) => {
   });
 };
 
+/** Two large tiles per row, picture first: for visual work. */
+const projectsGallery: Renderer = (ctx) =>
+  ctx.info.projects.length
+    ? group(
+        join(
+          heading(ctx.php.t('Selected work')),
+          ...grid(
+            ctx.info.projects.map((p, i) => join(projectPicture(ctx, p, i, '4/3'), projectText(ctx, p))),
+            2,
+          ),
+        ),
+        {
+          name: ctx.php.name('Projects'),
+          tagName: 'section',
+          anchor: 'projects',
+          padY: 70,
+          layout: { type: 'constrained', contentSize: '1280px' },
+        },
+      )
+    : '';
+
+/** Three square pictures per row with just a title: a photo wall. */
+const projectsTiles: Renderer = (ctx) =>
+  ctx.info.projects.length
+    ? group(
+        join(
+          ...grid(
+            ctx.info.projects.map((p, i) => {
+              const title = p.url ? `<a href="${ctx.php.url(p.url)}">${ctx.php.t(p.title)}</a>` : ctx.php.t(p.title);
+              return join(projectPicture(ctx, p, i, '1'), metaText(title));
+            }),
+          ),
+        ),
+        {
+          name: ctx.php.name('Projects'),
+          tagName: 'section',
+          anchor: 'projects',
+          padY: 50,
+          layout: { type: 'constrained', contentSize: '1280px' },
+        },
+      )
+    : '';
+
+/* ---------- Services and testimonials ---------- */
+
+const servicesCards: Renderer = ({ info, php, radius }) => {
+  if (!info.services.length) return '';
+  const cards = info.services.map((s) =>
+    group(join(heading(php.t(s.title), 3), s.description && paragraph(php.t(s.description))), {
+      name: php.name('Service'),
+      background: SURFACE,
+      pad: 40,
+      radius,
+      layout: { type: 'default' },
+    }),
+  );
+  return group(join(heading(php.t('Services')), ...grid(cards)), {
+    name: php.name('Services'),
+    tagName: 'section',
+    padY: 60,
+    layout: { type: 'constrained', contentSize: '1280px' },
+  });
+};
+
+const testimonialsQuotes: Renderer = ({ info, php }) => {
+  const real = info.testimonials.filter((t) => t.quote.trim());
+  if (!real.length) return '';
+  const quotes = real.map((t) => quote(php.t(t.quote), php.t([t.name, t.role].filter(Boolean).join(', '))));
+  return group(join(heading(php.t('Kind words')), ...quotes), { name: php.name('Testimonials'), tagName: 'section', padY: 60 });
+};
+
 /** Compact rows: small picture beside the text. */
 const projectsList: Renderer = (ctx) =>
   ctx.info.projects.length
@@ -492,6 +574,8 @@ export const SECTION_LABELS: Record<SectionType, string> = {
   experience: 'Experience',
   education: 'Education',
   achievements: 'Achievements',
+  services: 'Services',
+  testimonials: 'Testimonials',
   projects: 'Projects',
   posts: 'Latest posts',
   contact: 'Contact',
@@ -500,6 +584,7 @@ export const SECTION_LABELS: Record<SectionType, string> = {
 export const SECTIONS: Record<SectionType, Record<string, Variant>> = {
   hero: {
     avatar: { label: 'Round photo, centered', render: heroAvatar },
+    band: { label: 'Bold colour band', render: heroBand },
     centered: { label: 'Centered text', render: heroCentered },
     split: { label: 'Text beside photo', render: heroSplit },
     big: { label: 'Big type beside a tall photo', render: heroBig },
@@ -526,10 +611,14 @@ export const SECTIONS: Record<SectionType, Record<string, Variant>> = {
   },
   education: { list: { label: 'List', render: educationList } },
   achievements: { list: { label: 'List', render: achievementsList } },
+  services: { cards: { label: 'Cards', render: servicesCards } },
+  testimonials: { quotes: { label: 'Quotes', render: testimonialsQuotes } },
   projects: {
     grid: { label: 'Grid band', render: projectsGrid },
     cards: { label: 'Cards', render: projectsCards },
     rows: { label: 'Showcase rows', render: projectsRows },
+    gallery: { label: 'Gallery, two per row', render: projectsGallery },
+    tiles: { label: 'Photo wall', render: projectsTiles },
     list: { label: 'Compact list', render: projectsList },
   },
   posts: {

@@ -125,7 +125,19 @@ export function DownloadDialog(props: {
               </li>
             </ul>
 
-            <div className="mt-6 flex justify-end">
+            <p className="mt-5 text-xs text-slate-500">
+              How did it go?{' '}
+              <a
+                className="underline"
+                href="https://github.com/huzaifaalmesbah/folioblocks/issues/new?template=beta-feedback.yml"
+                target="_blank"
+                rel="noopener"
+              >
+                Tell us in two minutes
+              </a>
+              .
+            </p>
+            <div className="mt-4 flex justify-end">
               <button type="button" onClick={props.onClose} className="rounded-md bg-slate-900 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-700">
                 Done
               </button>

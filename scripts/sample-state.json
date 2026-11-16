@@ -54,7 +54,20 @@
       }
     ],
     "cvUrl": "https://example.com/cv.pdf",
-    "avatar": ""
+    "avatar": "",
+    "services": [
+      {
+        "title": "Theme setup",
+        "description": "Install and configure a block theme."
+      }
+    ],
+    "testimonials": [
+      {
+        "quote": "Careful, fast and kind to work with.",
+        "name": "A. Rahman",
+        "role": "Club advisor"
+      }
+    ]
   },
   "style": {
     "palette": {
@@ -140,5 +153,6 @@
     ]
   },
   "header": "inline",
-  "footer": "centered"
+  "footer": "centered",
+  "language": "en"
 }

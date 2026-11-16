@@ -62,6 +62,8 @@ type GroupOpts = {
   align?: 'full' | 'wide';
   padY?: number;
   background?: string;
+  /** Text colour slug, for sections on a dark or coloured ground. */
+  textColor?: string;
   layout?: Attrs;
   anchor?: string;
   className?: string;
@@ -111,10 +113,17 @@ export function group(children: string, opts: GroupOpts = {}): string {
   }
   if (Object.keys(spacingStyle).length) style.spacing = spacingStyle;
   if (Object.keys(style).length) attrs.style = style;
+  // Class order follows the editor's save: colour classes first, then the has-* flags.
+  if (opts.textColor) {
+    attrs.textColor = opts.textColor;
+    classes.push(`has-${opts.textColor}-color`);
+  }
   if (opts.background) {
     attrs.backgroundColor = opts.background;
-    classes.push(`has-${opts.background}-background-color`, 'has-background');
+    classes.push(`has-${opts.background}-background-color`);
   }
+  if (opts.textColor) classes.push('has-text-color');
+  if (opts.background) classes.push('has-background');
   attrs.layout = opts.layout ?? { type: 'constrained' };
 
   const styleAttr = styles.length ? ` style="${styles.join(';')}"` : '';
@@ -262,4 +271,13 @@ export function image(src: string, alt: string, opts: ImageOpts = {}): string {
   if (opts.rounded) classes.push('has-custom-border');
   const style = styles.length ? ` style="${styles.join(';')}"` : '';
   return block('image', attrs, `<figure class="${classes.join(' ')}"><img src="${src}" alt="${alt}"${style}/></figure>`);
+}
+
+/** A core Quote block: the words, then who said them. */
+export function quote(textHtml: string, citeHtml: string): string {
+  return block(
+    'quote',
+    undefined,
+    wrap('<blockquote class="wp-block-quote">', paragraph(textHtml), `<cite>${citeHtml}</cite></blockquote>`),
+  );
 }

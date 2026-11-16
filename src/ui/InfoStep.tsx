@@ -284,6 +284,29 @@ export function InfoStep() {
           ]}
           onChange={(achievements) => setInfo({ achievements })}
         />
+        <Repeater
+          label="Services (for freelancers)"
+          items={info.services}
+          empty={{ title: '', description: '' }}
+          addLabel="Add a service"
+          fields={[
+            { key: 'title', label: 'Service', placeholder: 'WordPress theme setup' },
+            { key: 'description', label: 'What it includes', textarea: true },
+          ]}
+          onChange={(services) => setInfo({ services })}
+        />
+        <Repeater
+          label="Testimonials"
+          items={info.testimonials}
+          empty={{ quote: '', name: '', role: '' }}
+          addLabel="Add a testimonial"
+          fields={[
+            { key: 'quote', label: 'What they said', textarea: true, placeholder: 'Only real words, used with their permission.' },
+            { key: 'name', label: 'Their name' },
+            { key: 'role', label: 'Their role', placeholder: 'Teacher, client, team lead…' },
+          ]}
+          onChange={(testimonials) => setInfo({ testimonials })}
+        />
         <Field
           label="CV link"
           type="url"

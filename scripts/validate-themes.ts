@@ -28,7 +28,7 @@ cases.push([
   'empty-profile',
   {
     ...cases[0][1],
-    info: { ...cases[0][1].info, bio: '', email: '', location: '', university: '', skills: [], contributions: [], projects: [], experience: [], education: [], achievements: [], cvUrl: '', socials: {} },
+    info: { ...cases[0][1].info, bio: '', email: '', location: '', university: '', skills: [], contributions: [], projects: [], experience: [], education: [], achievements: [], services: [], testimonials: [], cvUrl: '', socials: {} },
   },
 ]);
 

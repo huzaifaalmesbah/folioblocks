@@ -28,6 +28,16 @@ export function withSamples(info: Info): Info {
       ? info.experience
       : [{ role: 'Your role', org: 'Company or club', period: '2025 – now', description: 'One line about what you did there.' }],
     education: info.education.length ? info.education : [{ degree: 'Your degree', school: 'Your university', period: '2023 – 2027' }],
+    services: info.services.length
+      ? info.services
+      : [
+          { title: 'Service one', description: 'What you do for people, in one line.' },
+          { title: 'Service two', description: 'What you do for people, in one line.' },
+          { title: 'Service three', description: 'What you do for people, in one line.' },
+        ],
+    testimonials: info.testimonials.length
+      ? info.testimonials
+      : [{ quote: 'A sentence someone said about working with you.', name: 'Their name', role: 'Their role' }],
     achievements: info.achievements.length
       ? info.achievements
       : [{ title: 'Award or certificate', issuer: 'Who gave it', year: '2026', url: '' }],

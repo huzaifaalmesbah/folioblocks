@@ -24,6 +24,8 @@ Turn it into ONE JSON object in exactly this shape, and reply with the JSON only
   "experience": [{ "role": "", "org": "", "period": "Jan 2026 – now", "description": "one line" }],
   "contributions": [{ "team": "WordPress team or event, e.g. Polyglots", "description": "what I did", "date": "2026", "url": "" }],
   "achievements": [{ "title": "", "issuer": "", "year": "", "url": "" }],
+  "services": [{ "title": "", "description": "one line" }],
+  "testimonials": [{ "quote": "", "name": "", "role": "" }],
   "cvUrl": "",
   "socials": { "github": "", "linkedin": "", "x": "", "wordpress": "" }
 }
@@ -32,6 +34,8 @@ Rules:
 - Use only facts from my text. Never invent names, dates, links, numbers or achievements.
 - If something is missing, use "" or [] for it. Do not guess.
 - "contributions" is only for WordPress or open-source community work. Put jobs and internships in "experience".
+- "testimonials" only if my text quotes what a real person said about me, word for word. Never write one yourself.
+- "services" only if my text says I offer them (freelance work).
 - Newest first in every list. Keep every description to one clear line.
 - Keep my language: if my text is in Bengali, write the bio and descriptions in Bengali.
 - Links must be full URLs starting with https://.

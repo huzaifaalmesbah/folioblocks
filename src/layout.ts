@@ -157,6 +157,12 @@ export function sanitizeInfo(raw: unknown): Info {
           .map((a) => ({ title: str(a.title), issuer: str(a.issuer), year: str(a.year), url: str(a.url) }))
           .slice(0, 30)
       : [],
+    services: Array.isArray(i.services)
+      ? i.services.filter(isObj).map((x) => ({ title: str(x.title), description: str(x.description) })).slice(0, 12)
+      : [],
+    testimonials: Array.isArray(i.testimonials)
+      ? i.testimonials.filter(isObj).map((x) => ({ quote: str(x.quote), name: str(x.name), role: str(x.role) })).slice(0, 12)
+      : [],
     cvUrl: str(i.cvUrl),
     projects: Array.isArray(i.projects)
       ? i.projects

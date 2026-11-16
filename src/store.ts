@@ -123,7 +123,7 @@ export const useBuilder = create<Store>()(
     }),
     {
       name: 'folioblocks-state',
-      version: 6,
+      version: 7,
       storage: createJSONStorage(() => safeStorage),
       // Older drafts lack newer fields (v2: header/footer, v3: photos): fill them in from the defaults.
       migrate: (persisted) => {

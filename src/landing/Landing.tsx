@@ -95,6 +95,18 @@ function DesignMock({ p }: { p: PresetDef }) {
         {button}
       </div>
     );
+  } else if (hero0 === 'band') {
+    hero = (
+      <div className="-mx-3 flex flex-col items-center gap-1.5 px-3 py-4 text-center" style={{ background: palette.secondary }}>
+        <div style={{ fontFamily: heading, color: palette.base }} className="text-[15px] leading-tight font-bold">
+          Your Name
+        </div>
+        <div style={{ fontFamily: body, color: palette.base, opacity: 0.8 }} className="text-[8px]">
+          Student &amp; WordPress Contributor
+        </div>
+        {button}
+      </div>
+    );
   } else if (hero0 === 'centered') {
     hero = (
       <div className="flex flex-col items-center gap-1.5 py-4 text-center">
@@ -481,6 +493,7 @@ export function Landing() {
         <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-x-6 gap-y-2 px-4 sm:px-6">
           <span>FolioBlocks · GPL-2.0-or-later</span>
           <a className="hover:text-slate-700" href={REPO}>Source on GitHub</a>
+          <a className="hover:text-slate-700" href={`${REPO}/issues/new?template=beta-feedback.yml`}>Give feedback</a>
           <a className="hover:text-slate-700" href={SKILLS_REPO}>WordPress agent skills</a>
           <a className="hover:text-slate-700" href="https://openverse.org">Sample photos from Openverse (CC0)</a>
           <span className="ml-auto">Not affiliated with WordPress.org or WordPress.com.</span>

@@ -1,0 +1,53 @@
+name: Beta feedback
+description: Tell us how building your portfolio went
+title: "Beta feedback: "
+labels: ["beta-feedback"]
+body:
+  - type: markdown
+    attributes:
+      value: Thank you for testing FolioBlocks. Please don't include private details such as your phone number or address.
+  - type: dropdown
+    id: template
+    attributes:
+      label: Which template did you use?
+      options: [Minimal, Creative, Developer, Academic, Contributor, Resume, Writer, Bangla, Designer, Freelancer, Bold, Photographer]
+    validations:
+      required: true
+  - type: dropdown
+    id: device
+    attributes:
+      label: Device
+      options: [Laptop or desktop, Phone, Tablet]
+    validations:
+      required: true
+  - type: input
+    id: browser
+    attributes:
+      label: Browser
+      placeholder: Chrome, Firefox, Safari, Brave…
+  - type: textarea
+    id: hard
+    attributes:
+      label: What was hardest or most confusing?
+    validations:
+      required: true
+  - type: textarea
+    id: wrong
+    attributes:
+      label: Did anything look wrong or break?
+      description: In the preview, in WordPress Playground, or on your real site. Screenshots help.
+  - type: textarea
+    id: ai
+    attributes:
+      label: Fill with AI
+      description: Which AI chat did you use, and did it fill the form correctly?
+  - type: textarea
+    id: missing
+    attributes:
+      label: What is missing for your portfolio?
+      description: A field, a section, a template, a language…
+  - type: dropdown
+    id: publish
+    attributes:
+      label: Would you publish this as your portfolio?
+      options: ["Yes", "Yes, after a few changes", "Not yet"]
