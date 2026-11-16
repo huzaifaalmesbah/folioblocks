@@ -4,7 +4,7 @@ import { defaultState } from './defaults';
 import { addSection, layoutFromState, moveSection, removeSection, type SavedLayout } from './layout';
 import { presetByKey } from './presets';
 import { OLD_DEFAULT_BIO } from './samples';
-import type { BuilderState, FooterVariant, HeaderVariant, Info, PageKey, Palette, SectionType, Style } from './types';
+import type { BuilderState, FooterVariant, HeaderVariant, Info, Language, PageKey, Palette, SectionType, Style } from './types';
 
 /** Set when the browser refused to save (photos can fill localStorage). */
 export const storageStatus = { full: false };
@@ -43,6 +43,7 @@ type Store = BuilderState & {
   setPalette: (key: keyof Palette, value: string) => void;
   applyPalette: (palette: Palette) => void;
   applyPreset: (key: string) => void;
+  setLanguage: (v: Language) => void;
   setHeader: (v: HeaderVariant) => void;
   setFooter: (v: FooterVariant) => void;
   setSectionVariant: (page: PageKey, id: string, variant: string) => void;
@@ -77,8 +78,11 @@ export const useBuilder = create<Store>()(
           header: p.header,
           footer: p.footer,
           pages: structuredClone(p.pages),
+          // A template written for a language switches to it; the others keep the student's choice.
+          ...(p.language && { language: p.language }),
         });
       },
+      setLanguage: (language) => set({ language }),
       setHeader: (header) => set({ header }),
       setFooter: (footer) => set({ footer }),
       setSectionVariant: (page, id, variant) =>
@@ -119,7 +123,7 @@ export const useBuilder = create<Store>()(
     }),
     {
       name: 'folioblocks-state',
-      version: 5,
+      version: 6,
       storage: createJSONStorage(() => safeStorage),
       // Older drafts lack newer fields (v2: header/footer, v3: photos): fill them in from the defaults.
       migrate: (persisted) => {
@@ -145,5 +149,5 @@ export const useBuilder = create<Store>()(
 
 /** Strip store actions, leaving only serialisable BuilderState. */
 export function pickState(s: BuilderState): BuilderState {
-  return { info: s.info, style: s.style, preset: s.preset, header: s.header, footer: s.footer, pages: s.pages };
+  return { info: s.info, language: s.language ?? 'en', style: s.style, preset: s.preset, header: s.header, footer: s.footer, pages: s.pages };
 }

@@ -18,7 +18,8 @@ Nothing is sent to a server. Everything stays in the browser.
 | 3 | Quick preview that updates as you type (any browser), Open in WordPress Playground | ✅ done |
 | 3.5 | Photos (profile, projects), featured images, four distinct designs | ✅ done |
 | 4 | Drag-and-drop layout customizer, saved layouts, draft import/export | ✅ done |
-| 5 | Tests, accessibility, docs, GitHub Pages deploy, beta with students | ⏳ next |
+| 5 | Tiered profile form, 8 templates, Bengali, template gallery | ✅ done |
+| 6 | AI fill-in prompts, next-steps screen, mobile builder, student beta | ⏳ next |
 
 ## Development
 
@@ -97,6 +98,12 @@ Students can add a profile photo and a picture per project. They are resized to 
 The Info step has three tiers: **The basics** (name, tagline, bio, photo, email), **Recommended** (skills, projects, education, location, social links) and **Optional** (WordPress contributions with date and link, experience, achievements, CV link). A meter (`src/profile.ts`) shows how complete the profile is and what to add next.
 
 A section with nothing to show returns no markup, so the downloaded theme leaves it out (no "Project one" placeholders in a real site). The preview is generated with `generateTheme(state, { samples: true })`, which fills empty parts from `src/samples.ts` so students still see each section's shape; the Layout step marks those sections.
+
+### Templates and languages
+
+Eight templates in `src/presets.ts`: Minimal, Creative, Developer, Academic, Contributor (WordPress work first), Resume (one-page CV), Writer (posts first) and Bangla. Each sets a palette, fonts, header, footer and the sections of every page; the home page shows them as a gallery.
+
+The theme's own words (headings, buttons, menu, page titles) can be written in English or Bengali (`src/generator/i18n.ts`); the student's text is used as typed. Bengali uses the bundled Noto Sans Bengali font. To add a language, add a dictionary there and an option in the Style step.
 
 ### Layout editing and drafts
 

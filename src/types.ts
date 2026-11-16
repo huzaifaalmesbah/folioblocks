@@ -59,6 +59,7 @@ export type SectionType =
   | 'about'
   | 'skills'
   | 'contributions'
+  | 'stats'
   | 'experience'
   | 'education'
   | 'achievements'
@@ -73,8 +74,12 @@ export type PageKey = 'home' | 'about' | 'contact';
 export type HeaderVariant = 'inline' | 'centered';
 export type FooterVariant = 'centered' | 'split';
 
+/** The language of the theme's own words (headings, buttons, menu). The student's text is used as written. */
+export type Language = 'en' | 'bn';
+
 export type BuilderState = {
   info: Info;
+  language: Language;
   style: Style;
   preset: string;
   header: HeaderVariant;

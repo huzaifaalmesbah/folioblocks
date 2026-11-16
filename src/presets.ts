@@ -1,4 +1,4 @@
-import type { FooterVariant, HeaderVariant, PageKey, Palette, Section, Style } from './types';
+import type { FooterVariant, HeaderVariant, Language, PageKey, Palette, Section, Style } from './types';
 
 export type PaletteDef = { key: string; label: string; palette: Palette };
 
@@ -29,6 +29,21 @@ export const PALETTES: PaletteDef[] = [
     palette: { primary: '#be185d', secondary: '#831843', base: '#fffbfd', contrast: '#27151d', accent: '#fce7f3' },
   },
   {
+    key: 'ocean',
+    label: 'Ocean',
+    palette: { primary: '#0b62a8', secondary: '#0c3b5e', base: '#ffffff', contrast: '#0f2231', accent: '#e6f1f9' },
+  },
+  {
+    key: 'paper',
+    label: 'Paper',
+    palette: { primary: '#8a4b1f', secondary: '#4a2a12', base: '#faf7f2', contrast: '#2b2118', accent: '#f0e8dc' },
+  },
+  {
+    key: 'shapla',
+    label: 'Shapla',
+    palette: { primary: '#006a4e', secondary: '#b3202f', base: '#ffffff', contrast: '#1a1a1a', accent: '#e6f3ee' },
+  },
+  {
     key: 'mono',
     label: 'Monochrome',
     palette: { primary: '#111111', secondary: '#525252', base: '#ffffff', contrast: '#111111', accent: '#f4f4f5' },
@@ -41,6 +56,10 @@ export type PresetDef = {
   key: string;
   label: string;
   description: string;
+  /** Who it suits, shown in the gallery. */
+  bestFor: string;
+  /** Set when the template is written for a language; applying it switches the site language. */
+  language?: Language;
   style: Style;
   header: HeaderVariant;
   footer: FooterVariant;
@@ -55,6 +74,7 @@ export const PRESETS: PresetDef[] = [
     key: 'minimal',
     label: 'Minimal',
     description: 'Round photo, centered name, a clean project grid. Calm and simple.',
+    bestFor: 'Anyone: a clean, friendly start',
     style: { palette: palette('wordpress-blue'), fonts: { heading: 'inter', body: 'inter' }, radius: 'md' },
     header: 'inline',
     footer: 'centered',
@@ -68,6 +88,7 @@ export const PRESETS: PresetDef[] = [
     key: 'creative',
     label: 'Creative',
     description: 'Big serif type beside your photo, large showcase rows. Warm colours.',
+    bestFor: 'Designers and creative work',
     style: { palette: palette('sunset'), fonts: { heading: 'playfair-display', body: 'dm-sans' }, radius: 'lg' },
     header: 'centered',
     footer: 'centered',
@@ -81,6 +102,7 @@ export const PRESETS: PresetDef[] = [
     key: 'developer',
     label: 'Developer',
     description: 'Dark mode, monospace headings, project cards and a post list with thumbnails.',
+    bestFor: 'Developers and plugin authors',
     style: { palette: palette('midnight'), fonts: { heading: 'jetbrains-mono', body: 'inter' }, radius: 'sm' },
     header: 'inline',
     footer: 'split',
@@ -94,12 +116,70 @@ export const PRESETS: PresetDef[] = [
     key: 'academic',
     label: 'Academic',
     description: 'A research profile: portrait beside your details and bio, serif type, compact lists.',
+    bestFor: 'Researchers and academic profiles',
     style: { palette: palette('forest'), fonts: { heading: 'lora', body: 'lora' }, radius: 'none' },
     header: 'inline',
     footer: 'split',
     pages: {
       home: [s('hero', 'profile'), s('contributions', 'list'), s('projects', 'list'), s('posts', 'list'), s('contact', 'cta')],
       about: [s('about', 'columns'), s('skills', 'list'), s('experience', 'timeline'), s('education', 'list'), s('contributions', 'list'), s('achievements', 'list')],
+      contact: [s('contact', 'full')],
+    },
+  },
+  {
+    key: 'contributor',
+    label: 'Contributor',
+    description: 'Your WordPress work first: numbers at a glance, a dated contribution timeline, then projects.',
+    bestFor: 'WordPress Credits and Campus Connect students',
+    style: { palette: palette('ocean'), fonts: { heading: 'space-grotesk', body: 'inter' }, radius: 'md' },
+    header: 'inline',
+    footer: 'split',
+    pages: {
+      home: [s('hero', 'split'), s('stats', 'row'), s('contributions', 'timeline'), s('projects', 'cards'), s('posts', 'grid'), s('contact', 'cta')],
+      about: [s('about', 'photo'), s('skills', 'badges'), s('experience', 'timeline'), s('education', 'list'), s('achievements', 'list')],
+      contact: [s('contact', 'full')],
+    },
+  },
+  {
+    key: 'resume',
+    label: 'Resume',
+    description: 'A one-page CV: profile, experience, education, skills and achievements on the home page.',
+    bestFor: 'Job and internship applications',
+    style: { palette: palette('mono'), fonts: { heading: 'dm-sans', body: 'dm-sans' }, radius: 'sm' },
+    header: 'inline',
+    footer: 'split',
+    pages: {
+      home: [s('hero', 'profile'), s('experience', 'timeline'), s('education', 'list'), s('skills', 'badges'), s('achievements', 'list'), s('projects', 'list'), s('contact', 'cta')],
+      about: [s('about', 'text'), s('contributions', 'list')],
+      contact: [s('contact', 'full')],
+    },
+  },
+  {
+    key: 'writer',
+    label: 'Writer',
+    description: 'Words first: a quiet intro, then your latest posts. Serif headings on warm paper.',
+    bestFor: 'Bloggers and people who like to write',
+    style: { palette: palette('paper'), fonts: { heading: 'lora', body: 'inter' }, radius: 'sm' },
+    header: 'centered',
+    footer: 'centered',
+    pages: {
+      home: [s('hero', 'centered'), s('posts', 'list'), s('about', 'text'), s('contact', 'cta')],
+      about: [s('about', 'photo'), s('experience', 'compact'), s('education', 'list'), s('skills', 'list')],
+      contact: [s('contact', 'full')],
+    },
+  },
+  {
+    key: 'bangla',
+    label: 'বাংলা (Bangla)',
+    description: 'Headings, buttons and menu in Bengali, with a Bengali font. Write your own text in Bangla.',
+    bestFor: 'Sites written in Bengali',
+    language: 'bn',
+    style: { palette: palette('shapla'), fonts: { heading: 'noto-sans-bengali', body: 'noto-sans-bengali' }, radius: 'md' },
+    header: 'inline',
+    footer: 'centered',
+    pages: {
+      home: [s('hero', 'avatar'), s('about', 'text'), s('skills', 'badges'), s('projects', 'grid'), s('posts', 'grid'), s('contact', 'cta')],
+      about: [s('about', 'photo'), s('experience', 'timeline'), s('education', 'list'), s('contributions', 'list'), s('achievements', 'list')],
       contact: [s('contact', 'full')],
     },
   },

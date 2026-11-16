@@ -73,17 +73,19 @@ function DesignMock({ p }: { p: PresetDef }) {
   const heading = fontDef(fonts.heading).stack;
   const body = fontDef(fonts.body).stack;
   const radius = { none: '0', sm: '3px', md: '6px', lg: '12px' }[p.style.radius];
-  const name = <div style={{ fontFamily: heading, color: palette.contrast }} className="text-[15px] leading-tight font-bold">Your Name</div>;
+  const bn = p.language === 'bn';
+  const name = <div style={{ fontFamily: heading, color: palette.contrast }} className="text-[15px] leading-tight font-bold">{bn ? 'আপনার নাম' : 'Your Name'}</div>;
   const button = (
     <span className="inline-block px-2 py-1 text-[8px] font-semibold" style={{ background: palette.primary, color: palette.base, borderRadius: radius }}>
-      View my work
+      {bn ? 'আমার কাজ দেখুন' : 'View my work'}
     </span>
   );
-  const tag = <div style={{ fontFamily: body, color: palette.contrast, opacity: 0.75 }} className="text-[8px]">Student &amp; WordPress Contributor</div>;
+  const tag = <div style={{ fontFamily: body, color: palette.contrast, opacity: 0.75 }} className="text-[8px]">{bn ? 'শিক্ষার্থী ও ওয়ার্ডপ্রেস কন্ট্রিবিউটর' : 'Student & WordPress Contributor'}</div>;
   const photo = (cls: string, src = img('avatar.webp')) => <img src={src} alt="" className={`object-cover ${cls}`} style={{ borderRadius: radius }} />;
 
   let hero: ReactNode;
-  if (p.key === 'minimal') {
+  const hero0 = p.pages.home[0]?.variant;
+  if (hero0 === 'avatar') {
     hero = (
       <div className="flex flex-col items-center gap-1.5 py-2 text-center">
         <img src={img('avatar.webp')} alt="" className="h-9 w-9 rounded-full object-cover" />
@@ -92,7 +94,15 @@ function DesignMock({ p }: { p: PresetDef }) {
         {button}
       </div>
     );
-  } else if (p.key === 'academic') {
+  } else if (hero0 === 'centered') {
+    hero = (
+      <div className="flex flex-col items-center gap-1.5 py-4 text-center">
+        {name}
+        {tag}
+        {button}
+      </div>
+    );
+  } else if (hero0 === 'profile') {
     hero = (
       <div className="flex items-center gap-3 py-1">
         {photo('h-20 w-16')}
@@ -109,12 +119,12 @@ function DesignMock({ p }: { p: PresetDef }) {
     hero = (
       <div className="flex items-center gap-3 py-1">
         <div className="flex-1 space-y-1.5">
-          {p.key === 'creative' && <div style={{ color: palette.contrast }} className="text-[7px]">Hello, I'm</div>}
+          {hero0 === 'big' && <div style={{ color: palette.contrast }} className="text-[7px]">Hello, I'm</div>}
           {name}
           {tag}
           {button}
         </div>
-        {photo(p.key === 'creative' ? 'h-20 w-16' : 'h-16 w-16')}
+        {photo(hero0 === 'big' ? 'h-20 w-16' : 'h-16 w-16')}
       </div>
     );
   }
@@ -128,8 +138,8 @@ function DesignMock({ p }: { p: PresetDef }) {
       </div>
       <div className="space-y-2 p-3">
         <div className={`flex items-center text-[7px] ${p.header === 'centered' ? 'flex-col gap-0.5' : 'justify-between'}`} style={{ color: palette.contrast, fontFamily: body }}>
-          <span className="font-bold">Your Name</span>
-          <span className="opacity-70">About · Blog · Contact</span>
+          <span className="font-bold">{bn ? 'আপনার নাম' : 'Your Name'}</span>
+          <span className="opacity-70">{bn ? 'পরিচিতি · ব্লগ · যোগাযোগ' : 'About · Blog · Contact'}</span>
         </div>
         {hero}
         <div className="grid grid-cols-3 gap-1.5 rounded p-1.5" style={{ background: palette.accent }}>
@@ -180,7 +190,7 @@ export function Landing() {
             FolioBlocks
           </a>
           <div className="hidden items-center gap-5 text-sm text-slate-600 md:flex">
-            <a href="#designs" className="hover:text-slate-900">Designs</a>
+            <a href="#designs" className="hover:text-slate-900">Templates</a>
             <a href="#ai" className="hover:text-slate-900">AI guide</a>
             <a href="#wordpress-com" className="hover:text-slate-900">WordPress.com</a>
             <a href={REPO} className="hover:text-slate-900">GitHub</a>
@@ -222,7 +232,7 @@ export function Landing() {
             </div>
             <div className="relative mx-auto w-full max-w-md lg:max-w-none">
               <div className="grid grid-cols-2 gap-4">
-                {PRESETS.map((p, i) => (
+                {PRESETS.slice(0, 4).map((p, i) => (
                   <div key={p.key} className={i % 2 ? 'translate-y-6' : ''}>
                     <DesignMock p={p} />
                   </div>
@@ -274,7 +284,7 @@ export function Landing() {
         <section className="py-20" aria-labelledby="designs-title">
           <div className="mx-auto max-w-6xl px-4 sm:px-6">
             <div id="designs" className="mx-auto max-w-2xl scroll-mt-24 text-center">
-              <p className="text-sm font-semibold tracking-wide text-blue-700 uppercase">Four designs</p>
+              <p className="text-sm font-semibold tracking-wide text-blue-700 uppercase">{PRESETS.length} templates</p>
               <h2 id="designs-title" className="mt-2 text-3xl font-bold tracking-tight sm:text-4xl">Pick a starting point, then make it yours</h2>
               <p className="mt-4 text-lg text-slate-600">
                 Every design can be changed: colours, fonts, corners, and each page's sections, which you can reorder, swap, add or remove.
@@ -285,6 +295,7 @@ export function Landing() {
                 <article key={p.key} className="flex flex-col">
                   <DesignMock p={p} />
                   <h3 className="mt-4 font-semibold">{p.label}</h3>
+                  <p className="mt-1 text-xs font-medium text-blue-800">Best for: {p.bestFor}</p>
                   <p className="mt-1 flex-1 text-sm text-slate-600">{p.description}</p>
                   <button
                     type="button"
@@ -292,7 +303,7 @@ export function Landing() {
                     className="mt-3 self-start rounded-md border border-slate-300 px-3 py-1.5 text-sm font-medium hover:bg-slate-50"
                     aria-label={`Start with the ${p.label} design`}
                   >
-                    Start with {p.label}
+                    Use this template
                   </button>
                 </article>
               ))}

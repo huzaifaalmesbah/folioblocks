@@ -95,3 +95,39 @@ describe('new profile sections', () => {
     expect(parseSettings(exportSettings(state, [])).state.info).toEqual(full);
   });
 });
+
+describe('templates and language', () => {
+  it('every palette is readable: text on background and button text on primary pass WCAG AA', async () => {
+    const { contrastRatio } = await import('./color');
+    const { PALETTES } = await import('./presets');
+    for (const { key, palette } of PALETTES) {
+      expect(contrastRatio(palette.contrast, palette.base), `${key} text`).toBeGreaterThanOrEqual(4.5);
+      expect(contrastRatio(palette.base, palette.primary), `${key} button`).toBeGreaterThanOrEqual(4.5);
+      expect(contrastRatio(palette.primary, palette.base), `${key} link`).toBeGreaterThanOrEqual(4.5);
+    }
+  });
+
+  it('the Bangla template writes the theme\'s own words in Bengali and bundles a Bengali font', () => {
+    const p = PRESETS.find((x) => x.key === 'bangla')!;
+    const state: BuilderState = { ...withInfo(full, 'bangla'), language: p.language! };
+    const { files, assets } = generateTheme(state);
+    const home = files['patterns/page-home.php'];
+    expect(home).toContain("esc_html__( 'আমার সম্পর্কে'");
+    expect(home).toContain("esc_html__( 'প্রজেক্ট'");
+    expect(home).not.toContain("'About me'");
+    // The student's own text is untouched.
+    expect(home).toContain("'I study computer science and contribute to WordPress.'");
+    expect(files['patterns/footer.php']).toContain('ওয়ার্ডপ্রেস</a> দিয়ে তৈরি');
+    expect(assets.map((a) => a.path)).toContain('assets/fonts/noto-sans-bengali/noto-sans-bengali-var-normal.woff2');
+    expect(files['readme.txt']).toContain('Noto Sans Bengali');
+    for (const [path, content] of Object.entries(files)) {
+      if (/^patterns\//.test(path)) expect(checkBlockMarkup(content), path).toEqual([]);
+    }
+  });
+
+  it('shows stats only when there are at least two numbers', () => {
+    const stats = { id: 's', type: 'stats' as const, variant: 'row' };
+    expect(isSectionEmpty(stats, { ...defaultState.info, skills: ['a'] })).toBe(true);
+    expect(isSectionEmpty(stats, full)).toBe(false);
+  });
+});

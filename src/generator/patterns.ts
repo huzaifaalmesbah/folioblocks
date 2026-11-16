@@ -2,6 +2,7 @@ import { SITE_URL } from '../config';
 import type { BuilderState, PageKey } from '../types';
 import { block, group, join, paragraph, pattern } from './blocks';
 import { renderSection, socialLinks, type Ctx } from './sections';
+import { footerCredit } from './i18n';
 import { templates, type PatternDef } from './templates';
 import { RADIUS } from './themeJson';
 import { headerSafe, makePhp, type Php } from './utils';
@@ -59,9 +60,7 @@ function footerContent(state: BuilderState, php: Php): string {
       center
         ? { metadata: { name: php.name('Credit') }, align: 'center', fontSize: 'small' }
         : { metadata: { name: php.name('Credit') }, fontSize: 'small' },
-      `<p class="${center ? 'has-text-align-center ' : ''}has-small-font-size">${php.html(
-        `Built with <a href="https://wordpress.org">WordPress</a> · Theme made with <a href="${SITE_URL}">FolioBlocks</a>`,
-      )}</p>`,
+      `<p class="${center ? 'has-text-align-center ' : ''}has-small-font-size">${php.html(footerCredit(php.lang, SITE_URL))}</p>`,
     );
 
   if (state.footer === 'split') {
@@ -102,7 +101,7 @@ const PAGES: Record<PageKey, { title: string; category: string; description: str
 };
 
 export function patterns(state: BuilderState, slug: string): { patterns: Record<string, string>; templates: Record<string, string> } {
-  const php = makePhp(slug);
+  const php = makePhp(slug, state.language ?? 'en');
   const ctx: Ctx = { info: state.info, php, radius: RADIUS[state.style.radius] };
   const defs: PatternDef[] = [];
 

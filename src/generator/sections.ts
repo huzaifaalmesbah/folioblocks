@@ -1,5 +1,6 @@
 import type { Info, Section, SectionType } from '../types';
 import { badge, block, buttons, columns, container, group, heading, image, join, list, metaText, paragraph, separator } from './blocks';
+import { portraitAlt, screenshotAlt } from './i18n';
 import { AVATAR, projectImage } from './images';
 import { cleanUrl, makePhp, type Php } from './utils';
 
@@ -19,7 +20,7 @@ function grid(items: string[], size = 3): string[] {
 
 /** The student's photo (or the placeholder), with translated alt text. */
 function avatar({ info, php }: Ctx, opts: Parameters<typeof image>[2]): string {
-  return image(php.themeFile(AVATAR), php.attr(`Portrait of ${info.name}`), opts);
+  return image(php.themeFile(AVATAR), php.attr(portraitAlt(php.lang, info.name)), opts);
 }
 
 /* ---------- Hero ---------- */
@@ -202,6 +203,36 @@ const contributionsCards: Renderer = ({ info, php, radius }) => {
   });
 };
 
+/** Dated entries, newest first as written: the date leads, then what happened. */
+const contributionsTimeline: Renderer = ({ info, php }) => {
+  if (!info.contributions.length) return '';
+  const items = info.contributions.map((c) =>
+    group(join(c.date && metaText(php.t(c.date)), heading(contributionTitle(php, c), 3), paragraph(php.t(c.description))), {
+      name: php.name('Contribution'),
+      layout: { type: 'default' },
+    }),
+  );
+  return group(join(heading(php.t('My WordPress journey')), ...items.flatMap((item, i) => (i ? [separator(), item] : [item]))), {
+    name: php.name('WordPress journey'),
+    tagName: 'section',
+    padY: 60,
+  });
+};
+
+/* ---------- Numbers at a glance ---------- */
+
+/** Counts taken from the profile itself, so they are never made up. Needs at least two to be worth showing. */
+const statsRow: Renderer = ({ info, php }) => {
+  const stats = [
+    { n: info.projects.length, label: 'Projects' },
+    { n: info.contributions.length, label: 'Contributions' },
+    { n: info.skills.length, label: 'Skills' },
+  ].filter((s) => s.n > 0);
+  if (stats.length < 2) return '';
+  const cols = stats.map((s) => join(heading(String(s.n), 3, true), paragraph(php.t(s.label), true)));
+  return group(columns(cols), { name: php.name('Stats'), tagName: 'section', align: 'full', padY: 50, background: SURFACE });
+};
+
 /* ---------- Experience, education, achievements ---------- */
 
 const experienceTimeline: Renderer = ({ info, php }) => {
@@ -218,6 +249,16 @@ const experienceTimeline: Renderer = ({ info, php }) => {
     ),
   );
   return group(join(heading(php.t('Experience')), ...items), { name: php.name('Experience'), tagName: 'section', padY: 50 });
+};
+
+/** One line each: for a CV-style page. */
+const experienceCompact: Renderer = ({ info, php }) => {
+  if (!info.experience.length) return '';
+  const items = info.experience.map((e) => {
+    const where = [e.org, e.period].filter(Boolean).join(', ');
+    return `<strong>${php.t(e.role)}</strong>${where ? `: ${php.t(where)}` : ''}`;
+  });
+  return group(join(heading(php.t('Experience')), list(items)), { name: php.name('Experience'), tagName: 'section', padY: 50 });
 };
 
 const educationList: Renderer = ({ info, php }) => {
@@ -249,7 +290,7 @@ function projectText({ php }: Ctx, p: Info['projects'][number]): string {
 }
 
 function projectPicture({ php }: Ctx, p: Info['projects'][number], i: number, aspectRatio = '3/2'): string {
-  return image(php.themeFile(projectImage(i)), php.attr(`Screenshot of ${p.title}`), { aspectRatio });
+  return image(php.themeFile(projectImage(i)), php.attr(screenshotAlt(php.lang, p.title)), { aspectRatio });
 }
 
 /** Picture on top, then title and description. */
@@ -447,6 +488,7 @@ export const SECTION_LABELS: Record<SectionType, string> = {
   about: 'About',
   skills: 'Skills',
   contributions: 'WordPress journey',
+  stats: 'Numbers at a glance',
   experience: 'Experience',
   education: 'Education',
   achievements: 'Achievements',
@@ -475,8 +517,13 @@ export const SECTIONS: Record<SectionType, Record<string, Variant>> = {
   contributions: {
     list: { label: 'List', render: contributionsList },
     cards: { label: 'Cards', render: contributionsCards },
+    timeline: { label: 'Timeline', render: contributionsTimeline },
   },
-  experience: { timeline: { label: 'Timeline', render: experienceTimeline } },
+  stats: { row: { label: 'Row of numbers', render: statsRow } },
+  experience: {
+    timeline: { label: 'Timeline', render: experienceTimeline },
+    compact: { label: 'Compact list', render: experienceCompact },
+  },
   education: { list: { label: 'List', render: educationList } },
   achievements: { list: { label: 'List', render: achievementsList } },
   projects: {

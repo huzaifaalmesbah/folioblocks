@@ -19,7 +19,7 @@ rmSync(OUT, { recursive: true, force: true });
 
 const cases: [string, BuilderState][] = PRESETS.map((p) => [
   p.key,
-  { ...sample, preset: p.key, style: p.style, header: p.header, footer: p.footer, pages: p.pages },
+  { ...sample, language: p.language ?? 'en', preset: p.key, style: p.style, header: p.header, footer: p.footer, pages: p.pages },
 ]);
 // Cover the header and footer variants each preset doesn't use, and an empty profile.
 cases.push(['minimal-centered-split', { ...cases[0][1], header: 'centered', footer: 'split' }]);

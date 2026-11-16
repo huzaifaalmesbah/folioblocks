@@ -56,9 +56,11 @@ describe('quick preview', () => {
     }
     const home = renderPage(state, files, 'home').html;
     expect(home).toContain('Jane Doe');
-    expect(home).toContain('Campus Events');
-    expect(home).toContain('My first WordPress contribution');
-    expect(home).toContain('wp-social-link-github');
+    // Each template puts different sections on its home page.
+    const types = state.pages.home.map((s) => s.type);
+    if (types.includes('projects')) expect(home).toContain('Campus Events');
+    if (types.includes('posts')) expect(home).toContain('My first WordPress contribution');
+    expect(renderPage(state, files, 'contact').html).toContain('wp-social-link-github');
   });
 
   it('escapes what the student types', () => {

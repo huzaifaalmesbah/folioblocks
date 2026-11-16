@@ -1,4 +1,5 @@
 import { SITE_URL } from '../config';
+import { tr } from '../generator/i18n';
 import { SAMPLE_POST_IMAGES } from '../generator/images';
 import type { ThemeAsset } from '../fonts';
 import type { BuilderState, ThemeFiles } from '../types';
@@ -27,18 +28,18 @@ require '/wordpress/wp-load.php';
 global $wp_rewrite;
 $wp_rewrite->set_permalink_structure( '/%postname%/' );
 
-function fb_page( $title, $template = '' ) {
-	$args = array( 'post_type' => 'page', 'post_status' => 'publish', 'post_title' => $title );
+function fb_page( $slug, $title, $template = '' ) {
+	$args = array( 'post_type' => 'page', 'post_status' => 'publish', 'post_title' => $title, 'post_name' => $slug );
 	if ( $template ) {
 		$args['page_template'] = $template;
 	}
 	return wp_insert_post( $args );
 }
 
-$home    = fb_page( 'Home' );
-$about   = fb_page( 'About', 'page-about' );
-$blog    = fb_page( 'Blog' );
-$contact = fb_page( 'Contact', 'page-contact' );
+$home    = fb_page( 'home', '__HOME__' );
+$about   = fb_page( 'about', '__ABOUT__', 'page-about' );
+$blog    = fb_page( 'blog', '__BLOG__' );
+$contact = fb_page( 'contact', '__CONTACT__', 'page-contact' );
 
 update_option( 'show_on_front', 'page' );
 update_option( 'page_on_front', $home );
@@ -163,7 +164,13 @@ export function buildBlueprint(
           blogdescription: state.info.tagline,
         },
       },
-      { step: 'runPHP', code: SETUP_PHP },
+      {
+        step: 'runPHP',
+        // Page titles in the site's language; the slugs stay English so links keep working.
+        code: SETUP_PHP.replace(/__(HOME|ABOUT|BLOG|CONTACT)__/g, (_m, k: string) =>
+          tr(state.language, k[0] + k.slice(1).toLowerCase()).replace(/'/g, "\\'"),
+        ),
+      },
     ],
   };
 }

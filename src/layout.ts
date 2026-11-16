@@ -189,6 +189,7 @@ export function parseSettings(text: string): { state: BuilderState; layouts: Sav
       avatar: image(i.avatar),
     },
     style: style(s.style),
+    language: s.language === 'bn' ? 'bn' : 'en',
     preset: str(s.preset, defaultState.preset),
     header: header(s.header),
     footer: footer(s.footer),

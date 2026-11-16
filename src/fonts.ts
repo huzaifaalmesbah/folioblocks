@@ -48,6 +48,16 @@ export const FONTS = {
     file: 'jetbrains-mono.woff2',
     weight: '100 800', copyright: "Copyright 2020 The JetBrains Mono Project Authors (https://github.com/JetBrains/JetBrainsMono)", source: "https://www.jetbrains.com/lp/mono/",
   },
+  // Bengali glyphs only; Latin letters and digits fall back to the system sans.
+  'noto-sans-bengali': {
+    name: 'Noto Sans Bengali',
+    stack: `"Noto Sans Bengali", ${SANS}`,
+    category: 'sans',
+    file: 'noto-sans-bengali.woff2',
+    weight: '100 900',
+    copyright: 'Copyright 2025 The Noto Project Authors (https://github.com/notofonts/bengali)',
+    source: 'https://github.com/notofonts/bengali',
+  },
 } satisfies Record<string, FontDef>;
 
 export type FontKey = keyof typeof FONTS;

@@ -4,6 +4,7 @@ import { defaultState } from '../defaults';
 import type { BuilderState } from '../types';
 import { buildZip } from '../zip/buildZip';
 import { generateTheme, themeSlug } from './index';
+import { PALETTES } from '../presets';
 import { SECTIONS } from './sections';
 import { checkBlockMarkup } from './testUtils';
 
@@ -146,7 +147,7 @@ describe('Ipsum conventions', () => {
 
   it('adds every other palette as a colour style variation', () => {
     const variations = Object.keys(files).filter((p) => p.startsWith('styles/colors/'));
-    expect(variations.length).toBe(5);
+    expect(variations.length).toBe(PALETTES.length - 1);
     expect(variations[0]).toMatch(/^styles\/colors\/01-[a-z-]+\.json$/);
     const midnight = JSON.parse(files[variations.find((v) => v.endsWith('midnight.json'))!]);
     expect(midnight.title).toBe('Midnight');

@@ -33,7 +33,7 @@ export function LayoutStep() {
   return (
     <div className="space-y-6">
       <section className="space-y-3">
-        <SectionTitle>Starting layout</SectionTitle>
+        <SectionTitle>Template</SectionTitle>
         <div className="grid gap-2">
           {PRESETS.map((p) => {
             const active = p.key === preset;

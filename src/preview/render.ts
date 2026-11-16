@@ -7,6 +7,7 @@
  */
 import { parse } from '@wordpress/block-serialization-default-parser';
 import type { BuilderState, ThemeFiles } from '../types';
+import { tr } from '../generator/i18n';
 import { escapeHtml, renderPhp, type FileUrl } from './php';
 
 export type PreviewPage = 'home' | 'about' | 'blog' | 'post' | 'contact';
@@ -164,7 +165,7 @@ function renderDynamic(block: ParsedBlock, ctx: Ctx): string | null {
       return `<p class="wp-block-site-title${align}">${navLink('home', info.name)}</p>`;
     case 'core/navigation': {
       const items = (['about', 'blog', 'contact', 'home'] as PreviewPage[])
-        .map((p) => `<li class="wp-block-navigation-item">${navLink(p, p[0].toUpperCase() + p.slice(1))}</li>`)
+        .map((p) => `<li class="wp-block-navigation-item">${navLink(p, tr(ctx.state.language, p[0].toUpperCase() + p.slice(1)))}</li>`)
         .join('');
       const nav = `<nav class="wp-block-navigation"><ul class="wp-block-navigation__container wp-block-navigation">${items}</ul></nav>`;
       return addToFirstTag(nav, layoutClasses(block, ctx));

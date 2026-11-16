@@ -21,6 +21,7 @@ export const defaultState: BuilderState = {
     socials: {},
     avatar: '',
   },
+  language: 'en',
   style: minimal.style,
   preset: minimal.key,
   header: minimal.header,

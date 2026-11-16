@@ -1,3 +1,5 @@
+import type { Language } from '../types';
+import { tr } from './i18n';
 /** Turn a name into a WordPress-safe theme slug, e.g. "Jane Doe" → "jane-doe-portfolio". */
 export function themeSlug(name: string): string {
   const base = name
@@ -26,11 +28,13 @@ export function headerSafe(value: string): string {
 }
 
 /** Helpers that print user content safely from inside a PHP pattern file. */
-export function makePhp(textDomain: string) {
+export function makePhp(textDomain: string, lang: Language = 'en') {
+  const d = phpString(textDomain);
   return {
-    /** Translatable, escaped text. */
-    t: (text: string) =>
-      `<?php echo esc_html__( ${phpString(text)}, ${phpString(textDomain)} ); ?>`,
+    /** The language of the theme's own words. */
+    lang,
+    /** Translatable, escaped text. The theme's own strings are written in `lang`. */
+    t: (text: string) => `<?php echo esc_html__( ${phpString(tr(lang, text))}, ${d} ); ?>`,
     /** Escaped URL. */
     url: (url: string) => `<?php echo esc_url( ${phpString(cleanUrl(url))} ); ?>`,
     /** URL of a file in the theme, e.g. assets/images/avatar.webp (Ipsum's way: works from child themes too). */
@@ -39,12 +43,11 @@ export function makePhp(textDomain: string) {
      * Translatable text with simple HTML (links) kept, as Ipsum recommends:
      * clearer for translators than sprintf(), and they can drop the markup.
      */
-    html: (text: string) => `<?php echo wp_kses_post( __( ${phpString(text)}, ${phpString(textDomain)} ) ); ?>`,
+    html: (text: string) => `<?php echo wp_kses_post( __( ${phpString(text)}, ${d} ) ); ?>`,
     /** Translatable text for an HTML attribute or a block attribute. */
-    attr: (text: string) => `<?php echo esc_attr__( ${phpString(text)}, ${phpString(textDomain)} ); ?>`,
+    attr: (text: string) => `<?php echo esc_attr__( ${phpString(tr(lang, text))}, ${d} ); ?>`,
     /** Translatable block name, shown in the List View (metadata.name). */
-    name: (text: string) =>
-      `<?php echo esc_html_x( ${phpString(text)}, 'Block name shown in the List View', ${phpString(textDomain)} ); ?>`,
+    name: (text: string) => `<?php echo esc_html_x( ${phpString(text)}, 'Block name shown in the List View', ${d} ); ?>`,
   };
 }
 

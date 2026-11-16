@@ -29,6 +29,7 @@ type StepKey = (typeof STEPS)[number]['key'];
 
 export function Builder() {
   const info = useBuilder((s) => s.info);
+  const language = useBuilder((s) => s.language);
   const style = useBuilder((s) => s.style);
   const preset = useBuilder((s) => s.preset);
   const header = useBuilder((s) => s.header);
@@ -37,8 +38,8 @@ export function Builder() {
   const reset = useBuilder((s) => s.reset);
 
   const state = useMemo(
-    () => pickState({ info, style, preset, header, footer, pages }),
-    [info, style, preset, header, footer, pages],
+    () => pickState({ info, language, style, preset, header, footer, pages }),
+    [info, language, style, preset, header, footer, pages],
   );
   const { slug, files, assets } = useMemo(() => generateTheme(state), [state]);
   // The preview fills empty parts with sample content; the theme above leaves them out.
