@@ -115,6 +115,10 @@ FolioBlocks never calls an AI. It gives students prompts to paste into the AI ch
 
 All prompts tell the AI to use only the student's facts and never invent any.
 
+### Download check, next steps and small screens
+
+Pressing Download opens a dialog (`src/ui/DownloadDialog.tsx`): first a checklist from `src/checklist.ts` (placeholder name or photo, missing bio, bad links or email, unreadable colours, sections left out), each with a Fix link to the right step; then, once the zip is saved, the upload steps, a Playground link and the AI guide. On small screens the builder shows the form and the preview one at a time (Edit / Preview). The builder is lazy-loaded so the home page stays light, and the preview draws WordPress' own social icons (`src/preview/socialIcons.ts`, from Gutenberg).
+
 ### Layout editing and drafts
 
 - In the Layout step, each page's sections can be dragged into a new order (with `@dnd-kit`; keyboard dragging and the ↑ ↓ buttons work too), given a different design, removed, or added.

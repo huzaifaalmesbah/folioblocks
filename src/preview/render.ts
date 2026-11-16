@@ -9,6 +9,7 @@ import { parse } from '@wordpress/block-serialization-default-parser';
 import type { BuilderState, ThemeFiles } from '../types';
 import { tr } from '../generator/i18n';
 import { escapeHtml, renderPhp, type FileUrl } from './php';
+import { SOCIAL_ICONS } from './socialIcons';
 
 export type PreviewPage = 'home' | 'about' | 'blog' | 'post' | 'contact';
 
@@ -125,6 +126,12 @@ function layoutClasses(block: ParsedBlock, ctx: Ctx): string[] {
   return ['is-layout-flow'];
 }
 
+function socialIcon(service: string): string {
+  const icon = SOCIAL_ICONS[service];
+  if (!icon) return '';
+  return `<svg width="24" height="24" viewBox="${icon.viewBox}" aria-hidden="true" focusable="false">${icon.paths.map((d) => `<path d="${d}"></path>`).join('')}</svg>`;
+}
+
 /** Assemble a static block from its saved HTML and rendered children. */
 function renderStatic(block: ParsedBlock, ctx: Ctx): string {
   let i = 0;
@@ -226,12 +233,12 @@ function renderDynamic(block: ParsedBlock, ctx: Ctx): string | null {
       return `<form class="wp-block-search__button-outside wp-block-search__text-button wp-block-search" onsubmit="return false"><div class="wp-block-search__inside-wrapper"><input class="wp-block-search__input" type="search" aria-label="${escapeHtml(String(a.label ?? 'Search'))}"><button class="wp-block-search__button wp-element-button" type="button">${escapeHtml(String(a.buttonText ?? 'Search'))}</button></div></form>`;
     case 'core/social-links': {
       const links = block.innerBlocks.map((b) => renderBlock(b, ctx)).join('');
-      return addToFirstTag(`<ul class="wp-block-social-links has-visible-labels">${links}</ul>`, layoutClasses(block, ctx));
+      return addToFirstTag(`<ul class="wp-block-social-links">${links}</ul>`, layoutClasses(block, ctx));
     }
     case 'core/social-link': {
       const service = String(a.service ?? '');
       const label = SOCIAL_LABELS[service] ?? service;
-      return `<li class="wp-social-link wp-social-link-${service} wp-block-social-link"><a class="wp-block-social-link-anchor" href="${String(a.url ?? '#')}" target="_blank" rel="noopener"><span class="wp-block-social-link-label">${escapeHtml(label)}</span></a></li>`;
+      return `<li class="wp-social-link wp-social-link-${service} wp-block-social-link"><a class="wp-block-social-link-anchor" href="${String(a.url ?? '#')}" target="_blank" rel="noopener">${socialIcon(service)}<span class="wp-block-social-link-label screen-reader-text">${escapeHtml(label)}</span></a></li>`;
     }
     default:
       return null;

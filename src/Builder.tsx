@@ -11,6 +11,8 @@ import { InfoStep } from './ui/InfoStep';
 import { StyleStep } from './ui/StyleStep';
 import { LayoutStep } from './ui/LayoutStep';
 import { QuickPreview } from './preview/QuickPreview';
+import { publishChecklist } from './checklist';
+import { DownloadDialog } from './ui/DownloadDialog';
 
 type View = 'preview' | 'code';
 
@@ -52,6 +54,11 @@ export function Builder() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const [notice, setNotice] = useState('');
+  // Download opens a dialog: a pre-flight check, then what to do next.
+  const [dialog, setDialog] = useState<'closed' | 'check' | 'done'>('closed');
+  const checklist = useMemo(() => publishChecklist(state), [state]);
+  // On small screens the form and the preview take turns.
+  const [mobileView, setMobileView] = useState<'edit' | 'preview'>('edit');
 
   const Current = STEPS.find((s) => s.key === step)!.Component;
   const stepIndex = STEPS.findIndex((s) => s.key === step);
@@ -94,6 +101,7 @@ export function Builder() {
       const [screenshot, binaries] = await Promise.all([renderScreenshot(state), fetchAssets(assets)]);
       const zip = await buildZip(slug, files, { ...binaries, 'screenshot.png': screenshot });
       saveAs(zip, `${slug}.zip`);
+      setDialog('done');
     } catch (e) {
       setError(e instanceof Error ? e.message : String(e));
     } finally {
@@ -102,16 +110,51 @@ export function Builder() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col bg-slate-50 text-slate-900 lg:h-screen lg:flex-row">
-      <aside className="flex w-full shrink-0 flex-col border-slate-200 bg-white lg:w-[440px] lg:border-r">
-        <header className="space-y-3 border-b border-slate-200 p-6 pb-4">
+    <div className="flex h-dvh flex-col bg-slate-50 text-slate-900 lg:flex-row">
+      <DownloadDialog
+        open={dialog !== 'closed'}
+        phase={dialog === 'done' ? 'done' : 'check'}
+        items={checklist}
+        slug={slug}
+        busy={busy}
+        error={error}
+        onDownload={download}
+        onFix={(s) => {
+          setStep(s);
+          setMobileView('edit');
+          setDialog('closed');
+        }}
+        onPlayground={openInPlayground}
+        onClose={() => setDialog('closed')}
+      />
+
+      {/* Small screens: one panel at a time. */}
+      <div className="grid shrink-0 grid-cols-2 gap-1 border-b border-slate-200 bg-white p-2 lg:hidden" role="tablist" aria-label="Panel">
+        {(['edit', 'preview'] as const).map((v) => (
+          <button
+            key={v}
+            type="button"
+            role="tab"
+            aria-selected={mobileView === v}
+            onClick={() => setMobileView(v)}
+            className={`rounded-md py-2 text-sm font-semibold ${mobileView === v ? 'bg-slate-900 text-white' : 'bg-slate-100 text-slate-700'}`}
+          >
+            {v === 'edit' ? 'Edit' : 'Preview'}
+          </button>
+        ))}
+      </div>
+
+      <aside
+        className={`${mobileView === 'edit' ? 'flex' : 'hidden'} min-h-0 w-full flex-1 flex-col border-slate-200 bg-white lg:flex lg:w-[440px] lg:flex-none lg:border-r`}
+      >
+        <header className="space-y-3 border-b border-slate-200 p-4 pb-3 lg:p-6 lg:pb-4">
           <div>
             <h1 className="text-2xl font-bold">
               <a href="#/" className="hover:text-blue-700" aria-label="FolioBlocks home">
                 FolioBlocks
               </a>
             </h1>
-            <p className="text-sm text-slate-600">Build your WordPress portfolio theme, no code needed.</p>
+            <p className="hidden text-sm text-slate-600 lg:block">Build your WordPress portfolio theme, no code needed.</p>
           </div>
           <nav className="grid grid-cols-3 gap-1 rounded-lg bg-slate-100 p-1" aria-label="Steps">
             {STEPS.map((s) => (
@@ -164,11 +207,14 @@ export function Builder() {
           <div className="flex gap-2">
             <button
               type="button"
-              onClick={download}
+              onClick={() => {
+                setError('');
+                setDialog('check');
+              }}
               disabled={busy}
               className="flex-1 rounded-md bg-blue-700 px-4 py-2.5 text-sm font-semibold text-white hover:bg-blue-800 disabled:opacity-60"
             >
-              {busy ? 'Building…' : `Download ${slug}.zip`}
+              Download {slug}.zip
             </button>
             <button
               type="button"
@@ -178,7 +224,7 @@ export function Builder() {
               Reset
             </button>
           </div>
-          {error && (
+          {error && dialog === 'closed' && (
             <p role="alert" className="text-xs text-red-700">
               {error}
             </p>
@@ -203,7 +249,7 @@ export function Builder() {
         </footer>
       </aside>
 
-      <main className="flex min-h-[70vh] min-w-0 flex-1 flex-col lg:min-h-0">
+      <main className={`${mobileView === 'preview' ? 'flex' : 'hidden'} min-h-0 min-w-0 flex-1 flex-col lg:flex`}>
         <div className="flex items-center gap-3 border-b border-slate-200 bg-white px-4 py-2">
           <div className="flex gap-1 rounded-lg bg-slate-100 p-1" role="tablist" aria-label="Right panel">
             {VIEWS.map((v) => (
@@ -217,7 +263,13 @@ export function Builder() {
                   view === v.key ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
-                {v.key === 'code' ? `Code (${paths.length} files)` : v.label}
+                {v.key === 'code' ? (
+                  <>
+                    Code<span className="hidden sm:inline"> ({paths.length} files)</span>
+                  </>
+                ) : (
+                  v.label
+                )}
               </button>
             ))}
           </div>
@@ -227,7 +279,7 @@ export function Builder() {
           <button
             type="button"
             onClick={openInPlayground}
-            className="ml-auto shrink-0 rounded-md border border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-800 hover:bg-slate-100"
+            className="ml-auto shrink-0 rounded-md border border-slate-300 px-3 py-1.5 text-sm font-medium whitespace-nowrap text-slate-800 hover:bg-slate-100"
           >
             Open in WordPress Playground ↗
           </button>

@@ -164,7 +164,7 @@ export function themeCss(themeJsonText: string, fontUrl: (themePath: string) => 
     .wp-block-navigation a { color: inherit; text-decoration: none; }
     .wp-block-site-title a { color: inherit; text-decoration: none; }
     .wp-block-social-links { list-style: none; padding: 0; }
-    .wp-block-social-link-anchor { padding: 0.3em 0.8em; border: 1px solid currentColor; border-radius: 9999px; color: inherit !important; text-decoration: none; font-size: var(--wp--preset--font-size--small, 0.875rem); }
+    .screen-reader-text { border: 0; clip-path: inset(50%); height: 1px; margin: -1px; overflow: hidden; padding: 0; position: absolute; width: 1px; white-space: nowrap; }
     main { display: block; }
   `);
 

@@ -1,6 +1,8 @@
-import { useEffect, useState } from 'react';
-import { Builder } from './Builder';
+import { lazy, Suspense, useEffect, useState } from 'react';
 import { Landing } from './landing/Landing';
+
+// The builder (generator, zip, drag-and-drop) loads only when it is opened, so the home page stays light.
+const Builder = lazy(() => import('./Builder').then((m) => ({ default: m.Builder })));
 
 /**
  * Two views on one static page (GitHub Pages has no server routing):
@@ -30,5 +32,11 @@ export default function App() {
     document.title = builder ? 'Build your theme · FolioBlocks' : 'FolioBlocks: build your WordPress portfolio theme';
   }, [builder]);
 
-  return builder ? <Builder /> : <Landing />;
+  return builder ? (
+    <Suspense fallback={<p className="p-8 text-slate-600">Loading the builder…</p>}>
+      <Builder />
+    </Suspense>
+  ) : (
+    <Landing />
+  );
 }
