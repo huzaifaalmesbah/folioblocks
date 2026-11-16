@@ -122,14 +122,11 @@ Then build it following WordPress' Ipsum conventions: templates and parts delega
 Run it with wp-env, check every template in the Site Editor for invalid blocks, and finally zip it with the theme folder at the root of the zip.`;
 
 export const WPCOM_UPLOAD_STEPS = [
-  'In FolioBlocks, click "Download …zip". Don\'t unzip it.',
-  'In your WordPress.com dashboard, go to Appearance → Themes.',
-  'Click "Add Theme" (or "Install new theme"), then "Upload Theme", choose the zip and click "Install Now".',
-  'Click "Activate". (Not ready to go live? Try it on a staging site first.)',
-  'Create the pages Home, About, Blog and Contact. For About and Contact, pick the "About" and "Contact" template in the page settings.',
+  'Download your zip from FolioBlocks. Don\'t unzip it.',
+  'In WordPress.com, go to Appearance → Themes → Add Theme → Upload Theme, choose the zip, click "Install Now", then "Activate".',
+  'Create the pages Home, About, Blog and Contact. Give About and Contact the "About" and "Contact" template.',
   'In Settings → Reading, choose "A static page": Homepage = Home, Posts page = Blog.',
-  'Open Appearance → Editor to change colours (Styles has your other palettes), fonts, the menu and any text. Your edits are saved separately from the theme files.',
-];
+]
 
 export const STUDIO_STEPS = [
   'Install WordPress Studio (free, from wordpress.studio) and create a local site.',
@@ -140,9 +137,7 @@ export const STUDIO_STEPS = [
 
 export const WPCOM_LINKS = {
   upload: 'https://wordpress.com/support/themes/uploading-setting-up-custom-themes/',
-  pricing: 'https://wordpress.com/pricing/',
   studio: 'https://wordpress.studio/',
   studioSync: 'https://wordpress.studio/docs/sync/',
   studentPlan: 'https://wordpress.com/support/plan-features/student-plan/',
-  edu: 'https://wordpress.com/edu/',
 };

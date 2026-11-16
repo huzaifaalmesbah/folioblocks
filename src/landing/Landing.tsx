@@ -253,7 +253,7 @@ export function Landing() {
                 {
                   n: '3',
                   title: 'Publish it',
-                  text: 'Upload the zip to WordPress.com (the free Student plan works), any WordPress host, or push it from WordPress Studio.',
+                  text: 'Upload the zip to WordPress.com (the free Student plan works) or any WordPress host. Step by step below.',
                   link: { href: '#wordpress-com', label: 'Publishing guide' },
                 },
               ].map((c) => (
@@ -396,61 +396,47 @@ export function Landing() {
 
         {/* WordPress.com */}
         <section className="py-20">
-          <div className="mx-auto max-w-6xl px-4 sm:px-6">
-            <SectionHeading id="wordpress-com" eyebrow="Publish" title="Put your theme on WordPress.com">
-              Two ways: upload the zip from your dashboard, or build locally in WordPress Studio and publish from there.
-            </SectionHeading>
+          <div className="mx-auto max-w-3xl px-4 sm:px-6">
+            <SectionHeading id="wordpress-com" eyebrow="Publish" title="Put your theme on WordPress.com" />
 
-            <div className="mx-auto mt-10 flex max-w-4xl flex-col gap-4 rounded-2xl border border-blue-200 bg-blue-50 p-6 sm:flex-row sm:items-start">
-              <span aria-hidden className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-blue-700 text-xl text-white">
-                🎓
-              </span>
-              <div>
-                <h3 className="text-lg font-semibold text-slate-900">Students: the free WordPress.com Student plan is all you need</h3>
-                <p className="mt-2 text-slate-700">
-                  The Student plan is free for your first year and lets you upload custom themes and install plugins, with staging sites, backups
-                  and Studio Sync, so both ways below work. Many WP Campus Connect and WordPress Credits students get it through their program:
-                  your teacher or organiser applies once for the class at{' '}
-                  <a className="font-medium text-blue-800 underline" href={WPCOM_LINKS.edu}>wordpress.com/edu</a>, and you activate it on your site.
-                </p>
-                <p className="mt-2 text-sm text-slate-600">
-                  After the free year you can renew at a student price or move to the free plan; your posts and pages stay, but uploaded themes and
-                  plugins stop working on the free plan. <a className="underline" href={WPCOM_LINKS.studentPlan}>Student plan details</a>
-                </p>
-              </div>
+            <p className="mt-10 rounded-xl border border-blue-200 bg-blue-50 p-4 text-slate-800">
+              <span aria-hidden>🎓 </span>
+              <strong>Students:</strong> the free WordPress.com Student plan (first year free) can upload themes.{' '}
+              <a className="text-blue-800 underline" href={WPCOM_LINKS.studentPlan}>Details</a>
+            </p>
+
+            <div className="mt-6 rounded-xl border border-slate-200 p-6 shadow-sm">
+              <h3 className="text-lg font-semibold">Upload your theme</h3>
+              <ol className="mt-4 list-decimal space-y-2 pl-5 text-slate-700">
+                {WPCOM_UPLOAD_STEPS.map((s) => (
+                  <li key={s}>{s}</li>
+                ))}
+              </ol>
+              <p className="mt-4 text-sm text-slate-600">Tip: change colours, fonts and text any time in Appearance → Editor.</p>
             </div>
 
-            <div className="mt-8 grid gap-6 lg:grid-cols-2">
-              <div className="rounded-xl border border-slate-200 p-6 shadow-sm">
-                <h3 className="text-lg font-semibold">A. Upload the zip</h3>
-                <p className="mt-1 text-sm text-slate-600">Works on WordPress.com and on any self-hosted WordPress.</p>
-                <ol className="mt-4 list-decimal space-y-2 pl-5 text-slate-700">
-                  {WPCOM_UPLOAD_STEPS.map((s) => (
-                    <li key={s}>{s}</li>
-                  ))}
-                </ol>
-              </div>
-              <div className="rounded-xl border border-slate-200 p-6 shadow-sm">
-                <h3 className="text-lg font-semibold">B. Build locally with WordPress Studio, then publish</h3>
-                <p className="mt-1 text-sm text-slate-600">Good if you also want to customize with an AI agent before going live.</p>
-                <ol className="mt-4 list-decimal space-y-2 pl-5 text-slate-700">
+            <details className="group mt-4 rounded-xl border border-slate-200">
+              <summary className="flex cursor-pointer list-none items-center gap-3 px-6 py-4">
+                <span className="flex-1 font-semibold">Advanced: build locally with WordPress Studio</span>
+                <span aria-hidden className="text-slate-400 transition group-open:rotate-90">›</span>
+              </summary>
+              <div className="px-6 pb-6">
+                <ol className="list-decimal space-y-2 pl-5 text-slate-700">
                   {STUDIO_STEPS.map((s) => (
                     <li key={s}>{s}</li>
                   ))}
                 </ol>
-                <p className="mt-4 text-sm text-slate-600">
-                  "Content and settings" replaces the live database, so pick only your theme the first time. Studio makes a backup before
-                  publishing. <a className="text-blue-700 underline" href={WPCOM_LINKS.studioSync}>Studio Sync docs</a>
+                <p className="mt-3 text-sm text-slate-600">
+                  Publish only your theme the first time: "Content and settings" replaces the live site's content.{' '}
+                  <a className="text-blue-700 underline" href={WPCOM_LINKS.studioSync}>Studio Sync docs</a>
                 </p>
               </div>
-            </div>
-            <div className="mt-6 rounded-xl border border-amber-200 bg-amber-50 p-5 text-sm text-amber-900">
-              <strong>Not a student?</strong> Uploading themes isn't available on WordPress.com's Free plan. It works on the Student plan and on the
-              Personal, Premium, Business and Commerce plans; Studio publishing needs one of these too. Plans change, so check{' '}
-              <a className="underline" href={WPCOM_LINKS.upload}>WordPress.com's upload guide</a> and{' '}
-              <a className="underline" href={WPCOM_LINKS.pricing}>pricing</a> before you buy. The zip must be under 50 MB (FolioBlocks themes are a
-              few hundred KB).
-            </div>
+            </details>
+
+            <p className="mt-6 text-sm text-slate-500">
+              Not a student? Theme upload needs the Personal plan or higher; the Free plan can't upload themes.{' '}
+              <a className="underline" href={WPCOM_LINKS.upload}>WordPress.com guide</a>
+            </p>
           </div>
         </section>
 
