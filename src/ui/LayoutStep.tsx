@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { tr } from '../i18n/ui';
 import { fontDef } from '../fonts';
 import { PRESETS } from '../presets';
 import { useBuilder } from '../store';
@@ -18,14 +19,14 @@ export function LayoutStep() {
 
   function chooseSaved(key: string) {
     if (key === preset) return;
-    if (confirm('Switch to this saved layout? This replaces your colours, fonts and sections. Your info stays.')) {
+    if (confirm(tr('Switch to this saved layout? This replaces your colours, fonts and sections. Your info stays.'))) {
       applyLayout(key);
     }
   }
 
   function choosePreset(key: string) {
     if (key === preset) return;
-    if (confirm('Switch layout? This replaces your colours, fonts and section choices. Your info stays.')) {
+    if (confirm(tr('Switch layout? This replaces your colours, fonts and section choices. Your info stays.'))) {
       applyPreset(key);
     }
   }
@@ -97,8 +98,8 @@ export function LayoutStep() {
                 </button>
                 <button
                   type="button"
-                  aria-label={`Delete saved layout ${l.label}`}
-                  onClick={() => confirm(`Delete the saved layout "${l.label}"?`) && deleteLayout(l.key)}
+                  aria-label={tr('Delete saved layout {name}', { name: l.label })}
+                  onClick={() => confirm(tr('Delete the saved layout "{name}"?', { name: l.label })) && deleteLayout(l.key)}
                   className="rounded-md px-2 py-1 text-xs text-red-700 hover:bg-red-50"
                 >
                   Delete

@@ -12,6 +12,8 @@ import { StyleStep } from './ui/StyleStep';
 import { LayoutStep } from './ui/LayoutStep';
 import { QuickPreview } from './preview/QuickPreview';
 import { publishChecklist } from './checklist';
+import { LangToggle } from './i18n/LangToggle';
+import { tr } from './i18n/ui';
 import { DownloadDialog } from './ui/DownloadDialog';
 
 type View = 'preview' | 'code';
@@ -81,9 +83,9 @@ export function Builder() {
     setNotice('');
     try {
       const parsed = parseSettings(await file.text());
-      if (!confirm('Load this draft? It replaces your info and design. Your saved layouts are kept.')) return;
+      if (!confirm(tr('Load this draft? It replaces your info and design. Your saved layouts are kept.'))) return;
       useBuilder.getState().importSettings(parsed.state, parsed.layouts);
-      setNotice(`Loaded ${file.name}.`);
+      setNotice(tr('Loaded {file}.', { file: file.name }));
     } catch (err) {
       setError(err instanceof Error ? err.message : String(err));
     }
@@ -149,11 +151,14 @@ export function Builder() {
       >
         <header className="space-y-3 border-b border-slate-200 p-4 pb-3 lg:p-6 lg:pb-4">
           <div>
-            <h1 className="text-2xl font-bold">
-              <a href="#/" className="hover:text-blue-700" aria-label="FolioBlocks home">
-                FolioBlocks
-              </a>
-            </h1>
+            <div className="flex items-center justify-between">
+              <h1 className="text-2xl font-bold">
+                <a href="#/" className="hover:text-blue-700" aria-label="FolioBlocks home">
+                  FolioBlocks
+                </a>
+              </h1>
+              <LangToggle />
+            </div>
             <p className="hidden text-sm text-slate-600 lg:block">Build your WordPress portfolio theme, no code needed.</p>
           </div>
           <nav className="grid grid-cols-3 gap-1 rounded-lg bg-slate-100 p-1" aria-label="Steps">
@@ -218,7 +223,7 @@ export function Builder() {
             </button>
             <button
               type="button"
-              onClick={() => confirm('Reset everything to the defaults?') && reset()}
+              onClick={() => confirm(tr('Reset everything to the defaults?')) && reset()}
               className="rounded-md border border-slate-300 px-3 py-2.5 text-sm text-slate-700 hover:bg-slate-100"
             >
               Reset
@@ -289,7 +294,7 @@ export function Builder() {
 
         {view === 'code' && (
           <div className="flex min-h-0 flex-1 flex-col md:flex-row">
-            <nav className="max-h-48 overflow-y-auto border-slate-200 bg-white p-3 md:max-h-none md:w-64 md:border-r">
+            <nav data-no-translate className="max-h-48 overflow-y-auto border-slate-200 bg-white p-3 md:max-h-none md:w-64 md:border-r">
               {paths.map((p) => (
                 <button
                   key={p}

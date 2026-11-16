@@ -2,6 +2,8 @@ import { useEffect, useState, type ReactNode } from 'react';
 import { fontDef } from '../fonts';
 import { PRESETS, type PresetDef } from '../presets';
 import { themeSlug } from '../generator/utils';
+import { LangToggle } from '../i18n/LangToggle';
+import { tr } from '../i18n/ui';
 import { useBuilder } from '../store';
 import {
   FROM_SCRATCH_PROMPT,
@@ -191,7 +193,7 @@ export function Landing() {
   function startWith(key: string) {
     const label = PRESETS.find((p) => p.key === key)?.label ?? key;
     // Switching design replaces colours, fonts and sections, so ask anyone who has started.
-    if (hasDraft && !confirm(`Switch your theme to the ${label} design? Your info and photos stay.`)) return;
+    if (hasDraft && !confirm(tr('Switch your theme to the {name} design? Your info and photos stay.', { name: tr(label) }))) return;
     applyPreset(key);
     window.location.hash = '#/build';
   }
@@ -219,7 +221,8 @@ export function Landing() {
             <a href="#wordpress-com" className="hover:text-slate-900">WordPress.com</a>
             <a href={REPO} className="hover:text-slate-900">GitHub</a>
           </div>
-          <a href="#/build" className="ml-auto rounded-md bg-slate-900 px-3.5 py-2 text-sm font-semibold text-white hover:bg-slate-700">
+          <LangToggle className="ml-auto" />
+          <a href="#/build" className="rounded-md bg-slate-900 px-3.5 py-2 text-sm font-semibold text-white hover:bg-slate-700">
             Start building
           </a>
         </nav>
@@ -325,7 +328,7 @@ export function Landing() {
                     type="button"
                     onClick={() => startWith(p.key)}
                     className="mt-3 self-start rounded-md border border-slate-300 px-3 py-1.5 text-sm font-medium hover:bg-slate-50"
-                    aria-label={`Start with the ${p.label} design`}
+                    aria-label={tr('Start with the {name} design', { name: tr(p.label) })}
                   >
                     Use this template
                   </button>

@@ -1,4 +1,5 @@
 import { useState, type ReactNode } from 'react';
+import { tr } from '../i18n/ui';
 import { IMAGE_LIMITS, resizeImage } from '../images';
 import { profileCompleteness } from '../profile';
 import { storageStatus, useBuilder } from '../store';
@@ -50,7 +51,7 @@ function Meter() {
         <div className={`h-full rounded-full ${percent === 100 ? 'bg-green-600' : 'bg-blue-600'}`} style={{ width: `${percent}%` }} />
       </div>
       <p className="mt-2 text-xs text-slate-600">
-        {next.length ? <>Next: {next.slice(0, 2).join(' · ')}</> : 'Everything a strong portfolio needs is here.'}
+        {next.length ? <>Next: {next.slice(0, 2).map((n) => tr(n)).join(' · ')}</> : 'Everything a strong portfolio needs is here.'}
       </p>
     </div>
   );
@@ -72,7 +73,7 @@ function FillWithAi() {
     try {
       const { info, setInfo } = useBuilder.getState();
       const next = parseProfile(answer, info);
-      if (!confirm(`Fill your profile as "${next.name}"? This replaces the text you have now. Your photos stay.`)) return;
+      if (!confirm(tr('Fill your profile as "{name}"? This replaces the text you have now. Your photos stay.', { name: next.name }))) return;
       setInfo(next);
       setAnswer('');
       setDone(true);

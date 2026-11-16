@@ -1,4 +1,5 @@
-import { lazy, Suspense, useEffect, useState } from 'react';
+import { lazy, Suspense, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { startDomTranslator, tr, useUi } from './i18n/ui';
 import { Landing } from './landing/Landing';
 
 // The builder (generator, zip, drag-and-drop) loads only when it is opened, so the home page stays light.
@@ -28,15 +29,27 @@ export default function App() {
     return () => window.removeEventListener('hashchange', onHash);
   }, []);
 
-  useEffect(() => {
-    document.title = builder ? 'Build your theme · FolioBlocks' : 'FolioBlocks: build your WordPress portfolio theme';
-  }, [builder]);
+  const lang = useUi((s) => s.lang);
+  const rootRef = useRef<HTMLDivElement>(null);
 
-  return builder ? (
-    <Suspense fallback={<p className="p-8 text-slate-600">Loading the builder…</p>}>
-      <Builder />
-    </Suspense>
-  ) : (
-    <Landing />
+  useEffect(() => {
+    document.title = builder ? tr('Build your theme · FolioBlocks') : tr('FolioBlocks: build your WordPress portfolio theme');
+    document.documentElement.lang = lang;
+  }, [builder, lang]);
+
+  // Translate before the first paint, and keep translating as the page changes.
+  useLayoutEffect(() => (rootRef.current ? startDomTranslator(rootRef.current, lang) : undefined), [lang]);
+
+  // key={lang}: switching language remounts the page, so it is always translated from English.
+  return (
+    <div ref={rootRef} key={lang}>
+      {builder ? (
+        <Suspense fallback={<p className="p-8 text-slate-600">Loading the builder…</p>}>
+          <Builder />
+        </Suspense>
+      ) : (
+        <Landing />
+      )}
+    </div>
   );
 }

@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
 import type { CheckItem } from '../checklist';
+import { tr } from '../i18n/ui';
 import { WPCOM_UPLOAD_STEPS } from '../landing/content';
 
 /**
@@ -88,7 +89,7 @@ export function DownloadDialog(props: {
                 disabled={props.busy}
                 className="rounded-md bg-blue-700 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-800 disabled:opacity-60"
               >
-                {props.busy ? 'Building…' : fixes.length ? 'Download anyway' : `Download ${props.slug}.zip`}
+                {props.busy ? 'Building…' : fixes.length ? 'Download anyway' : tr('Download {file}', { file: `${props.slug}.zip` })}
               </button>
             </div>
           </>

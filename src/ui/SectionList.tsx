@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { tr } from '../i18n/ui';
 import {
   closestCenter,
   DndContext,
@@ -39,7 +40,7 @@ function SortableSection(props: { page: PageKey; section: Section; index: number
           ref={setActivatorNodeRef}
           type="button"
           className={`${iconBtn} cursor-grab touch-none active:cursor-grabbing`}
-          aria-label={`Drag to reorder ${label}`}
+          aria-label={tr('Drag to reorder {name}', { name: tr(label) })}
           {...attributes}
           {...listeners}
         >
@@ -53,7 +54,7 @@ function SortableSection(props: { page: PageKey; section: Section; index: number
         <button
           type="button"
           className={iconBtn}
-          aria-label={`Move ${label} up`}
+          aria-label={tr('Move {name} up', { name: tr(label) })}
           disabled={index === 0}
           onClick={() => moveSection(page, index, index - 1)}
         >
@@ -62,7 +63,7 @@ function SortableSection(props: { page: PageKey; section: Section; index: number
         <button
           type="button"
           className={iconBtn}
-          aria-label={`Move ${label} down`}
+          aria-label={tr('Move {name} down', { name: tr(label) })}
           disabled={index === count - 1}
           onClick={() => moveSection(page, index, index + 1)}
         >
@@ -71,7 +72,7 @@ function SortableSection(props: { page: PageKey; section: Section; index: number
         <button
           type="button"
           className={`${iconBtn} hover:text-red-700`}
-          aria-label={`Remove ${label}`}
+          aria-label={tr('Remove {name}', { name: tr(label) })}
           onClick={() => removeSection(page, section.id)}
         >
           ✕

@@ -21,7 +21,8 @@ Nothing is sent to a server. Everything stays in the browser.
 | 5 | Tiered profile form, 8 templates, Bengali, template gallery | ✅ done |
 | 6 | AI fill-in prompts, download check and next steps, mobile builder | ✅ done |
 | 7 | Twelve templates, services and testimonials, student beta guide | ✅ done |
-| 8 | Run the student beta ([guide](docs/beta-test.md)), Bengali app interface | ⏳ next |
+| 8 | Bengali app interface | ✅ done |
+| 9 | Run the student beta ([guide](docs/beta-test.md)) | ⏳ next |
 
 ## Development
 
@@ -106,6 +107,8 @@ A section with nothing to show returns no markup, so the downloaded theme leaves
 Twelve templates in `src/presets.ts`: Minimal, Creative, Developer, Academic, Contributor (WordPress work first), Resume (one-page CV), Writer (posts first), Bangla, Designer (gallery), Freelancer (services and testimonials), Bold (colour-band hero) and Photographer (photo wall). Each sets a palette, fonts, header, footer and the sections of every page; the home page shows them as a gallery.
 
 The theme's own words (headings, buttons, menu, page titles) can be written in English or Bengali (`src/generator/i18n.ts`); the student's text is used as typed. Bengali uses the bundled Noto Sans Bengali font. To add a language, add a dictionary there and an option in the Style step.
+
+The app's own interface is separate: it can be shown in English or Bengali with the switch in the header (`src/i18n/`). Components stay plain English; `src/i18n/bn.ts` is a dictionary keyed by the English text, applied to the rendered page, with `tr()` for messages built in code. Text without a translation stays English. Prompts, code and product names are not translated.
 
 ### AI help (no API, no key)
 
