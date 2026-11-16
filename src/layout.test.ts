@@ -87,7 +87,7 @@ describe('settings files', () => {
     );
     expect(parsed.state.info.name).toBe('X');
     expect(parsed.state.info.avatar).toBe('');
-    expect(parsed.state.info.projects[0].image).toBe('');
+    expect(parsed.state.info.projects[0].image).toBeUndefined();
     expect(parsed.state.style.palette.primary).toBe(defaultState.style.palette.primary);
     expect(parsed.state.style.fonts.heading).toBe(defaultState.style.fonts.heading);
     expect(parsed.state.style.radius).toBe(defaultState.style.radius);

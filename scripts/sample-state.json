@@ -6,30 +6,139 @@
     "location": "Dhaka, Bangladesh",
     "bio": "I am a student who loves building for the open web and contributing to WordPress.",
     "email": "jane@example.com",
-    "skills": ["PHP", "JavaScript", "Gutenberg"],
-    "contributions": [{ "team": "Polyglots", "description": "Translated plugins into Bengali." }],
-    "projects": [{ "title": "Campus Events", "description": "A block plugin for university events.", "url": "https://example.com" }],
-    "socials": { "github": "https://github.com/example", "wordpress": "https://profiles.wordpress.org/example" }
+    "skills": [
+      "PHP",
+      "JavaScript",
+      "Gutenberg"
+    ],
+    "contributions": [
+      {
+        "team": "Polyglots",
+        "description": "Translated plugins into Bengali.",
+        "date": "2026",
+        "url": "https://translate.wordpress.org"
+      }
+    ],
+    "projects": [
+      {
+        "title": "Campus Events",
+        "description": "A block plugin for university events.",
+        "url": "https://example.com"
+      }
+    ],
+    "socials": {
+      "github": "https://github.com/example",
+      "wordpress": "https://profiles.wordpress.org/example"
+    },
+    "experience": [
+      {
+        "role": "Web Intern",
+        "org": "Example Agency",
+        "period": "Jan 2026 – Jun 2026",
+        "description": "Built block patterns for client sites."
+      }
+    ],
+    "education": [
+      {
+        "degree": "BSc in Computer Science",
+        "school": "Example University",
+        "period": "2023 – 2027"
+      }
+    ],
+    "achievements": [
+      {
+        "title": "Hackathon winner",
+        "issuer": "Campus Tech Fest",
+        "year": "2025",
+        "url": "https://example.com/award"
+      }
+    ],
+    "cvUrl": "https://example.com/cv.pdf",
+    "avatar": ""
   },
   "style": {
-    "palette": { "primary": "#3858e9", "secondary": "#1e1e1e", "base": "#ffffff", "contrast": "#1e1e1e", "accent": "#f0f3ff" },
-    "fonts": { "heading": "system-serif", "body": "system-sans" },
+    "palette": {
+      "primary": "#3858e9",
+      "secondary": "#1e1e1e",
+      "base": "#ffffff",
+      "contrast": "#1e1e1e",
+      "accent": "#f0f3ff"
+    },
+    "fonts": {
+      "heading": "system-serif",
+      "body": "system-sans"
+    },
     "radius": "md"
   },
   "preset": "minimal",
   "pages": {
     "home": [
-      { "id": "h1", "type": "hero", "variant": "split" },
-      { "id": "h2", "type": "about", "variant": "text" },
-      { "id": "h3", "type": "projects", "variant": "grid" },
-      { "id": "h4", "type": "posts", "variant": "grid" },
-      { "id": "h5", "type": "contact", "variant": "cta" }
+      {
+        "id": "h1",
+        "type": "hero",
+        "variant": "split"
+      },
+      {
+        "id": "h2",
+        "type": "about",
+        "variant": "text"
+      },
+      {
+        "id": "h3",
+        "type": "projects",
+        "variant": "grid"
+      },
+      {
+        "id": "h4",
+        "type": "posts",
+        "variant": "grid"
+      },
+      {
+        "id": "h5",
+        "type": "contact",
+        "variant": "cta"
+      }
     ],
     "about": [
-      { "id": "a1", "type": "about", "variant": "text" },
-      { "id": "a2", "type": "skills", "variant": "list" },
-      { "id": "a3", "type": "contributions", "variant": "list" }
+      {
+        "id": "a1",
+        "type": "about",
+        "variant": "text"
+      },
+      {
+        "id": "a2",
+        "type": "skills",
+        "variant": "list"
+      },
+      {
+        "id": "a3",
+        "type": "experience",
+        "variant": "timeline"
+      },
+      {
+        "id": "a4",
+        "type": "education",
+        "variant": "list"
+      },
+      {
+        "id": "a5",
+        "type": "contributions",
+        "variant": "list"
+      },
+      {
+        "id": "a6",
+        "type": "achievements",
+        "variant": "list"
+      }
     ],
-    "contact": [{ "id": "c1", "type": "contact", "variant": "full" }]
-  }
+    "contact": [
+      {
+        "id": "c1",
+        "type": "contact",
+        "variant": "full"
+      }
+    ]
+  },
+  "header": "inline",
+  "footer": "centered"
 }

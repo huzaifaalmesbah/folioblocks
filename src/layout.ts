@@ -148,16 +148,35 @@ export function parseSettings(text: string): { state: BuilderState; layouts: Sav
       tagline: str(i.tagline, d.tagline),
       university: str(i.university),
       location: str(i.location),
-      bio: str(i.bio, d.bio),
+      bio: str(i.bio),
       email: str(i.email),
       skills: Array.isArray(i.skills) ? i.skills.filter((x) => typeof x === 'string').map((x) => x.slice(0, 100)).slice(0, 50) : d.skills,
       contributions: Array.isArray(i.contributions)
-        ? i.contributions.filter(isObj).map((c) => ({ team: str(c.team), description: str(c.description) })).slice(0, 30)
+        ? i.contributions
+            .filter(isObj)
+            .map((c) => ({ team: str(c.team), description: str(c.description), date: str(c.date), url: str(c.url) }))
+            .slice(0, 30)
         : [],
+      experience: Array.isArray(i.experience)
+        ? i.experience
+            .filter(isObj)
+            .map((e) => ({ role: str(e.role), org: str(e.org), period: str(e.period), description: str(e.description) }))
+            .slice(0, 20)
+        : [],
+      education: Array.isArray(i.education)
+        ? i.education.filter(isObj).map((e) => ({ degree: str(e.degree), school: str(e.school), period: str(e.period) })).slice(0, 10)
+        : [],
+      achievements: Array.isArray(i.achievements)
+        ? i.achievements
+            .filter(isObj)
+            .map((a) => ({ title: str(a.title), issuer: str(a.issuer), year: str(a.year), url: str(a.url) }))
+            .slice(0, 30)
+        : [],
+      cvUrl: str(i.cvUrl),
       projects: Array.isArray(i.projects)
         ? i.projects
             .filter(isObj)
-            .map((p) => ({ title: str(p.title), description: str(p.description), url: str(p.url), image: image(p.image) }))
+            .map((p) => ({ title: str(p.title), description: str(p.description), url: str(p.url), ...(image(p.image) && { image: image(p.image) }) }))
             .slice(0, 12)
         : [],
       socials: isObj(i.socials)

@@ -10,7 +10,7 @@ import {
 } from '@dnd-kit/core';
 import { SortableContext, sortableKeyboardCoordinates, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { SECTION_LABELS, SECTIONS } from '../generator/sections';
+import { isSectionEmpty, SECTION_LABELS, SECTIONS } from '../generator/sections';
 import { useBuilder } from '../store';
 import type { PageKey, Section, SectionType } from '../types';
 import { inputCls } from './fields';
@@ -25,6 +25,7 @@ function SortableSection(props: { page: PageKey; section: Section; index: number
     id: section.id,
   });
   const label = SECTION_LABELS[section.type];
+  const empty = useBuilder((s) => isSectionEmpty(section, s.info));
   const variants = Object.entries(SECTIONS[section.type]).map(([value, v]) => ({ value, label: v.label }));
 
   return (
@@ -76,6 +77,11 @@ function SortableSection(props: { page: PageKey; section: Section; index: number
           ✕
         </button>
       </div>
+      {empty && (
+        <p className="mt-1 pl-8 text-xs text-amber-800">
+          Nothing to show yet: the preview uses sample content, and your theme leaves this out. Fill it in under 1. Info.
+        </p>
+      )}
       {variants.length > 1 && (
         <label className="mt-1 block pl-8 text-xs text-slate-600">
           <span className="sr-only">{label} design</span>

@@ -1,4 +1,5 @@
 import { fontAssets, fontDef, type ThemeAsset } from '../fonts';
+import { withSamples } from '../samples';
 import type { BuilderState, ThemeFiles } from '../types';
 import IMAGE_CREDITS from './imageCredits.json';
 import { imageAssets } from './images';
@@ -176,7 +177,12 @@ add_action( 'wp_enqueue_scripts', '${fn}_enqueue_styles' );
 }
 
 /** Generate every text file of the theme. Binary files (fonts, screenshot) are listed in `assets` or added by the zip step. */
-export function generateTheme(state: BuilderState): { slug: string; files: ThemeFiles; assets: ThemeAsset[] } {
+export function generateTheme(
+  input: BuilderState,
+  /** `samples`: fill empty parts of the profile with sample content. For the preview only, never for a download. */
+  opts: { samples?: boolean } = {},
+): { slug: string; files: ThemeFiles; assets: ThemeAsset[] } {
+  const state = opts.samples ? { ...input, info: withSamples(input.info) } : input;
   const slug = themeSlug(state.info.name);
   const p = patterns(state, slug);
   const files: ThemeFiles = {

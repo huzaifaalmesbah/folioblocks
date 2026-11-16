@@ -6,7 +6,10 @@ export type { FontKey };
 export type ImageDataUrl = string;
 
 export type Project = { title: string; description: string; url: string; image?: ImageDataUrl };
-export type Contribution = { team: string; description: string };
+export type Contribution = { team: string; description: string; date?: string; url?: string };
+export type Experience = { role: string; org: string; period: string; description: string };
+export type Education = { degree: string; school: string; period: string };
+export type Achievement = { title: string; issuer: string; year: string; url: string };
 
 export type Socials = {
   github?: string;
@@ -25,6 +28,11 @@ export type Info = {
   skills: string[];
   contributions: Contribution[];
   projects: Project[];
+  experience: Experience[];
+  education: Education[];
+  achievements: Achievement[];
+  /** Link to a CV or résumé (PDF, Google Doc, LinkedIn…). */
+  cvUrl: string;
   socials: Socials;
   /** Profile photo. Falls back to a placeholder. */
   avatar?: ImageDataUrl;
@@ -51,6 +59,9 @@ export type SectionType =
   | 'about'
   | 'skills'
   | 'contributions'
+  | 'experience'
+  | 'education'
+  | 'achievements'
   | 'projects'
   | 'posts'
   | 'contact';

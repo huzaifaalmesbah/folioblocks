@@ -1,6 +1,6 @@
 import { SITE_URL } from '../config';
 import type { BuilderState, PageKey } from '../types';
-import { block, group, join, pattern } from './blocks';
+import { block, group, join, paragraph, pattern } from './blocks';
 import { renderSection, socialLinks, type Ctx } from './sections';
 import { templates, type PatternDef } from './templates';
 import { RADIUS } from './themeJson';
@@ -116,7 +116,10 @@ export function patterns(state: BuilderState, slug: string): { patterns: Record<
       blockTypes: 'core/post-content',
       postTypes: 'page',
       viewportWidth: 1280,
-      content: join(...state.pages[page].map((s) => renderSection(s, ctx))),
+      // Sections with nothing to show are left out; a page with none gets a line to start from.
+      content:
+        join(...state.pages[page].map((s) => renderSection(s, ctx))) ||
+        group(paragraph(php.t('This page is empty for now. Add blocks to it in the Site Editor.')), { name: php.name('Empty page'), padY: 60 }),
     });
   });
 

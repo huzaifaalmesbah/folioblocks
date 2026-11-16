@@ -15,8 +15,12 @@ function withPreset(key: string, info: Partial<BuilderState['info']> = {}): Buil
 }
 
 describe('images', () => {
-  it('uses placeholders until the student adds photos, and only ships images in use', () => {
-    const { assets, files } = generateTheme(withPreset('minimal'));
+  it('uses placeholders in the preview until the student adds photos, and only ships images in use', () => {
+    // The download has no projects yet, so it ships only the avatar.
+    const bare = generateTheme(withPreset('minimal')).assets.filter((a) => a.path.startsWith('assets/images/'));
+    expect(bare.map((a) => a.path)).toEqual(['assets/images/avatar.webp']);
+
+    const { assets, files } = generateTheme(withPreset('minimal'), { samples: true });
     const images = assets.filter((a) => a.path.startsWith('assets/images/'));
     expect(images.map((a) => a.path).sort()).toEqual([
       'assets/images/avatar.webp',
@@ -80,7 +84,7 @@ describe('images', () => {
 
   it('renders images in the quick preview', () => {
     const state = withPreset('creative', { avatar: WEBP });
-    const { files } = generateTheme(state);
+    const { files } = generateTheme(state, { samples: true });
     const { html } = renderPage(state, files, 'home', {
       fileUrl: (p) => (p.endsWith('avatar.webp') ? WEBP : `https://x.test/${p}`),
       sampleImage: (i) => `https://x.test/post-${i}.webp`,

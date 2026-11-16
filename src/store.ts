@@ -3,6 +3,7 @@ import { createJSONStorage, persist } from 'zustand/middleware';
 import { defaultState } from './defaults';
 import { addSection, layoutFromState, moveSection, removeSection, type SavedLayout } from './layout';
 import { presetByKey } from './presets';
+import { OLD_DEFAULT_BIO } from './samples';
 import type { BuilderState, FooterVariant, HeaderVariant, Info, PageKey, Palette, SectionType, Style } from './types';
 
 /** Set when the browser refused to save (photos can fill localStorage). */
@@ -118,7 +119,7 @@ export const useBuilder = create<Store>()(
     }),
     {
       name: 'folioblocks-state',
-      version: 4,
+      version: 5,
       storage: createJSONStorage(() => safeStorage),
       // Older drafts lack newer fields (v2: header/footer, v3: photos): fill them in from the defaults.
       migrate: (persisted) => {
@@ -127,7 +128,13 @@ export const useBuilder = create<Store>()(
           ...structuredClone(defaultState),
           ...old,
           // v4 dropped the cover image: don't keep its data in storage.
-          info: { ...defaultState.info, ...old.info, cover: undefined } as BuilderState['info'],
+          info: {
+            ...defaultState.info,
+            ...old.info,
+            // The old placeholder bio counts as empty (v5), so it doesn't ship in a theme.
+            bio: old.info?.bio === OLD_DEFAULT_BIO ? '' : (old.info?.bio ?? ''),
+            cover: undefined,
+          } as BuilderState['info'],
           header: old.header ?? defaultState.header,
           footer: old.footer ?? defaultState.footer,
         } as Store;

@@ -23,7 +23,14 @@ const cases: [string, BuilderState][] = PRESETS.map((p) => [
 ]);
 // Cover the header and footer variants each preset doesn't use, and an empty profile.
 cases.push(['minimal-centered-split', { ...cases[0][1], header: 'centered', footer: 'split' }]);
-cases.push(['empty-profile', { ...cases[0][1], info: { ...cases[0][1].info, contributions: [], projects: [], socials: {}, email: '' } }]);
+// Nothing filled in: every optional section must hide itself and the theme must still be valid.
+cases.push([
+  'empty-profile',
+  {
+    ...cases[0][1],
+    info: { ...cases[0][1].info, bio: '', email: '', location: '', university: '', skills: [], contributions: [], projects: [], experience: [], education: [], achievements: [], cvUrl: '', socials: {} },
+  },
+]);
 
 let failed = 0;
 for (const [label, state] of cases) {

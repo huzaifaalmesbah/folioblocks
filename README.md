@@ -92,6 +92,12 @@ src/generator/   pure functions → { "style.css": "...", "theme.json": "...", .
 
 Students can add a profile photo and a picture per project. They are resized to WebP in the browser (`src/images.ts`) and shipped in the theme's `assets/images/`, referenced with `get_parent_theme_file_uri()` and translated alt text, as Ipsum does. Without a photo, the theme uses a placeholder: CC0 photos from Openverse, and a drawn silhouette for the avatar (see Image credits). Only images the chosen layout uses are shipped. Sample posts get placeholder featured images in Playground and the preview.
 
+### Profile fields and empty sections
+
+The Info step has three tiers: **The basics** (name, tagline, bio, photo, email), **Recommended** (skills, projects, education, location, social links) and **Optional** (WordPress contributions with date and link, experience, achievements, CV link). A meter (`src/profile.ts`) shows how complete the profile is and what to add next.
+
+A section with nothing to show returns no markup, so the downloaded theme leaves it out (no "Project one" placeholders in a real site). The preview is generated with `generateTheme(state, { samples: true })`, which fills empty parts from `src/samples.ts` so students still see each section's shape; the Layout step marks those sections.
+
 ### Layout editing and drafts
 
 - In the Layout step, each page's sections can be dragged into a new order (with `@dnd-kit`; keyboard dragging and the ↑ ↓ buttons work too), given a different design, removed, or added.

@@ -60,7 +60,7 @@ export const PRESETS: PresetDef[] = [
     footer: 'centered',
     pages: {
       home: [s('hero', 'avatar'), s('about', 'text'), s('projects', 'grid'), s('posts', 'grid'), s('contact', 'cta')],
-      about: [s('about', 'photo'), s('skills', 'list'), s('contributions', 'list')],
+      about: [s('about', 'photo'), s('skills', 'list'), s('experience', 'timeline'), s('education', 'list'), s('contributions', 'list'), s('achievements', 'list')],
       contact: [s('contact', 'full')],
     },
   },
@@ -73,7 +73,7 @@ export const PRESETS: PresetDef[] = [
     footer: 'centered',
     pages: {
       home: [s('hero', 'big'), s('skills', 'badges'), s('projects', 'rows'), s('posts', 'grid'), s('contact', 'cta')],
-      about: [s('about', 'photo'), s('skills', 'badges'), s('contributions', 'cards')],
+      about: [s('about', 'photo'), s('skills', 'badges'), s('experience', 'timeline'), s('education', 'list'), s('contributions', 'cards'), s('achievements', 'list')],
       contact: [s('contact', 'full')],
     },
   },
@@ -86,7 +86,7 @@ export const PRESETS: PresetDef[] = [
     footer: 'split',
     pages: {
       home: [s('hero', 'split'), s('skills', 'badges'), s('projects', 'cards'), s('contributions', 'cards'), s('posts', 'list'), s('contact', 'cta')],
-      about: [s('about', 'columns'), s('skills', 'list'), s('contributions', 'list')],
+      about: [s('about', 'columns'), s('skills', 'list'), s('experience', 'timeline'), s('education', 'list'), s('contributions', 'list'), s('achievements', 'list')],
       contact: [s('contact', 'full')],
     },
   },
@@ -99,7 +99,7 @@ export const PRESETS: PresetDef[] = [
     footer: 'split',
     pages: {
       home: [s('hero', 'profile'), s('contributions', 'list'), s('projects', 'list'), s('posts', 'list'), s('contact', 'cta')],
-      about: [s('about', 'columns'), s('skills', 'list'), s('contributions', 'list')],
+      about: [s('about', 'columns'), s('skills', 'list'), s('experience', 'timeline'), s('education', 'list'), s('contributions', 'list'), s('achievements', 'list')],
       contact: [s('contact', 'full')],
     },
   },

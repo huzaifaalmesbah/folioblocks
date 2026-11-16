@@ -1,9 +1,10 @@
 import type { Info, Section, SectionType } from '../types';
-import { badge, block, buttons, columns, container, group, heading, image, join, list, paragraph, separator } from './blocks';
+import { badge, block, buttons, columns, container, group, heading, image, join, list, metaText, paragraph, separator } from './blocks';
 import { AVATAR, projectImage } from './images';
-import { cleanUrl, type Php } from './utils';
+import { cleanUrl, makePhp, type Php } from './utils';
 
 export type Ctx = { info: Info; php: Php; /** Card/button corner radius as CSS, e.g. "10px". */ radius: string };
+/** Returns the section's markup, or '' when the student has nothing to show in it yet. */
 type Renderer = (ctx: Ctx) => string;
 
 /** Surface: the faint wash behind cards and bands (Ipsum's `accent-5`). */
@@ -23,17 +24,20 @@ function avatar({ info, php }: Ctx, opts: Parameters<typeof image>[2]): string {
 
 /* ---------- Hero ---------- */
 
-function heroCtas({ info, php }: Ctx): { label: string; href: string }[] {
-  const ctas = [{ label: php.t('View my work'), href: '#projects' }];
+/** Hero buttons: only the ones that lead somewhere. '' when there are none. */
+function heroButtons({ info, php }: Ctx, center = false): string {
+  const ctas: { label: string; href: string }[] = [];
+  if (info.projects.length) ctas.push({ label: php.t('View my work'), href: '#projects' });
   if (info.email) ctas.push({ label: php.t('Contact me'), href: php.url(`mailto:${info.email}`) });
-  return ctas;
+  if (info.cvUrl && cleanUrl(info.cvUrl)) ctas.push({ label: php.t('Download CV'), href: php.url(info.cvUrl) });
+  return ctas.length ? buttons(ctas, center) : '';
 }
 
 function heroText(ctx: Ctx, center: boolean): string {
   return join(
     heading(ctx.php.t(ctx.info.name), 1, center),
     paragraph(ctx.php.t(ctx.info.tagline), center),
-    buttons(heroCtas(ctx), center),
+    heroButtons(ctx, center),
   );
 }
 
@@ -67,7 +71,7 @@ const heroBig: Renderer = (ctx) => {
     heading(php.t(info.name), 1),
     paragraph(php.t(info.tagline)),
     meta && paragraph(php.t(meta)),
-    buttons(heroCtas(ctx)),
+    heroButtons(ctx),
   );
   return group(columns([text, avatar(ctx, { aspectRatio: '4/5' })], { verticalAlignment: 'center' }), {
     name: php.name('Hero'),
@@ -86,8 +90,8 @@ const heroProfile: Renderer = (ctx) => {
     heading(php.t(info.name), 1),
     paragraph(php.t(info.tagline)),
     meta && paragraph(php.t(meta)),
-    paragraph(php.t(info.bio)),
-    buttons(heroCtas(ctx)),
+    info.bio && paragraph(php.t(info.bio)),
+    heroButtons(ctx),
   );
   return group(columns([avatar(ctx, { aspectRatio: '4/5' }), text]), {
     name: php.name('Hero'),
@@ -106,7 +110,8 @@ function aboutMeta(info: Info): string {
 
 const aboutText: Renderer = ({ info, php }) => {
   const meta = aboutMeta(info);
-  return group(join(heading(php.t('About me')), paragraph(php.t(info.bio)), meta && paragraph(php.t(meta))), {
+  if (!info.bio && !meta) return '';
+  return group(join(heading(php.t('About me')), info.bio && paragraph(php.t(info.bio)), meta && paragraph(php.t(meta))), {
     name: php.name('About'),
     tagName: 'section',
     padY: 60,
@@ -115,6 +120,7 @@ const aboutText: Renderer = ({ info, php }) => {
 
 const aboutColumns: Renderer = ({ info, php }) => {
   const meta = aboutMeta(info);
+  if (!info.bio) return aboutText({ info, php, radius: '' });
   const left = join(heading(php.t('About me')), meta && paragraph(php.t(meta)));
   return group(columns([left, paragraph(php.t(info.bio))]), {
     name: php.name('About'),
@@ -128,7 +134,8 @@ const aboutColumns: Renderer = ({ info, php }) => {
 const aboutPhoto: Renderer = (ctx) => {
   const { info, php } = ctx;
   const meta = aboutMeta(info);
-  const text = join(heading(php.t('About me')), paragraph(php.t(info.bio)), meta && paragraph(php.t(meta)));
+  if (!info.bio && !meta) return '';
+  const text = join(heading(php.t('About me')), info.bio && paragraph(php.t(info.bio)), meta && paragraph(php.t(meta)));
   return group(columns([avatar(ctx, { aspectRatio: '4/5' }), text]), {
     name: php.name('About'),
     tagName: 'section',
@@ -139,19 +146,18 @@ const aboutPhoto: Renderer = (ctx) => {
 
 /* ---------- Skills ---------- */
 
-function skillItems(info: Info): string[] {
-  return info.skills.length ? info.skills : ['Add your skills'];
-}
-
 const skillsList: Renderer = ({ info, php }) =>
-  group(join(heading(php.t('Skills')), list(skillItems(info).map(php.t))), {
-    name: php.name('Skills'),
-    tagName: 'section',
-    padY: 50,
-  });
+  info.skills.length
+    ? group(join(heading(php.t('Skills')), list(info.skills.map(php.t))), {
+        name: php.name('Skills'),
+        tagName: 'section',
+        padY: 50,
+      })
+    : '';
 
 const skillsBadges: Renderer = ({ info, php, radius }) => {
-  const pills = group(join(...skillItems(info).map((s) => badge(php.t(s), radius === '0' ? '0' : '9999px'))), {
+  if (!info.skills.length) return '';
+  const pills = group(join(...info.skills.map((s) => badge(php.t(s), radius === '0' ? '0' : '9999px'))), {
     name: php.name('Skill badges'),
     layout: { type: 'flex', flexWrap: 'wrap' },
   });
@@ -160,14 +166,16 @@ const skillsBadges: Renderer = ({ info, php, radius }) => {
 
 /* ---------- WordPress contributions ---------- */
 
-function contributionItems(info: Info): Info['contributions'] {
-  return info.contributions.length
-    ? info.contributions
-    : [{ team: 'Your team', description: 'Add your WordPress contributions (Make teams, translations, meetups…)' }];
+/** A contribution's team name, linked to the proof (a ticket, a profile, an event page) when there is one. */
+function contributionTitle(php: Php, c: Info['contributions'][number]): string {
+  return c.url && cleanUrl(c.url) ? `<a href="${php.url(c.url)}">${php.t(c.team)}</a>` : php.t(c.team);
 }
 
 const contributionsList: Renderer = ({ info, php }) => {
-  const items = contributionItems(info).map((c) => `<strong>${php.t(c.team)}</strong>: ${php.t(c.description)}`);
+  if (!info.contributions.length) return '';
+  const items = info.contributions.map(
+    (c) => `<strong>${contributionTitle(php, c)}</strong>: ${php.t(c.description)}${c.date ? ` (${php.t(c.date)})` : ''}`,
+  );
   return group(join(heading(php.t('My WordPress journey')), list(items)), {
     name: php.name('WordPress journey'),
     tagName: 'section',
@@ -176,8 +184,9 @@ const contributionsList: Renderer = ({ info, php }) => {
 };
 
 const contributionsCards: Renderer = ({ info, php, radius }) => {
-  const cards = contributionItems(info).map((c) =>
-    group(join(heading(php.t(c.team), 3), paragraph(php.t(c.description))), {
+  if (!info.contributions.length) return '';
+  const cards = info.contributions.map((c) =>
+    group(join(c.date && metaText(php.t(c.date)), heading(contributionTitle(php, c), 3), paragraph(php.t(c.description))), {
       name: php.name('Contribution card'),
       background: SURFACE,
       pad: 40,
@@ -191,6 +200,45 @@ const contributionsCards: Renderer = ({ info, php, radius }) => {
     padY: 60,
     layout: { type: 'constrained', contentSize: '1280px' },
   });
+};
+
+/* ---------- Experience, education, achievements ---------- */
+
+const experienceTimeline: Renderer = ({ info, php }) => {
+  if (!info.experience.length) return '';
+  const items = info.experience.map((e) =>
+    group(
+      join(
+        e.period && metaText(php.t(e.period)),
+        heading(php.t(e.role), 3),
+        e.org && paragraph(php.t(e.org)),
+        e.description && paragraph(php.t(e.description)),
+      ),
+      { name: php.name('Experience item'), layout: { type: 'default' } },
+    ),
+  );
+  return group(join(heading(php.t('Experience')), ...items), { name: php.name('Experience'), tagName: 'section', padY: 50 });
+};
+
+const educationList: Renderer = ({ info, php }) => {
+  if (!info.education.length) return '';
+  const items = info.education.map((e) =>
+    group(join(heading(php.t(e.degree), 3), paragraph(php.t([e.school, e.period].filter(Boolean).join(' · ')))), {
+      name: php.name('Education item'),
+      layout: { type: 'default' },
+    }),
+  );
+  return group(join(heading(php.t('Education')), ...items), { name: php.name('Education'), tagName: 'section', padY: 50 });
+};
+
+const achievementsList: Renderer = ({ info, php }) => {
+  if (!info.achievements.length) return '';
+  const items = info.achievements.map((a) => {
+    const title = a.url && cleanUrl(a.url) ? `<a href="${php.url(a.url)}">${php.t(a.title)}</a>` : php.t(a.title);
+    const details = [a.issuer, a.year].filter(Boolean).join(', ');
+    return `<strong>${title}</strong>${details ? `: ${php.t(details)}` : ''}`;
+  });
+  return group(join(heading(php.t('Achievements')), list(items)), { name: php.name('Achievements'), tagName: 'section', padY: 50 });
 };
 
 /* ---------- Projects ---------- */
@@ -209,28 +257,21 @@ function projectContent(ctx: Ctx, p: Info['projects'][number], i: number): strin
   return join(projectPicture(ctx, p, i), projectText(ctx, p));
 }
 
-function projectItems(info: Info): Info['projects'] {
-  return info.projects.length
-    ? info.projects
-    : [
-        { title: 'Project one', description: 'Describe your project in one line.', url: '' },
-        { title: 'Project two', description: 'Describe your project in one line.', url: '' },
-        { title: 'Project three', description: 'Describe your project in one line.', url: '' },
-      ];
-}
-
 const projectsGrid: Renderer = (ctx) =>
-  group(join(heading(ctx.php.t('Projects')), ...grid(projectItems(ctx.info).map((p, i) => projectContent(ctx, p, i)))), {
-    name: ctx.php.name('Projects'),
-    tagName: 'section',
-    anchor: 'projects',
-    align: 'full',
-    padY: 60,
-    background: SURFACE,
-  });
+  ctx.info.projects.length
+    ? group(join(heading(ctx.php.t('Projects')), ...grid(ctx.info.projects.map((p, i) => projectContent(ctx, p, i)))), {
+        name: ctx.php.name('Projects'),
+        tagName: 'section',
+        anchor: 'projects',
+        align: 'full',
+        padY: 60,
+        background: SURFACE,
+      })
+    : '';
 
 const projectsCards: Renderer = (ctx) => {
-  const cards = projectItems(ctx.info).map((p, i) =>
+  if (!ctx.info.projects.length) return '';
+  const cards = ctx.info.projects.map((p, i) =>
     group(projectContent(ctx, p, i), {
       name: ctx.php.name('Project card'),
       background: SURFACE,
@@ -250,33 +291,37 @@ const projectsCards: Renderer = (ctx) => {
 
 /** Compact rows: small picture beside the text. */
 const projectsList: Renderer = (ctx) =>
-  group(
-    join(
-      heading(ctx.php.t('Projects')),
-      ...projectItems(ctx.info).map((p, i) => columns([projectPicture(ctx, p, i), projectText(ctx, p)])),
-    ),
-    { name: ctx.php.name('Projects'), tagName: 'section', padY: 60, anchor: 'projects' },
-  );
+  ctx.info.projects.length
+    ? group(
+        join(
+          heading(ctx.php.t('Projects')),
+          ...ctx.info.projects.map((p, i) => columns([projectPicture(ctx, p, i), projectText(ctx, p)])),
+        ),
+        { name: ctx.php.name('Projects'), tagName: 'section', padY: 60, anchor: 'projects' },
+      )
+    : '';
 
 /** Large pictures, alternating sides: a showcase. */
 const projectsRows: Renderer = (ctx) =>
-  group(
-    join(
-      heading(ctx.php.t('Selected work')),
-      ...projectItems(ctx.info).map((p, i) => {
-        const pic = projectPicture(ctx, p, i, '4/3');
-        const text = projectText(ctx, p);
-        return columns(i % 2 ? [text, pic] : [pic, text]);
-      }),
-    ),
-    {
-      name: ctx.php.name('Projects'),
-      tagName: 'section',
-      anchor: 'projects',
-      padY: 70,
-      layout: { type: 'constrained', contentSize: '1280px' },
-    },
-  );
+  ctx.info.projects.length
+    ? group(
+        join(
+          heading(ctx.php.t('Selected work')),
+          ...ctx.info.projects.map((p, i) => {
+            const pic = projectPicture(ctx, p, i, '4/3');
+            const text = projectText(ctx, p);
+            return columns(i % 2 ? [text, pic] : [pic, text]);
+          }),
+        ),
+        {
+          name: ctx.php.name('Projects'),
+          tagName: 'section',
+          anchor: 'projects',
+          padY: 70,
+          layout: { type: 'constrained', contentSize: '1280px' },
+        },
+      )
+    : '';
 
 /* ---------- Latest posts ---------- */
 
@@ -365,29 +410,33 @@ export function socialLinks(info: Info, php: Php, justify: 'center' | 'right' | 
   );
 }
 
+/** A call to action needs somewhere to go: hidden without an email. */
 const contactCta: Renderer = ({ info, php }) =>
-  group(
-    join(
-      heading(php.t("Let's work together"), 2, true),
-      paragraph(php.t('Have a question or an idea? Get in touch.'), true),
-      info.email && buttons([{ label: php.t('Email me'), href: php.url(`mailto:${info.email}`) }], true),
-    ),
-    { name: php.name('Call to action'), tagName: 'section', align: 'full', padY: 70, background: SURFACE },
-  );
+  info.email
+    ? group(
+        join(
+          heading(php.t("Let's work together"), 2, true),
+          paragraph(php.t('Have a question or an idea? Get in touch.'), true),
+          buttons([{ label: php.t('Email me'), href: php.url(`mailto:${info.email}`) }], true),
+        ),
+        { name: php.name('Call to action'), tagName: 'section', align: 'full', padY: 70, background: SURFACE },
+      )
+    : '';
 
-const contactFull: Renderer = ({ info, php }) =>
-  group(
+const contactFull: Renderer = ({ info, php }) => {
+  const socials = socialLinks(info, php);
+  if (!info.email && !info.location && !socials) return '';
+  return group(
     join(
       heading(php.t('Contact'), 1, true),
-      paragraph(php.t('The best way to reach me is by email.'), true),
-      info.email
-        ? paragraph(`<a href="${php.url(`mailto:${info.email}`)}">${php.t(info.email)}</a>`, true)
-        : paragraph(php.t('[Add your email address]'), true),
+      info.email && paragraph(php.t('The best way to reach me is by email.'), true),
+      info.email && paragraph(`<a href="${php.url(`mailto:${info.email}`)}">${php.t(info.email)}</a>`, true),
       info.location && paragraph(php.t(info.location), true),
-      socialLinks(info, php),
+      socials,
     ),
     { name: php.name('Contact'), tagName: 'section', padY: 80 },
   );
+};
 
 /* ---------- Registry ---------- */
 
@@ -398,6 +447,9 @@ export const SECTION_LABELS: Record<SectionType, string> = {
   about: 'About',
   skills: 'Skills',
   contributions: 'WordPress journey',
+  experience: 'Experience',
+  education: 'Education',
+  achievements: 'Achievements',
   projects: 'Projects',
   posts: 'Latest posts',
   contact: 'Contact',
@@ -424,6 +476,9 @@ export const SECTIONS: Record<SectionType, Record<string, Variant>> = {
     list: { label: 'List', render: contributionsList },
     cards: { label: 'Cards', render: contributionsCards },
   },
+  experience: { timeline: { label: 'Timeline', render: experienceTimeline } },
+  education: { list: { label: 'List', render: educationList } },
+  achievements: { list: { label: 'List', render: achievementsList } },
   projects: {
     grid: { label: 'Grid band', render: projectsGrid },
     cards: { label: 'Cards', render: projectsCards },
@@ -444,4 +499,9 @@ export function renderSection(section: Section, ctx: Ctx): string {
   const variants = SECTIONS[section.type];
   const v = variants[section.variant] ?? Object.values(variants)[0];
   return v.render(ctx);
+}
+
+/** Whether a section has nothing to show for this person, so the theme leaves it out. */
+export function isSectionEmpty(section: Section, info: Info): boolean {
+  return renderSection(section, { info, php: makePhp('x'), radius: '0' }) === '';
 }

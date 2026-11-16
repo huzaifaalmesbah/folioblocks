@@ -41,6 +41,8 @@ export function Builder() {
     [info, style, preset, header, footer, pages],
   );
   const { slug, files, assets } = useMemo(() => generateTheme(state), [state]);
+  // The preview fills empty parts with sample content; the theme above leaves them out.
+  const preview = useMemo(() => generateTheme(state, { samples: true }), [state]);
   const paths = [...Object.keys(files), ...assets.map((a) => a.path)].sort();
 
   const [step, setStep] = useState<StepKey>('info');
@@ -230,7 +232,7 @@ export function Builder() {
           </button>
         </div>
 
-        {view === 'preview' && <QuickPreview state={state} files={files} assets={assets} />}
+        {view === 'preview' && <QuickPreview state={state} files={preview.files} assets={preview.assets} />}
 
         {view === 'code' && (
           <div className="flex min-h-0 flex-1 flex-col md:flex-row">
