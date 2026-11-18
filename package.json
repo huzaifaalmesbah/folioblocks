@@ -3,6 +3,9 @@
   "private": true,
   "version": "0.1.0",
   "type": "module",
+  "bin": {
+    "folioblocks": "cli/folioblocks.mjs"
+  },
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
@@ -16,7 +19,9 @@
     "validate": "tsx scripts/validate-themes.ts",
     "i18n:extract": "tsx scripts/i18n-extract.ts",
     "i18n:check": "tsx scripts/i18n-check.ts",
-    "i18n:new": "tsx scripts/i18n-new.ts"
+    "i18n:new": "tsx scripts/i18n-new.ts",
+    "cli": "tsx src/cli/folioblocks.ts",
+    "build:cli": "tsx scripts/build-cli.ts"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",

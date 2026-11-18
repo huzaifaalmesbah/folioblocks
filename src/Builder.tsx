@@ -87,6 +87,30 @@ export function Builder() {
   const [undo, setUndo] = useState<Undo | null>(null);
   const clearUndo = useCallback(() => setUndo(null), []);
 
+  // A link from the folioblocks command line (`#/build?import=…`) carries a project: load it once, after asking.
+  useEffect(() => {
+    const load = () => {
+      const params = new URLSearchParams(window.location.hash.split('?')[1] ?? '');
+      const data = params.get('import');
+      if (!data) return;
+      // Drop the project from the address, so a reload doesn't load it again.
+      history.replaceState(null, '', '#/build?step=info');
+      try {
+        const b64 = data.replace(/-/g, '+').replace(/_/g, '/');
+        const bytes = Uint8Array.from(atob(b64 + '='.repeat((4 - (b64.length % 4)) % 4)), (c) => c.charCodeAt(0));
+        const parsed = parseSettings(new TextDecoder().decode(bytes));
+        if (!confirm(tr('Load the project from this link ({name})? It replaces your info and design. Your saved designs stay.', { name: parsed.state.info.name }))) return;
+        withUndo(tr('Loaded the project from the link.'), () => useBuilder.getState().importSettings(parsed.state, parsed.layouts));
+        setStepState('info');
+      } catch (err) {
+        setError(err instanceof Error ? err.message : String(err));
+      }
+    };
+    load();
+    window.addEventListener('hashchange', load);
+    return () => window.removeEventListener('hashchange', load);
+  }, []);
+
   // A link to `#/build?step=…` while the builder is open moves to that step.
   useEffect(() => {
     const onHash = () => {

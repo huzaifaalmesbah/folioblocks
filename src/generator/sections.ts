@@ -19,7 +19,7 @@ import {
 } from './blocks';
 import type { LookDef } from './looks';
 import { portraitAlt, screenshotAlt } from './i18n';
-import { AVATAR, projectImage } from './images';
+import { avatarPath, projectImagePath } from './images';
 import { cleanUrl, makePhp, type Php } from './utils';
 
 export type Ctx = {
@@ -99,7 +99,7 @@ function grid(items: string[], size = 3): string[] {
 
 /** The student's photo (or the placeholder), with translated alt text. */
 function avatar({ info, php }: Ctx, opts: Parameters<typeof image>[2]): string {
-  return image(php.themeFile(AVATAR), php.attr(portraitAlt(php.lang, info.name)), opts);
+  return image(php.themeFile(avatarPath(info)), php.attr(portraitAlt(php.lang, info.name)), opts);
 }
 
 /* ---------- Hero ---------- */
@@ -379,8 +379,8 @@ function projectText({ php }: Ctx, p: Info['projects'][number]): string {
   return join(heading(title, 3), p.description && paragraph(php.t(p.description)));
 }
 
-function projectPicture({ php }: Ctx, p: Info['projects'][number], i: number, aspectRatio = '3/2'): string {
-  return image(php.themeFile(projectImage(i)), php.attr(screenshotAlt(php.lang, p.title)), { aspectRatio });
+function projectPicture({ php, info }: Ctx, p: Info['projects'][number], i: number, aspectRatio = '3/2'): string {
+  return image(php.themeFile(projectImagePath(info, i)), php.attr(screenshotAlt(php.lang, p.title)), { aspectRatio });
 }
 
 /** Picture on top, then title and description. */
