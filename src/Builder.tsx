@@ -234,15 +234,6 @@ export function Builder() {
                 { kind: 'button', label: 'Save a backup file', hint: 'Keep your work safe, or continue on another computer.', onClick: exportDraft },
                 { kind: 'file', label: 'Open a backup file', hint: 'Continue from a file you saved before.', accept: 'application/json,.json', onFile: importDraft },
                 { kind: 'divider' },
-                {
-                  kind: 'button',
-                  label: 'View the theme files',
-                  hint: 'The code that goes into your zip.',
-                  onClick: () => {
-                    setView('code');
-                    setMobileView('preview');
-                  },
-                },
                 { kind: 'button', label: 'Download blueprint.json', hint: 'For WordPress Playground (advanced).', onClick: downloadBlueprint },
                 { kind: 'divider' },
                 { kind: 'button', label: 'Start over', hint: 'Clear your info and design in this browser.', danger: true, onClick: startOver },
@@ -358,18 +349,31 @@ export function Builder() {
 
       <main className={`${mobileView === 'preview' ? 'flex' : 'hidden'} min-h-0 min-w-0 flex-1 flex-col lg:flex`}>
         <div className="flex items-center gap-3 border-b border-slate-200 bg-white px-4 py-2">
-          {view === 'preview' ? (
-            <p className="text-sm font-semibold text-slate-800">
-              Preview <span className="hidden font-normal text-slate-500 sm:inline">· updates as you type</span>
-            </p>
-          ) : (
-            <>
-              <button type="button" onClick={() => setView('preview')} className="rounded-md px-2 py-1 text-sm font-medium text-blue-700 hover:bg-blue-50">
-                ← Back to preview
+          <div className="flex gap-1 rounded-lg bg-slate-100 p-1" role="tablist" aria-label="Right panel">
+            {(['preview', 'code'] as const).map((v) => (
+              <button
+                key={v}
+                type="button"
+                role="tab"
+                aria-selected={view === v}
+                onClick={() => setView(v)}
+                className={`rounded-md px-3 py-1 text-sm font-medium ${
+                  view === v ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-600 hover:text-slate-900'
+                }`}
+              >
+                {v === 'preview' ? (
+                  'Preview'
+                ) : (
+                  <>
+                    Code<span className="hidden sm:inline"> ({paths.length} files)</span>
+                  </>
+                )}
               </button>
-              <p className="hidden text-xs text-slate-500 sm:block">The {paths.length} theme files that go into your zip.</p>
-            </>
-          )}
+            ))}
+          </div>
+          <p className="hidden text-xs text-slate-500 xl:block">
+            {view === 'preview' ? 'Updates as you type.' : 'The theme files that go into your zip.'}
+          </p>
           <button
             type="button"
             onClick={openInPlayground}
