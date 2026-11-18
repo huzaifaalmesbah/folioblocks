@@ -46,9 +46,17 @@ function declarations(style: Obj | undefined): string[] {
   if (color?.background) out.push(`background-color: ${value(color.background)}`);
   const typography = style.typography as Obj | undefined;
   for (const [k, v] of Object.entries(typography ?? {})) out.push(`${kebab(k)}: ${value(v)}`);
+  if (color?.gradient) out.push(`background: ${value(color.gradient)}`);
   const border = style.border as Obj | undefined;
   if (border?.radius) out.push(`border-radius: ${value(border.radius)}`);
-  if (border?.width) out.push(`border-width: ${value(border.width)}`);
+  if (border?.color) out.push(`border-color: ${value(border.color)}`);
+  if (border?.width) out.push(`border-width: ${value(border.width)}`, `border-style: ${value(border.style ?? 'solid')}`);
+  for (const side of ['top', 'right', 'bottom', 'left']) {
+    const b = border?.[side] as Obj | undefined;
+    if (b?.color) out.push(`border-${side}-color: ${value(b.color)}`);
+    if (b?.width) out.push(`border-${side}-width: ${value(b.width)}`, `border-${side}-style: ${value(b.style ?? 'solid')}`);
+  }
+  if (style.shadow) out.push(`box-shadow: ${value(style.shadow)}`);
   const spacing = style.spacing as Obj | undefined;
   const padding = spacing?.padding as Obj | undefined;
   for (const [k, v] of Object.entries(padding ?? {})) out.push(`padding-${k}: ${value(v)}`);
@@ -83,9 +91,11 @@ const BLOCK_SELECTORS: Record<string, string> = {
   'core/separator': '.wp-block-separator',
   'core/image': '.wp-block-image img',
   'core/post-featured-image': '.wp-block-post-featured-image img',
+  'core/quote': '.wp-block-quote',
+  'core/group': '.wp-block-group',
 };
 
-export function themeCss(themeJsonText: string, fontUrl: (themePath: string) => string): string {
+export function themeCss(themeJsonText: string, fontUrl: (themePath: string) => string, blockStyleTexts: string[] = []): string {
   const json = JSON.parse(themeJsonText) as Json;
   const settings = (json.settings ?? {}) as Obj;
   const styles = (json.styles ?? {}) as Obj;
@@ -112,6 +122,9 @@ export function themeCss(themeJsonText: string, fontUrl: (themePath: string) => 
     vars.push(`--wp--preset--font-size--${s.slug}: ${fluid ? fluidSize(String(fluid.min), String(fluid.max)) : s.size}`);
   }
   for (const s of ((settings.spacing as Obj)?.spacingSizes ?? []) as Obj[]) vars.push(`--wp--preset--spacing--${s.slug}: ${s.size}`);
+  for (const s of (((settings.shadow as Obj)?.presets ?? []) as Obj[])) vars.push(`--wp--preset--shadow--${s.slug}: ${s.shadow}`);
+  const gradients = ((settings.color as Obj)?.gradients ?? []) as Obj[];
+  for (const g of gradients) vars.push(`--wp--preset--gradient--${g.slug}: ${g.gradient}`);
   const layout = (settings.layout ?? {}) as Obj;
   const rootStyles = (styles.spacing ?? {}) as Obj;
   const rootPadding = (rootStyles.padding ?? {}) as Obj;
@@ -126,7 +139,10 @@ export function themeCss(themeJsonText: string, fontUrl: (themePath: string) => 
   for (const c of ((settings.color as Obj)?.palette ?? []) as Obj[]) {
     css.push(`.has-${c.slug}-color { color: var(--wp--preset--color--${c.slug}) !important; }`);
     css.push(`.has-${c.slug}-background-color { background-color: var(--wp--preset--color--${c.slug}) !important; }`);
+    css.push(`.has-${c.slug}-border-color { border-color: var(--wp--preset--color--${c.slug}) !important; }`);
   }
+  for (const g of gradients) css.push(`.has-${g.slug}-gradient-background { background: var(--wp--preset--gradient--${g.slug}) !important; }`);
+  css.push('.has-border-color, [style*="border-width"] { border-style: solid; }', '[style*="border-left-width"] { border-left-style: solid; }', '[style*="border-top-width"] { border-top-style: solid; }');
   for (const s of (typography.fontSizes ?? []) as Obj[]) css.push(`.has-${s.slug}-font-size { font-size: var(--wp--preset--font-size--${s.slug}) !important; }`);
   for (const f of families) css.push(`.has-${f.slug}-font-family { font-family: var(--wp--preset--font-family--${f.slug}) !important; }`);
 
@@ -167,6 +183,14 @@ export function themeCss(themeJsonText: string, fontUrl: (themePath: string) => 
     .screen-reader-text { border: 0; clip-path: inset(50%); height: 1px; margin: -1px; overflow: hidden; padding: 0; position: absolute; width: 1px; white-space: nowrap; }
     main { display: block; }
   `);
+
+  // Block style variations (styles/blocks/*.json), as is-style-<slug> classes.
+  for (const text of blockStyleTexts) {
+    const v = JSON.parse(text) as Obj;
+    for (const type of (v.blockTypes ?? []) as string[]) {
+      css.push(rule(`.wp-block-${type.replace(/^core\//, '')}.is-style-${v.slug}`, declarations(v.styles as Obj)));
+    }
+  }
 
   return css.filter(Boolean).join('\n');
 }

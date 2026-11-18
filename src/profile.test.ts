@@ -156,9 +156,9 @@ describe('services, testimonials and the newest designs', () => {
     expect(home).toContain('class="wp-block-group alignfull has-base-color has-accent-3-background-color has-text-color has-background"');
   });
 
-  it('has twelve templates, each with its own key and a best-for line', () => {
-    expect(PRESETS).toHaveLength(12);
-    expect(new Set(PRESETS.map((p) => p.key)).size).toBe(12);
+  it('has twenty templates, each with its own key and a best-for line', () => {
+    expect(PRESETS).toHaveLength(20);
+    expect(new Set(PRESETS.map((p) => p.key)).size).toBe(20);
     for (const p of PRESETS) expect(p.bestFor.length, p.key).toBeGreaterThan(5);
   });
 });

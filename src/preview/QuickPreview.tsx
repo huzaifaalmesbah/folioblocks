@@ -33,7 +33,17 @@ export function QuickPreview(props: { state: BuilderState; files: ThemeFiles; as
     () => renderPage(state, files, page, { patterns, fileUrl, sampleImage: (i) => publicUrl(SAMPLE_POST_IMAGES[i]) }),
     [state, files, page, patterns, fileUrl],
   );
-  const css = useMemo(() => themeCss(files['theme.json'], fileUrl), [files, fileUrl]);
+  const css = useMemo(
+    () =>
+      themeCss(
+        files['theme.json'],
+        fileUrl,
+        Object.entries(files)
+          .filter(([path]) => path.startsWith('styles/blocks/'))
+          .map(([, text]) => text),
+      ),
+    [files, fileUrl],
+  );
 
   // Swap content in place so the scroll position survives each edit.
   useEffect(() => {

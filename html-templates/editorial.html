@@ -1,0 +1,665 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Maliha Rahman — Product Designer, Dhaka</title>
+<meta name="description" content="Maliha Rahman is a product (UI/UX) designer in Dhaka. Case studies in fintech onboarding, health booking and design systems, plus writing, experience and contact.">
+<style>
+/* Fonts: local files only */
+@font-face { font-family: "Playfair Display"; src: url("assets/fonts/playfair-display.woff2") format("woff2"); font-weight: 400 900; font-style: normal; font-display: swap; }
+@font-face { font-family: "Inter"; src: url("assets/fonts/inter.woff2") format("woff2"); font-weight: 100 900; font-style: normal; font-display: swap; }
+
+:root {
+  /* theme.json presets */
+  --wp--preset--color--base: #f4efe6;      /* paper */
+  --wp--preset--color--contrast: #1b1814;  /* ink */
+  --wp--preset--color--primary: #a83c22;   /* vermilion accent, 5.2:1 on paper */
+  --wp--preset--color--secondary: #5b534a; /* muted ink, 7:1 on paper */
+  --wp--preset--color--accent: #e9e1d2;    /* darker paper for panels */
+  --wp--preset--font-family--heading: "Playfair Display", "Iowan Old Style", Georgia, serif;
+  --wp--preset--font-family--body: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  /* derived tokens */
+  --rule: color-mix(in srgb, var(--wp--preset--color--contrast) 18%, transparent);
+  --rule-strong: var(--wp--preset--color--contrast);
+  --gutter: clamp(1rem, 4vw, 3rem);
+  --wide: 1240px;
+  --space-section: clamp(4.5rem, 10vw, 9rem);
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; scroll-padding-top: 5rem; -webkit-text-size-adjust: 100%; overflow-x: clip; }
+body {
+  margin: 0;
+  background: var(--wp--preset--color--base);
+  color: var(--wp--preset--color--contrast);
+  font-family: var(--wp--preset--font-family--body);
+  font-size: clamp(1rem, 0.95rem + 0.2vw, 1.0625rem);
+  line-height: 1.65;
+  font-feature-settings: "ss01", "cv11";
+  text-rendering: optimizeLegibility;
+}
+img { display: block; max-width: 100%; height: auto; }
+a { color: inherit; text-decoration-thickness: 1px; text-underline-offset: 0.2em; }
+a:hover { color: var(--wp--preset--color--primary); }
+:focus-visible { outline: 2px solid var(--wp--preset--color--primary); outline-offset: 3px; border-radius: 2px; }
+::selection { background: var(--wp--preset--color--primary); color: var(--wp--preset--color--base); }
+
+h1, h2, h3, h4 { font-family: var(--wp--preset--font-family--heading); font-weight: 500; line-height: 1.05; letter-spacing: -0.02em; margin: 0; }
+em, .italic { font-style: italic; }
+h1 em, h2 em, h3 em, blockquote em { color: var(--wp--preset--color--primary); font-weight: 400; }
+p { margin: 0 0 1em; }
+
+.skip { position: absolute; left: -999px; top: 0; background: var(--wp--preset--color--contrast); color: var(--wp--preset--color--base); padding: .75rem 1rem; z-index: 100; }
+.skip:focus { left: 1rem; top: 1rem; }
+
+.wrap { width: min(100% - 2 * var(--gutter), var(--wide)); margin-inline: auto; }
+
+/* Small labels */
+.eyebrow {
+  font-size: .75rem; letter-spacing: .14em; text-transform: uppercase; font-weight: 600;
+  color: var(--wp--preset--color--secondary);
+}
+
+/* Header */
+.site-header {
+  position: sticky; top: 0; z-index: 50;
+  background: color-mix(in srgb, var(--wp--preset--color--base) 88%, transparent);
+  backdrop-filter: saturate(1.2) blur(10px);
+  -webkit-backdrop-filter: saturate(1.2) blur(10px);
+  border-bottom: 1px solid var(--rule);
+}
+.site-header .wrap { display: flex; align-items: center; justify-content: space-between; gap: 1rem; min-height: 4rem; }
+.brand { font-family: var(--wp--preset--font-family--heading); font-size: 1.25rem; text-decoration: none; letter-spacing: -0.01em; }
+.brand em { color: var(--wp--preset--color--primary); }
+.site-nav ul { list-style: none; display: flex; gap: clamp(.75rem, 2vw, 1.75rem); margin: 0; padding: 0; }
+.site-nav a { text-decoration: none; font-size: .875rem; font-weight: 500; padding-block: .25rem; background: linear-gradient(currentColor, currentColor) 0 100% / 0 1px no-repeat; transition: background-size .3s ease; }
+.site-nav a:hover { background-size: 100% 1px; }
+.site-nav .nav-cta { color: var(--wp--preset--color--primary); }
+@media (max-width: 760px) {
+  .site-nav li:not(.keep) { display: none; }
+}
+
+/* Section scaffolding: number + title on a fine rule */
+section { padding-block: var(--space-section); }
+section + section { border-top: 1px solid var(--rule); }
+.section-head {
+  display: grid; grid-template-columns: minmax(0, 1fr); gap: 1rem;
+  margin-bottom: clamp(2.5rem, 6vw, 5rem);
+}
+.section-head .num { font-family: var(--wp--preset--font-family--heading); font-style: italic; font-size: 1.125rem; color: var(--wp--preset--color--primary); }
+.section-head h2 { font-size: clamp(2.5rem, 1.6rem + 4vw, 5.5rem); }
+.section-head p { max-width: 38ch; color: var(--wp--preset--color--secondary); margin: 0; }
+@media (min-width: 900px) {
+  .section-head { grid-template-columns: 7rem minmax(0, 1fr) minmax(0, 22rem); align-items: end; }
+  .section-head .num { align-self: start; padding-top: .6rem; }
+}
+
+/* Buttons */
+.buttons { display: flex; flex-wrap: wrap; gap: .75rem; }
+.btn {
+  display: inline-flex; align-items: center; gap: .6rem;
+  padding: .85rem 1.4rem; border-radius: 999px;
+  font-weight: 600; font-size: .9375rem; text-decoration: none;
+  border: 1px solid var(--wp--preset--color--contrast);
+  transition: background-color .2s ease, color .2s ease, transform .2s ease;
+}
+.btn-solid { background: var(--wp--preset--color--contrast); color: var(--wp--preset--color--base); }
+.btn-solid:hover { background: var(--wp--preset--color--primary); border-color: var(--wp--preset--color--primary); color: var(--wp--preset--color--base); }
+.btn-outline:hover { background: var(--wp--preset--color--contrast); color: var(--wp--preset--color--base); }
+.btn .arrow { transition: transform .2s ease; }
+.btn:hover .arrow { transform: translateX(3px); }
+
+/* 01 Hero */
+.hero { padding-top: clamp(3rem, 8vw, 7rem); padding-bottom: clamp(3rem, 7vw, 6rem); }
+.hero-meta { display: flex; flex-wrap: wrap; justify-content: space-between; gap: .75rem 2rem; border-bottom: 1px solid var(--rule-strong); padding-bottom: 1rem; margin-bottom: clamp(2rem, 5vw, 4rem); }
+.hero h1 {
+  font-size: clamp(3rem, 1rem + 9.2vw, 10.5rem);
+  line-height: .92; letter-spacing: -0.045em; font-weight: 500;
+  max-width: 13ch;
+}
+.hero h1 em { font-weight: 400; letter-spacing: -0.03em; }
+.hero-foot { display: grid; gap: 2rem; margin-top: clamp(2.5rem, 6vw, 5rem); }
+.hero-foot .lede { font-size: clamp(1.125rem, 1rem + .5vw, 1.375rem); line-height: 1.5; max-width: 34ch; margin: 0; }
+.availability { display: inline-flex; align-items: center; gap: .6rem; font-size: .9375rem; font-weight: 500; }
+.dot { width: .6rem; height: .6rem; border-radius: 50%; background: #2f7a4a; box-shadow: 0 0 0 0 rgba(47,122,74,.5); animation: pulse 2.4s infinite; flex: none; }
+@keyframes pulse { 70% { box-shadow: 0 0 0 .55rem rgba(47,122,74,0); } 100% { box-shadow: 0 0 0 0 rgba(47,122,74,0); } }
+@media (min-width: 900px) {
+  .hero-foot { grid-template-columns: 1fr 1fr auto; align-items: end; }
+}
+
+/* 02 Selected work */
+.cases { display: grid; gap: clamp(4rem, 9vw, 8rem); }
+.case { display: grid; gap: clamp(1.5rem, 3vw, 3rem); }
+.case-media { position: relative; overflow: hidden; background: var(--wp--preset--color--accent); }
+.case-media img { width: 100%; aspect-ratio: 3 / 2; object-fit: cover; transition: transform .8s cubic-bezier(.2,.7,.2,1); }
+.case:hover .case-media img { transform: scale(1.025); }
+.case-index { position: absolute; left: 1rem; top: 1rem; background: var(--wp--preset--color--base); padding: .25rem .65rem; font-family: var(--wp--preset--font-family--heading); font-style: italic; font-size: .95rem; }
+.case-body h3 { font-size: clamp(1.875rem, 1.3rem + 2.4vw, 3.25rem); margin: .5rem 0 1.25rem; }
+.case-body > p { color: var(--wp--preset--color--secondary); max-width: 52ch; }
+.case-facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr)); gap: 1.25rem; margin: 1.75rem 0; padding: 1.25rem 0; border-block: 1px solid var(--rule); }
+.case-facts dt { font-size: .7rem; letter-spacing: .14em; text-transform: uppercase; font-weight: 600; color: var(--wp--preset--color--secondary); margin-bottom: .35rem; }
+.case-facts dd { margin: 0; font-size: .9375rem; line-height: 1.5; }
+.metrics { display: flex; flex-wrap: wrap; gap: 1.5rem 2.5rem; margin: 0 0 1.75rem; padding: 0; list-style: none; }
+.metrics strong { display: block; font-family: var(--wp--preset--font-family--heading); font-size: clamp(2.25rem, 1.8rem + 1.6vw, 3.25rem); font-weight: 500; line-height: 1; color: var(--wp--preset--color--primary); letter-spacing: -0.03em; }
+.metrics span { font-size: .8125rem; color: var(--wp--preset--color--secondary); }
+.tags { display: flex; flex-wrap: wrap; gap: .5rem; list-style: none; margin: 0 0 1.75rem; padding: 0; }
+.tags li { font-size: .75rem; font-weight: 500; padding: .3rem .75rem; border: 1px solid var(--rule); border-radius: 999px; }
+.read-link { font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: .5rem; border-bottom: 1px solid currentColor; padding-bottom: .2rem; }
+@media (min-width: 900px) {
+  .case { grid-template-columns: 7fr 5fr; align-items: center; }
+  .case:nth-child(even) .case-media { order: 2; }
+}
+
+/* 03 About */
+.about-grid { display: grid; gap: clamp(2rem, 5vw, 5rem); }
+.portrait { margin: 0; }
+.portrait img { width: 100%; aspect-ratio: 4 / 5; object-fit: cover; filter: grayscale(.15) contrast(1.02); }
+.portrait figcaption { font-size: .8125rem; color: var(--wp--preset--color--secondary); margin-top: .75rem; font-style: italic; font-family: var(--wp--preset--font-family--heading); }
+.about-text .big { font-family: var(--wp--preset--font-family--heading); font-size: clamp(1.5rem, 1.1rem + 1.6vw, 2.375rem); line-height: 1.25; letter-spacing: -0.015em; margin-bottom: 1.75rem; }
+.about-text .big em { color: var(--wp--preset--color--primary); }
+.about-text .cols { columns: 2 16rem; column-gap: 2.5rem; color: var(--wp--preset--color--secondary); }
+.about-text .cols p { break-inside: avoid; }
+.dropcap::first-letter { font-family: var(--wp--preset--font-family--heading); float: left; font-size: 3.6em; line-height: .8; padding: .08em .1em 0 0; color: var(--wp--preset--color--contrast); }
+.facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr)); gap: 1rem; margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--rule-strong); }
+.facts strong { display: block; font-family: var(--wp--preset--font-family--heading); font-size: 2rem; font-weight: 500; line-height: 1.1; }
+.facts span { font-size: .8125rem; color: var(--wp--preset--color--secondary); }
+@media (min-width: 900px) { .about-grid { grid-template-columns: 5fr 7fr; align-items: start; } .portrait { position: sticky; top: 6rem; } }
+
+/* 04 Services */
+.services-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr)); border-top: 1px solid var(--rule-strong); }
+.service { padding: 2rem 1.5rem 2.25rem 0; border-bottom: 1px solid var(--rule); }
+.service .eyebrow { color: var(--wp--preset--color--primary); }
+.service h3 { font-size: 1.75rem; margin: .9rem 0 .75rem; }
+.service p { color: var(--wp--preset--color--secondary); font-size: .9375rem; margin: 0; }
+@media (min-width: 700px) { .service + .service { padding-left: 1.5rem; border-left: 1px solid var(--rule); } }
+
+/* 05 Experience */
+.timeline { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--rule-strong); }
+.job { display: grid; gap: .5rem 2rem; padding: 1.75rem 0; border-bottom: 1px solid var(--rule); }
+.job .years { font-variant-numeric: tabular-nums; font-size: .875rem; color: var(--wp--preset--color--secondary); }
+.job h3 { font-size: clamp(1.5rem, 1.2rem + 1vw, 2rem); }
+.job h3 span { font-family: var(--wp--preset--font-family--body); font-size: .9375rem; font-weight: 500; letter-spacing: 0; color: var(--wp--preset--color--secondary); display: block; margin-top: .4rem; }
+.job p { color: var(--wp--preset--color--secondary); margin: 0; max-width: 56ch; }
+@media (min-width: 900px) { .job { grid-template-columns: 10rem minmax(0, 1fr) minmax(0, 1.2fr); align-items: baseline; } }
+
+/* 06 Tools */
+.tools-grid { display: grid; gap: 2.5rem; grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr)); }
+.tools-grid h3 { font-size: 1.375rem; padding-bottom: .75rem; border-bottom: 1px solid var(--rule-strong); margin-bottom: .75rem; }
+.tools-grid ul { list-style: none; margin: 0; padding: 0; }
+.tools-grid li { display: flex; justify-content: space-between; gap: 1rem; padding: .55rem 0; border-bottom: 1px dotted var(--rule); font-size: .9375rem; }
+.tools-grid li span { color: var(--wp--preset--color--secondary); font-size: .8125rem; }
+
+/* 07 Testimonials */
+[data-section="testimonials"] { background: var(--wp--preset--color--contrast); color: var(--wp--preset--color--base); border-top: 0; }
+[data-section="testimonials"] + section { border-top: 0; }
+[data-section="testimonials"] .section-head .num, [data-section="testimonials"] h2 em { color: #f0a58f; }
+[data-section="testimonials"] .section-head p { color: color-mix(in srgb, var(--wp--preset--color--base) 72%, transparent); }
+.pull { margin: 0; }
+.pull blockquote { margin: 0; font-family: var(--wp--preset--font-family--heading); font-size: clamp(1.875rem, 1.1rem + 3.4vw, 4.25rem); line-height: 1.1; letter-spacing: -0.025em; max-width: 22ch; }
+.pull blockquote::before { content: "\201C"; display: block; font-size: 1.8em; line-height: .6; color: #f0a58f; }
+.pull blockquote em { color: #f0a58f; }
+.pull figcaption { margin-top: 2rem; font-size: .9375rem; }
+.pull figcaption strong { display: block; font-weight: 600; }
+.pull figcaption span { color: color-mix(in srgb, var(--wp--preset--color--base) 72%, transparent); }
+.quotes-small { display: grid; gap: 2rem; grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr)); margin-top: clamp(3rem, 6vw, 5rem); padding-top: 2rem; border-top: 1px solid color-mix(in srgb, var(--wp--preset--color--base) 25%, transparent); }
+.quotes-small blockquote { margin: 0 0 1rem; font-family: var(--wp--preset--font-family--heading); font-size: 1.3rem; line-height: 1.4; font-style: italic; }
+.quotes-small figcaption { font-size: .875rem; color: color-mix(in srgb, var(--wp--preset--color--base) 72%, transparent); }
+[data-section="testimonials"] :focus-visible { outline-color: var(--wp--preset--color--base); }
+
+/* 08 Writing */
+.posts-grid { display: grid; gap: clamp(2rem, 4vw, 3rem); grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr)); }
+.post a { text-decoration: none; display: block; }
+.post figure { margin: 0 0 1.25rem; overflow: hidden; background: var(--wp--preset--color--accent); }
+.post img { width: 100%; aspect-ratio: 3 / 2; object-fit: cover; transition: transform .6s ease; }
+.post a:hover img { transform: scale(1.04); }
+.post h3 { font-size: 1.625rem; line-height: 1.15; margin: .6rem 0 .75rem; }
+.post a:hover h3 { color: var(--wp--preset--color--primary); }
+.post p { color: var(--wp--preset--color--secondary); font-size: .9375rem; margin: 0; }
+.post .meta { display: flex; gap: .75rem; font-size: .75rem; letter-spacing: .1em; text-transform: uppercase; font-weight: 600; color: var(--wp--preset--color--secondary); }
+
+/* 09 Education & awards */
+.edu-grid { display: grid; gap: clamp(2rem, 5vw, 4rem); grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr)); }
+.edu-grid h3.col-title { font-size: 1.375rem; padding-bottom: .75rem; border-bottom: 1px solid var(--rule-strong); }
+.list { list-style: none; margin: 0; padding: 0; }
+.list li { display: grid; grid-template-columns: 4.5rem 1fr; gap: 1rem; padding: 1.25rem 0; border-bottom: 1px solid var(--rule); }
+.list .yr { font-family: var(--wp--preset--font-family--heading); font-style: italic; color: var(--wp--preset--color--primary); font-size: 1.125rem; }
+.list strong { display: block; font-weight: 600; }
+.list span { color: var(--wp--preset--color--secondary); font-size: .9375rem; }
+
+/* 10 Contact */
+[data-section="contact"] { padding-bottom: clamp(3rem, 6vw, 5rem); }
+.contact-intro { font-size: clamp(1.125rem, 1rem + .5vw, 1.375rem); max-width: 40ch; margin-bottom: 2rem; }
+.big-mail {
+  display: inline-block; font-family: var(--wp--preset--font-family--heading);
+  font-size: clamp(1.625rem, .4rem + 6vw, 7rem); line-height: 1.05; letter-spacing: -0.04em;
+  text-decoration: none; overflow-wrap: anywhere;
+  background: linear-gradient(var(--wp--preset--color--primary), var(--wp--preset--color--primary)) 0 100% / 100% 2px no-repeat;
+  padding-bottom: .1em;
+}
+.big-mail em { color: var(--wp--preset--color--primary); }
+.contact-row { display: grid; gap: 2rem; margin-top: clamp(2.5rem, 6vw, 4.5rem); padding-top: 2rem; border-top: 1px solid var(--rule-strong); }
+.socials { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: .5rem 1.75rem; }
+.socials a { text-decoration: none; font-weight: 500; display: inline-flex; gap: .35rem; align-items: center; }
+.socials a::after { content: "\2197"; font-size: .85em; color: var(--wp--preset--color--primary); }
+@media (min-width: 900px) { .contact-row { grid-template-columns: 1fr auto; align-items: center; } }
+
+.site-footer { border-top: 1px solid var(--rule); padding-block: 2rem; font-size: .8125rem; color: var(--wp--preset--color--secondary); }
+.site-footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 1rem; }
+
+/* Gentle reveal, only when JS has marked the page and motion is allowed */
+@media (prefers-reduced-motion: no-preference) {
+  .js .reveal { opacity: 0; transform: translateY(24px); transition: opacity .9s ease, transform .9s cubic-bezier(.2,.7,.2,1); }
+  .js .reveal.in { opacity: 1; transform: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+}
+
+@media print {
+  .site-header, .skip { display: none; }
+  [data-section="testimonials"] { background: none; color: inherit; }
+}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="site-header">
+  <div class="wrap">
+    <a class="brand" href="#top">Maliha <em>Rahman</em></a>
+    <nav class="site-nav" aria-label="Main">
+      <ul>
+        <li><a href="#work">Work</a></li>
+        <li><a href="#about">About</a></li>
+        <li><a href="#experience">Experience</a></li>
+        <li><a href="#writing">Writing</a></li>
+        <li class="keep"><a class="nav-cta" href="#contact">Contact</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+
+  <!-- Hero -->
+  <section data-section="hero" class="hero" id="top">
+    <div class="wrap">
+      <div class="hero-meta">
+        <span class="eyebrow">Product Designer — Dhaka, Bangladesh</span>
+        <span class="eyebrow">Portfolio · Vol. 03 · 2026</span>
+      </div>
+      <h1>Designing calm <em>software</em> for busy people.</h1>
+      <div class="hero-foot">
+        <p class="lede">I'm Maliha, a product designer at Ranga Pay. For two years I have been turning messy money tasks into flows that merchants actually finish.</p>
+        <p class="availability"><span class="dot" aria-hidden="true"></span> Open to senior product design roles from February 2027</p>
+        <div class="buttons">
+          <a class="btn btn-solid" href="#work">See selected work <span class="arrow" aria-hidden="true">&rarr;</span></a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Selected work -->
+  <section data-section="projects" id="work" aria-labelledby="work-title">
+    <div class="wrap">
+      <header class="section-head">
+        <span class="num">01 —</span>
+        <h2 id="work-title">Selected <em>work</em></h2>
+        <p>Three projects from the last two years, each with the problem, my part in it and what changed after launch.</p>
+      </header>
+
+      <div class="cases">
+        <article class="case reveal">
+          <figure class="case-media" style="margin:0">
+            <img src="assets/images/project-1.webp" width="1200" height="800" alt="Screens of the redesigned Ranga Pay merchant onboarding flow on a phone and a laptop" loading="lazy">
+            <span class="case-index">No. 1</span>
+          </figure>
+          <div class="case-body">
+            <p class="eyebrow">Ranga Pay · Fintech · 2025</p>
+            <h3>Merchant onboarding, <em>from 11 screens to 4</em></h3>
+            <p>Small shop owners were dropping off while uploading trade licences and bank details. I mapped every step with the support team, cut what the regulator did not need, and let people save and come back.</p>
+            <dl class="case-facts">
+              <div><dt>Problem</dt><dd>Only 41% of sign-ups finished onboarding.</dd></div>
+              <div><dt>Role</dt><dd>Lead designer, with 1 PM and 4 engineers.</dd></div>
+              <div><dt>Timeline</dt><dd>14 weeks, discovery to launch.</dd></div>
+            </dl>
+            <ul class="metrics">
+              <li><strong>68%</strong><span>completion, up from 41%</span></li>
+              <li><strong>−52%</strong><span>support tickets on KYC</span></li>
+            </ul>
+            <ul class="tags" aria-label="Tags">
+              <li>UX research</li><li>Flow design</li><li>Bangla-first copy</li><li>Usability testing</li>
+            </ul>
+            <a class="read-link" href="#case-onboarding">Read case study <span aria-hidden="true">&rarr;</span></a>
+          </div>
+        </article>
+
+        <article class="case reveal">
+          <figure class="case-media" style="margin:0">
+            <img src="assets/images/project-2.webp" width="1200" height="800" alt="Nodi Health booking app showing a doctor list and a time slot picker" loading="lazy">
+            <span class="case-index">No. 2</span>
+          </figure>
+          <div class="case-body">
+            <p class="eyebrow">Nodi Health · Freelance · 2025</p>
+            <h3>Booking a doctor <em>in under a minute</em></h3>
+            <p>A clinic network in Chattogram took bookings by phone, and the lines were busy all morning. I designed a booking app for patients who often use shared phones and mobile data, with large touch targets and a Bangla-first interface.</p>
+            <dl class="case-facts">
+              <div><dt>Problem</dt><dd>Average call wait of 9 minutes to book.</dd></div>
+              <div><dt>Role</dt><dd>Sole designer, research to hand-off.</dd></div>
+              <div><dt>Timeline</dt><dd>8 weeks, evenings and weekends.</dd></div>
+            </dl>
+            <ul class="metrics">
+              <li><strong>48s</strong><span>median time to book</span></li>
+              <li><strong>3.2k</strong><span>bookings in the first month</span></li>
+            </ul>
+            <ul class="tags" aria-label="Tags">
+              <li>Mobile app</li><li>Accessibility</li><li>Prototyping</li><li>Health</li>
+            </ul>
+            <a class="read-link" href="#case-nodi">Read case study <span aria-hidden="true">&rarr;</span></a>
+          </div>
+        </article>
+
+        <article class="case reveal">
+          <figure class="case-media" style="margin:0">
+            <img src="assets/images/project-3.webp" width="1200" height="800" alt="A grid of components and colour tokens from the Tala design system" loading="lazy">
+            <span class="case-index">No. 3</span>
+          </figure>
+          <div class="case-body">
+            <p class="eyebrow">Ranga Pay · Design systems · 2024–26</p>
+            <h3>Tala, a design system <em>three teams share</em></h3>
+            <p>Three product squads had built three different buttons, and two date pickers that disagreed on the week start. I started Tala: tokens first, then 60 core components in Figma and code, with docs written for engineers.</p>
+            <dl class="case-facts">
+              <div><dt>Problem</dt><dd>Slow, inconsistent UI across three apps.</dd></div>
+              <div><dt>Role</dt><dd>Co-owner with a frontend lead.</dd></div>
+              <div><dt>Scope</dt><dd>Tokens, 60 components, docs site.</dd></div>
+            </dl>
+            <ul class="metrics">
+              <li><strong>2×</strong><span>faster screen hand-off</span></li>
+              <li><strong>94%</strong><span>of new UI built from Tala</span></li>
+            </ul>
+            <ul class="tags" aria-label="Tags">
+              <li>Design tokens</li><li>Figma variables</li><li>Documentation</li><li>Governance</li>
+            </ul>
+            <a class="read-link" href="#case-tala">Read case study <span aria-hidden="true">&rarr;</span></a>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- About -->
+  <section data-section="about" id="about" aria-labelledby="about-title">
+    <div class="wrap">
+      <header class="section-head">
+        <span class="num">02 —</span>
+        <h2 id="about-title">About <em>me</em></h2>
+        <p>Architecture student turned product designer. Still drawing floor plans, now for screens.</p>
+      </header>
+      <div class="about-grid">
+        <figure class="portrait reveal">
+          <img src="assets/images/avatar.webp" width="800" height="800" alt="Portrait of Maliha Rahman" loading="lazy">
+          <figcaption>At the Ranga Pay studio, Gulshan, Dhaka.</figcaption>
+        </figure>
+        <div class="about-text">
+          <p class="big">I care about the <em>boring</em> parts of a product: the form that asks one question too many, the error message nobody wrote, the screen people see on slow 3G.</p>
+          <div class="cols">
+            <p class="dropcap">I grew up in Chattogram and studied architecture before I found interface design through a university hackathon. That training still shapes how I work: I sketch a lot, I test with real people early, and I like constraints.</p>
+            <p>At Ranga Pay I design for merchants and their customers across web and mobile. I run research sessions in Bangla and English, write much of our product copy, and look after our design system with the frontend team.</p>
+            <p>Outside work I mentor two junior designers through Design Adda, write about research methods, and spend Fridays photographing old shop signs in Puran Dhaka.</p>
+          </div>
+          <div class="facts">
+            <div><strong>2+ yrs</strong><span>in product design</span></div>
+            <div><strong>40+</strong><span>research sessions run</span></div>
+            <div><strong>3</strong><span>apps shipped to stores</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Services -->
+  <section data-section="services" id="services" aria-labelledby="services-title">
+    <div class="wrap">
+      <header class="section-head">
+        <span class="num">03 —</span>
+        <h2 id="services-title">What I <em>do</em></h2>
+        <p>The four things teams usually bring me in for.</p>
+      </header>
+      <div class="services-grid">
+        <article class="service">
+          <span class="eyebrow">i.</span>
+          <h3>Product design</h3>
+          <p>End-to-end flows for web and mobile, from a rough problem to tested screens engineers can build.</p>
+        </article>
+        <article class="service">
+          <span class="eyebrow">ii.</span>
+          <h3>Design systems</h3>
+          <p>Tokens, components and docs that keep several teams consistent without slowing them down.</p>
+        </article>
+        <article class="service">
+          <span class="eyebrow">iii.</span>
+          <h3>UX research</h3>
+          <p>Interviews, usability tests and diary studies, in Bangla or English, turned into clear decisions.</p>
+        </article>
+        <article class="service">
+          <span class="eyebrow">iv.</span>
+          <h3>Prototyping</h3>
+          <p>Clickable prototypes in Figma or ProtoPie, realistic enough to test before a line of code.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- Experience -->
+  <section data-section="experience" id="experience" aria-labelledby="exp-title">
+    <div class="wrap">
+      <header class="section-head">
+        <span class="num">04 —</span>
+        <h2 id="exp-title"><em>Experience</em></h2>
+        <p>Where I have worked, most recent first.</p>
+      </header>
+      <ol class="timeline">
+        <li class="job">
+          <span class="years">2024 — Now</span>
+          <h3>Product Designer <span>Ranga Pay, Dhaka</span></h3>
+          <p>Design merchant onboarding, payouts and the dashboard. Co-own the Tala design system. Run monthly usability tests with merchants.</p>
+        </li>
+        <li class="job">
+          <span class="years">2023 — 2024</span>
+          <h3>Junior UI/UX Designer <span>Ranga Pay, Dhaka</span></h3>
+          <p>Redesigned the payment link builder and the receipt screens. Set up the first shared Figma library for the team.</p>
+        </li>
+        <li class="job">
+          <span class="years">2025</span>
+          <h3>Freelance Product Designer <span>Nodi Health, Chattogram</span></h3>
+          <p>Designed a patient booking app and the clinic's staff view, from research to developer hand-off.</p>
+        </li>
+        <li class="job">
+          <span class="years">2022 — 2023</span>
+          <h3>Design Intern <span>Kolpo Studio, Dhaka</span></h3>
+          <p>Worked on landing pages, app screens and pitch decks for local startups. Learned to present work to clients.</p>
+        </li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- Tools & skills -->
+  <section data-section="skills" id="skills" aria-labelledby="skills-title">
+    <div class="wrap">
+      <header class="section-head">
+        <span class="num">05 —</span>
+        <h2 id="skills-title">Tools &amp; <em>skills</em></h2>
+        <p>What I use every week, and what I am getting better at.</p>
+      </header>
+      <div class="tools-grid">
+        <div>
+          <h3>Design</h3>
+          <ul>
+            <li>Figma <span>Daily</span></li>
+            <li>FigJam <span>Daily</span></li>
+            <li>ProtoPie <span>Weekly</span></li>
+            <li>Adobe Illustrator <span>Sometimes</span></li>
+          </ul>
+        </div>
+        <div>
+          <h3>Research</h3>
+          <ul>
+            <li>Usability testing <span>Expert</span></li>
+            <li>User interviews <span>Expert</span></li>
+            <li>Maze <span>Weekly</span></li>
+            <li>Dovetail <span>Weekly</span></li>
+          </ul>
+        </div>
+        <div>
+          <h3>Build &amp; ship</h3>
+          <ul>
+            <li>HTML &amp; CSS <span>Good</span></li>
+            <li>Design tokens <span>Good</span></li>
+            <li>Storybook <span>Learning</span></li>
+            <li>Jira &amp; Linear <span>Daily</span></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Testimonials -->
+  <section data-section="testimonials" id="testimonials" aria-labelledby="test-title">
+    <div class="wrap">
+      <header class="section-head">
+        <span class="num">06 —</span>
+        <h2 id="test-title">Kind <em>words</em></h2>
+        <p>From people I have worked with.</p>
+      </header>
+      <figure class="pull reveal">
+        <blockquote>Maliha asks the question everyone else skipped, then shows up with a prototype that <em>answers it</em>.</blockquote>
+        <figcaption><strong>Farhan Kabir</strong><span>Head of Product, Ranga Pay</span></figcaption>
+      </figure>
+      <div class="quotes-small">
+        <figure style="margin:0">
+          <blockquote>Our phone lines went quiet in the first week. Patients just book now, even the older ones.</blockquote>
+          <figcaption>Dr. Sharmin Akter, Operations Lead, Nodi Health</figcaption>
+        </figure>
+        <figure style="margin:0">
+          <blockquote>Tala's docs are the first design docs our engineers read without being asked.</blockquote>
+          <figcaption>Tanvir Hasan, Frontend Lead, Ranga Pay</figcaption>
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <!-- Writing -->
+  <section data-section="posts" id="writing" aria-labelledby="posts-title">
+    <div class="wrap">
+      <header class="section-head">
+        <span class="num">07 —</span>
+        <h2 id="posts-title">Notes &amp; <em>writing</em></h2>
+        <p>Short essays on research, systems and designing for Bangladesh.</p>
+      </header>
+      <div class="posts-grid">
+        <article class="post">
+          <a href="#post-1">
+            <figure><img src="assets/images/post-1.webp" width="1200" height="800" alt="Sticky notes from a research synthesis session on a wall" loading="lazy"></figure>
+            <div class="meta"><span>Research</span><span>Sep 2026</span></div>
+            <h3>Running usability tests in Bangla, without a lab</h3>
+            <p>A phone, a quiet café and a script that works in two languages.</p>
+          </a>
+        </article>
+        <article class="post">
+          <a href="#post-2">
+            <figure><img src="assets/images/post-2.webp" width="1200" height="800" alt="A desk with a laptop showing a component library" loading="lazy"></figure>
+            <div class="meta"><span>Systems</span><span>Jun 2026</span></div>
+            <h3>Our design tokens had three names for one grey</h3>
+            <p>How we cleaned up Tala's colours and what we would do differently.</p>
+          </a>
+        </article>
+        <article class="post">
+          <a href="#post-3">
+            <figure><img src="assets/images/post-3.webp" width="1200" height="800" alt="A hand holding a phone with a slow loading screen" loading="lazy"></figure>
+            <div class="meta"><span>Craft</span><span>Mar 2026</span></div>
+            <h3>Designing for the slowest phone in the room</h3>
+            <p>Why we now test every flow on a five-year-old Android and 3G.</p>
+          </a>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- Education & awards -->
+  <section data-section="education" id="education" aria-labelledby="edu-title">
+    <div class="wrap">
+      <header class="section-head">
+        <span class="num">08 —</span>
+        <h2 id="edu-title">Education &amp; <em>awards</em></h2>
+        <p>Formal study, courses and a few nice moments.</p>
+      </header>
+      <div class="edu-grid">
+        <div>
+          <h3 class="col-title">Education</h3>
+          <ul class="list">
+            <li><span class="yr">2023</span><div><strong>B.Arch, Architecture</strong><span>Meghna University of Engineering, Dhaka</span></div></li>
+            <li><span class="yr">2022</span><div><strong>Google UX Design Certificate</strong><span>Online, 7 courses</span></div></li>
+            <li><span class="yr">2024</span><div><strong>Design Systems Masterclass</strong><span>Design Adda, Dhaka</span></div></li>
+          </ul>
+        </div>
+        <div>
+          <h3 class="col-title">Awards</h3>
+          <ul class="list">
+            <li><span class="yr">2026</span><div><strong>Best Fintech Experience, shortlist</strong><span>Bangladesh Digital Product Awards</span></div></li>
+            <li><span class="yr">2025</span><div><strong>Speaker, "Research on a budget"</strong><span>UX Dhaka Meetup #31</span></div></li>
+            <li><span class="yr">2022</span><div><strong>1st place, Civic Hack Chattogram</strong><span>Bus route app for commuters</span></div></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Contact -->
+  <section data-section="contact" id="contact" aria-labelledby="contact-title">
+    <div class="wrap">
+      <header class="section-head">
+        <span class="num">09 —</span>
+        <h2 id="contact-title">Let's <em>talk</em></h2>
+        <p>Hiring, a project, or a question about one of my notes. I reply within two days.</p>
+      </header>
+      <p class="contact-intro">The best way to reach me is email. Tell me a little about the team and the problem.</p>
+      <a class="big-mail" href="mailto:hello@maliharahman.design">hello@<wbr><em>maliharahman</em><wbr>.design</a>
+      <div class="contact-row">
+        <ul class="socials" aria-label="Social links">
+          <li><a href="https://www.linkedin.com/in/maliha-rahman-design" rel="me">LinkedIn</a></li>
+          <li><a href="https://dribbble.com/maliharahman" rel="me">Dribbble</a></li>
+          <li><a href="https://www.behance.net/maliharahman" rel="me">Behance</a></li>
+          <li><a href="https://medium.com/@maliharahman" rel="me">Medium</a></li>
+        </ul>
+        <div class="buttons">
+          <a class="btn btn-solid" href="cv.pdf" download>Download CV <span class="arrow" aria-hidden="true">&darr;</span></a>
+          <a class="btn btn-outline" href="mailto:hello@maliharahman.design?subject=Let%27s%20talk">Book a call</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <span>&copy; 2026 Maliha Rahman. Designed in Dhaka.</span>
+    <a href="#top">Back to top &uarr;</a>
+  </div>
+</footer>
+
+<script>
+  /* Optional: fade blocks in as they scroll into view. Page reads fine without it. */
+  (function () {
+    if (!('IntersectionObserver' in window) || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    document.documentElement.classList.add('js');
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } });
+    }, { rootMargin: '0px 0px -10% 0px' });
+    document.querySelectorAll('.reveal').forEach(function (el) { io.observe(el); });
+  })();
+</script>
+</body>
+</html>

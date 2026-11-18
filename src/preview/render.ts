@@ -120,10 +120,33 @@ function layoutClasses(block: ParsedBlock, ctx: Ctx): string[] {
     return ['is-layout-flex', id];
   }
   if (l.type === 'grid') {
-    ctx.css.push(`${sel} { grid-template-columns: repeat(${l.columnCount ?? 3}, minmax(0, 1fr)); }`);
-    return ['is-layout-grid', id];
+    const n = Number(l.columnCount ?? 3);
+    const cols = l.minimumColumnWidth
+      ? `repeat(auto-fill, minmax(max(min(${l.minimumColumnWidth}, 100%), (100% - (var(--wp--style--block-gap) * ${n - 1})) / ${n}), 1fr))`
+      : `repeat(${n}, minmax(0, 1fr))`;
+    ctx.css.push(`${sel} { grid-template-columns: ${cols}; }`);
+    return ['is-layout-grid', id, ...gapClass(block, ctx, sel)];
   }
-  return ['is-layout-flow'];
+  if (name === 'core/group') gapClass(block, ctx, sel);
+  return ['is-layout-flow', id];
+}
+
+/** A group's own block gap, and its span inside a grid parent. */
+function gapClass(block: ParsedBlock, ctx: Ctx, sel: string): string[] {
+  const style = (block.attrs?.style ?? {}) as { spacing?: { blockGap?: string }; layout?: { columnSpan?: number; rowSpan?: number } };
+  const gap = style.spacing?.blockGap;
+  if (gap !== undefined) ctx.css.push(`${sel} { gap: ${gap}; } ${sel} > * + * { margin-block-start: ${gap} !important; }`);
+  return [];
+}
+
+/** Grid children: column and row spans, collapsed on narrow screens as WordPress does. */
+function spanCss(block: ParsedBlock, ctx: Ctx): string[] {
+  const span = ((block.attrs?.style ?? {}) as { layout?: { columnSpan?: number; rowSpan?: number } }).layout;
+  if (!span?.columnSpan && !span?.rowSpan) return [];
+  const id = `wp-container-content-${++containerId}`;
+  const rules = [span.columnSpan && `grid-column: span ${span.columnSpan}`, span.rowSpan && `grid-row: span ${span.rowSpan}`].filter(Boolean);
+  ctx.css.push(`.${id} { ${rules.join('; ')}; } @media (max-width: 600px) { .${id} { grid-column: 1 / -1; grid-row: auto; } }`);
+  return [id];
 }
 
 function socialIcon(service: string): string {
@@ -138,7 +161,7 @@ function renderStatic(block: ParsedBlock, ctx: Ctx): string {
   const html = block.innerContent
     .map((part) => (part === null ? renderBlock(block.innerBlocks[i++], ctx) : part))
     .join('');
-  return addToFirstTag(html.trim(), layoutClasses(block, ctx));
+  return addToFirstTag(html.trim(), [...layoutClasses(block, ctx), ...spanCss(block, ctx)]);
 }
 
 function renderChildren(blocks: ParsedBlock[], ctx: Ctx): string {
@@ -233,7 +256,11 @@ function renderDynamic(block: ParsedBlock, ctx: Ctx): string | null {
       return `<form class="wp-block-search__button-outside wp-block-search__text-button wp-block-search" onsubmit="return false"><div class="wp-block-search__inside-wrapper"><input class="wp-block-search__input" type="search" aria-label="${escapeHtml(String(a.label ?? 'Search'))}"><button class="wp-block-search__button wp-element-button" type="button">${escapeHtml(String(a.buttonText ?? 'Search'))}</button></div></form>`;
     case 'core/social-links': {
       const links = block.innerBlocks.map((b) => renderBlock(b, ctx)).join('');
-      return addToFirstTag(`<ul class="wp-block-social-links">${links}</ul>`, layoutClasses(block, ctx));
+      const classes = ['wp-block-social-links', a.iconColorValue ? 'has-icon-color' : '', String(a.className ?? '')].filter(Boolean).join(' ');
+      // WordPress passes the icon colour to each link through block context; an inline colour does the same here.
+      const color = a.iconColorValue ? ` style="--fb-icon:${String(a.iconColorValue)}"` : '';
+      if (a.iconColorValue) ctx.css.push('.has-icon-color .wp-social-link { color: var(--fb-icon) !important; background: none !important; }');
+      return addToFirstTag(`<ul class="${classes}"${color}>${links}</ul>`, layoutClasses(block, ctx));
     }
     case 'core/social-link': {
       const service = String(a.service ?? '');

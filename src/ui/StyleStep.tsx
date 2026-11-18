@@ -1,4 +1,5 @@
 import { FONT_KEYS, FONTS, type FontKey } from '../fonts';
+import { LOOK_KEYS, LOOKS } from '../generator/looks';
 import { PALETTES } from '../presets';
 import { useBuilder } from '../store';
 import type { Language, Palette, Radius } from '../types';
@@ -119,6 +120,31 @@ export function StyleStep() {
           }}
         />
         <p className="text-xs text-slate-500">Your own text is used exactly as you write it, in any language.</p>
+      </section>
+
+      <section className="space-y-3">
+        <SectionTitle>Look</SectionTitle>
+        <div className="grid grid-cols-3 gap-2" role="radiogroup" aria-label="Look">
+          {LOOK_KEYS.map((k) => {
+            const active = (style.look ?? 'plain') === k;
+            return (
+              <button
+                key={k}
+                type="button"
+                role="radio"
+                aria-checked={active}
+                title={LOOKS[k].description}
+                onClick={() => setStyle({ look: k })}
+                className={`rounded-md border px-2 py-2 text-xs ${
+                  active ? 'border-blue-600 bg-blue-50 text-blue-800' : 'border-slate-300 text-slate-700'
+                }`}
+              >
+                {LOOKS[k].label}
+              </button>
+            );
+          })}
+        </div>
+        <p className="text-xs text-slate-500">{LOOKS[style.look ?? 'plain'].description}</p>
       </section>
 
       <section className="space-y-3">

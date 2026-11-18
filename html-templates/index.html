@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FolioBlocks Templates</title>
+<meta name="description" content="Eight 2026 portfolio website designs for students and job holders, in plain HTML.">
+<style>
+@font-face { font-family: "Space Grotesk"; src: url("assets/fonts/space-grotesk.woff2") format("woff2"); font-weight: 300 700; font-display: swap; }
+@font-face { font-family: "Inter"; src: url("assets/fonts/inter.woff2") format("woff2"); font-weight: 100 900; font-display: swap; }
+:root {
+  --wp--preset--color--base: #f6f5f1;
+  --wp--preset--color--contrast: #17171a;
+  --wp--preset--color--primary: #3858e9;
+  --wp--preset--color--secondary: #5d5d66;
+  --wp--preset--color--accent: #ffffff;
+  --wp--preset--font-family--heading: "Space Grotesk", system-ui, sans-serif;
+  --wp--preset--font-family--body: "Inter", system-ui, sans-serif;
+  --line: color-mix(in srgb, var(--wp--preset--color--contrast) 12%, transparent);
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --wp--preset--color--base: #121216;
+    --wp--preset--color--contrast: #f1f1f4;
+    --wp--preset--color--primary: #8ea2ff;
+    --wp--preset--color--secondary: #a6a6b2;
+    --wp--preset--color--accent: #1c1c22;
+  }
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--wp--preset--color--base);
+  color: var(--wp--preset--color--contrast);
+  font: 16px/1.6 var(--wp--preset--font-family--body);
+}
+a { color: inherit; }
+:focus-visible { outline: 3px solid var(--wp--preset--color--primary); outline-offset: 3px; border-radius: 6px; }
+.wrap { max-width: 1200px; margin: 0 auto; padding: 0 clamp(16px, 4vw, 40px); }
+header { padding: clamp(48px, 8vw, 96px) 0 clamp(32px, 5vw, 56px); }
+.eyebrow { font: 600 13px/1 var(--wp--preset--font-family--heading); letter-spacing: .12em; text-transform: uppercase; color: var(--wp--preset--color--primary); }
+h1 { font: 700 clamp(36px, 6vw, 68px)/1.02 var(--wp--preset--font-family--heading); letter-spacing: -.03em; margin: 14px 0 18px; max-width: 14ch; }
+.lede { color: var(--wp--preset--color--secondary); font-size: clamp(17px, 2vw, 19px); max-width: 60ch; margin: 0; }
+.filters { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 28px; }
+.filters button {
+  font: 500 14px/1 var(--wp--preset--font-family--body);
+  padding: 10px 16px; border-radius: 999px; cursor: pointer;
+  border: 1px solid var(--line); background: var(--wp--preset--color--accent); color: inherit;
+}
+.filters button[aria-pressed="true"] { background: var(--wp--preset--color--contrast); color: var(--wp--preset--color--base); border-color: transparent; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 1fr)); gap: clamp(16px, 2.5vw, 28px); padding-bottom: 80px; }
+.card {
+  display: flex; flex-direction: column;
+  background: var(--wp--preset--color--accent); border: 1px solid var(--line);
+  border-radius: 18px; overflow: hidden; text-decoration: none;
+  transition: transform .25s ease, box-shadow .25s ease;
+}
+.card:hover { transform: translateY(-4px); box-shadow: 0 18px 40px -20px rgb(0 0 0 / .35); }
+.card[hidden] { display: none; }
+.thumb { position: relative; aspect-ratio: 16 / 10; overflow: hidden; background: var(--line); border-bottom: 1px solid var(--line); }
+.thumb iframe {
+  position: absolute; top: 0; left: 0; border: 0; pointer-events: none;
+  width: 1280px; height: 800px; transform-origin: 0 0;
+  transform: scale(var(--s, .3));
+}
+.body { padding: 18px 20px 22px; display: grid; gap: 8px; }
+.body h2 { font: 600 21px/1.2 var(--wp--preset--font-family--heading); margin: 0; letter-spacing: -.01em; }
+.body p { margin: 0; color: var(--wp--preset--color--secondary); font-size: 15px; }
+.tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
+.tags span { font-size: 12px; font-weight: 500; padding: 4px 10px; border-radius: 999px; background: color-mix(in srgb, var(--wp--preset--color--primary) 12%, transparent); color: var(--wp--preset--color--primary); }
+footer { border-top: 1px solid var(--line); padding: 28px 0 40px; color: var(--wp--preset--color--secondary); font-size: 14px; }
+@media (prefers-reduced-motion: reduce) { .card { transition: none; } .card:hover { transform: none; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="eyebrow">FolioBlocks · HTML templates 2026</div>
+    <h1>Portfolio designs for students and job holders</h1>
+    <p class="lede">Eight ready designs for a CV and portfolio site: your past work, projects, skills and contact. Each one is a single HTML file and will become a FolioBlocks block-theme layout.</p>
+    <div class="filters" role="group" aria-label="Filter by track">
+      <button type="button" aria-pressed="true" data-filter="all">All</button>
+      <button type="button" aria-pressed="false" data-filter="developer">Developer</button>
+      <button type="button" aria-pressed="false" data-filter="designer">Designer</button>
+      <button type="button" aria-pressed="false" data-filter="student">Student</button>
+      <button type="button" aria-pressed="false" data-filter="job">Job holder</button>
+    </div>
+  </header>
+
+  <main class="grid">
+    <a class="card" href="profile.html" data-tracks="developer job">
+      <div class="thumb"><iframe src="profile.html" title="Profile preview" loading="lazy" tabindex="-1" aria-hidden="true"></iframe></div>
+      <div class="body"><h2>Profile</h2><p>A profile card and a feed, like a social profile. Experience timeline, projects, open source.</p><div class="tags"><span>Developer</span><span>Job holder</span></div></div>
+    </a>
+    <a class="card" href="terminal.html" data-tracks="developer student">
+      <div class="thumb"><iframe src="terminal.html" title="Terminal preview" loading="lazy" tabindex="-1" aria-hidden="true"></iframe></div>
+      <div class="body"><h2>Terminal</h2><p>The whole site is a terminal. Visitors can type commands like <code>projects</code> or <code>cv</code>.</p><div class="tags"><span>Developer</span><span>Student</span></div></div>
+    </a>
+    <a class="card" href="bento.html" data-tracks="developer student">
+      <div class="thumb"><iframe src="bento.html" title="Bento preview" loading="lazy" tabindex="-1" aria-hidden="true"></iframe></div>
+      <div class="body"><h2>Bento</h2><p>Everything on one screen in a grid of tiles: now, skills, projects, stats, contact.</p><div class="tags"><span>Developer</span><span>Student</span></div></div>
+    </a>
+    <a class="card" href="resume.html" data-tracks="job developer designer">
+      <div class="thumb"><iframe src="resume.html" title="Resume preview" loading="lazy" tabindex="-1" aria-hidden="true"></iframe></div>
+      <div class="body"><h2>Résumé</h2><p>A one-page CV that looks good on screen and prints straight to an A4 PDF.</p><div class="tags"><span>Any track</span><span>Job holder</span></div></div>
+    </a>
+    <a class="card" href="editorial.html" data-tracks="designer job">
+      <div class="thumb"><iframe src="editorial.html" title="Editorial preview" loading="lazy" tabindex="-1" aria-hidden="true"></iframe></div>
+      <div class="body"><h2>Editorial</h2><p>Magazine-style big serif type with full case studies. For product and UI/UX designers.</p><div class="tags"><span>Designer</span><span>Job holder</span></div></div>
+    </a>
+    <a class="card" href="aurora.html" data-tracks="student developer">
+      <div class="thumb"><iframe src="aurora.html" title="Aurora preview" loading="lazy" tabindex="-1" aria-hidden="true"></iframe></div>
+      <div class="body"><h2>Aurora</h2><p>Dark, soft moving gradients and glass cards. For new graduates looking for a first job.</p><div class="tags"><span>Student</span><span>Fresh graduate</span></div></div>
+    </a>
+    <a class="card" href="brutal.html" data-tracks="designer student">
+      <div class="thumb"><iframe src="brutal.html" title="Brutal preview" loading="lazy" tabindex="-1" aria-hidden="true"></iframe></div>
+      <div class="body"><h2>Brutal</h2><p>Thick borders, hard shadows and loud colour. For graphic and brand design students.</p><div class="tags"><span>Designer</span><span>Student</span></div></div>
+    </a>
+    <a class="card" href="journey.html" data-tracks="job developer">
+      <div class="thumb"><iframe src="journey.html" title="Journey preview" loading="lazy" tabindex="-1" aria-hidden="true"></iframe></div>
+      <div class="body"><h2>Journey</h2><p>Your career told as a story on a timeline. Good when you have changed roles.</p><div class="tags"><span>Job holder</span><span>Career change</span></div></div>
+    </a>
+  </main>
+</div>
+<footer><div class="wrap">All names, companies and links in these designs are made up. Fonts and images are bundled in <code>assets/</code>.</div></footer>
+<script>
+// Scale each 1280×800 live preview to fit its card.
+const fit = () => document.querySelectorAll('.thumb').forEach(t => t.style.setProperty('--s', t.clientWidth / 1280));
+new ResizeObserver(fit).observe(document.querySelector('.grid'));
+fit();
+
+// Track filter.
+const buttons = document.querySelectorAll('.filters button');
+buttons.forEach(b => b.addEventListener('click', () => {
+  buttons.forEach(x => x.setAttribute('aria-pressed', String(x === b)));
+  const f = b.dataset.filter;
+  document.querySelectorAll('.card').forEach(c => { c.hidden = f !== 'all' && !c.dataset.tracks.split(' ').includes(f); });
+}));
+</script>
+</body>
+</html>

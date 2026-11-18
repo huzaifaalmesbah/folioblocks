@@ -1,0 +1,637 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nusrat Jahan Rafa — Junior Frontend &amp; WordPress Developer</title>
+<meta name="description" content="Portfolio of Nusrat Jahan Rafa, a CSE graduate from Dhaka building fast, accessible WordPress and frontend sites. Open to work from January 2027.">
+<meta name="theme-color" content="#070b1f">
+<style>
+@font-face { font-family: "Space Grotesk"; src: url("assets/fonts/space-grotesk.woff2") format("woff2"); font-weight: 300 700; font-display: swap; }
+@font-face { font-family: "DM Sans"; src: url("assets/fonts/dm-sans.woff2") format("woff2"); font-weight: 100 1000; font-display: swap; }
+
+:root {
+  --wp--preset--color--base: #070b1f;
+  --wp--preset--color--contrast: #eef1fb;
+  --wp--preset--color--primary: #5eead4;
+  --wp--preset--color--secondary: #a78bfa;
+  --wp--preset--color--accent: #f9a8d4;
+  --wp--preset--font-family--heading: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+  --wp--preset--font-family--body: "DM Sans", ui-sans-serif, system-ui, sans-serif;
+
+  /* derived tokens (all built from the presets above) */
+  --muted: color-mix(in srgb, var(--wp--preset--color--contrast) 82%, var(--wp--preset--color--base));
+  --glass-bg: color-mix(in srgb, var(--wp--preset--color--base) 62%, transparent);
+  --glass-solid: color-mix(in srgb, var(--wp--preset--color--base) 88%, var(--wp--preset--color--secondary));
+  --glass-line: color-mix(in srgb, var(--wp--preset--color--contrast) 14%, transparent);
+  --glass-hi: color-mix(in srgb, var(--wp--preset--color--contrast) 6%, transparent);
+  --radius: 22px;
+  --wrap: min(1160px, 100% - 2.5rem);
+  --space: clamp(4.5rem, 10vw, 8rem);
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--wp--preset--color--base);
+  color: var(--wp--preset--color--contrast);
+  font-family: var(--wp--preset--font-family--body);
+  font-size: clamp(1rem, .96rem + .2vw, 1.075rem);
+  line-height: 1.65;
+  overflow-x: hidden;
+}
+img { max-width: 100%; height: auto; display: block; }
+a { color: var(--wp--preset--color--primary); text-underline-offset: .2em; }
+h1, h2, h3, h4 { font-family: var(--wp--preset--font-family--heading); line-height: 1.12; margin: 0 0 .6em; letter-spacing: -.02em; font-weight: 600; }
+p { margin: 0 0 1em; }
+:focus-visible { outline: 3px solid var(--wp--preset--color--primary); outline-offset: 3px; border-radius: 6px; }
+.skip { position: absolute; left: 1rem; top: -4rem; z-index: 50; background: var(--wp--preset--color--primary); color: var(--wp--preset--color--base); padding: .6rem 1rem; border-radius: 10px; font-weight: 700; }
+.skip:focus { top: 1rem; }
+.visually-hidden { position: absolute !important; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* ---------- Aurora background (pure CSS) ---------- */
+.aurora { position: fixed; inset: 0; z-index: -1; overflow: hidden; pointer-events: none; }
+.aurora::after { /* fine grain + vignette keeps blobs soft and text readable */
+  content: ""; position: absolute; inset: 0;
+  background: radial-gradient(ellipse at 50% 0%, transparent 0 40%, var(--wp--preset--color--base) 95%);
+}
+.blob { position: absolute; width: 60vmax; aspect-ratio: 1; border-radius: 50%; filter: blur(90px); opacity: .3; will-change: transform; }
+.blob--1 { background: var(--wp--preset--color--primary); top: -25vmax; left: -15vmax; animation: drift1 26s ease-in-out infinite alternate; }
+.blob--2 { background: var(--wp--preset--color--secondary); top: -10vmax; right: -25vmax; animation: drift2 32s ease-in-out infinite alternate; opacity: .32; }
+.blob--3 { background: var(--wp--preset--color--accent); bottom: -35vmax; left: 20vw; animation: drift3 38s ease-in-out infinite alternate; opacity: .18; }
+@keyframes drift1 { to { transform: translate(18vw, 22vh) scale(1.15) rotate(30deg); } }
+@keyframes drift2 { to { transform: translate(-22vw, 30vh) scale(.85); } }
+@keyframes drift3 { to { transform: translate(-15vw, -25vh) scale(1.2); } }
+
+/* ---------- Layout helpers ---------- */
+.wrap { width: var(--wrap); margin-inline: auto; }
+section { padding-block: var(--space); scroll-margin-top: 4rem; }
+.eyebrow { font-family: var(--wp--preset--font-family--heading); text-transform: uppercase; letter-spacing: .16em; font-size: .78rem; font-weight: 600; color: var(--wp--preset--color--primary); margin-bottom: .9rem; display: inline-flex; gap: .6rem; align-items: center; }
+.eyebrow::before { content: ""; width: 1.6rem; height: 2px; background: currentColor; border-radius: 2px; }
+.section-title { font-size: clamp(2rem, 1.4rem + 2.6vw, 3.2rem); max-width: 18ch; }
+.lede { color: var(--muted); max-width: 60ch; font-size: 1.08em; }
+.grid { display: grid; gap: clamp(1rem, 2.5vw, 1.5rem); }
+.grid--3 { grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); }
+.grid--2 { grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr)); }
+.grid--4 { grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr)); }
+.head { margin-bottom: clamp(2rem, 5vw, 3.25rem); }
+
+/* ---------- Glass ---------- */
+.glass {
+  background: var(--glass-solid);
+  border: 1px solid var(--glass-line);
+  border-radius: var(--radius);
+  padding: clamp(1.25rem, 3vw, 2rem);
+  box-shadow: inset 0 1px 0 var(--glass-hi), 0 20px 50px -30px #000;
+}
+@supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .glass { background: var(--glass-bg); -webkit-backdrop-filter: blur(22px) saturate(140%); backdrop-filter: blur(22px) saturate(140%); }
+}
+@media (prefers-reduced-transparency: reduce) {
+  .glass { background: var(--glass-solid); backdrop-filter: none; -webkit-backdrop-filter: none; }
+}
+
+/* ---------- Header ---------- */
+.site-header { position: sticky; top: 0; z-index: 20; padding-block: .8rem; }
+.site-header .wrap { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: .55rem .6rem .55rem 1.1rem; border-radius: 999px; }
+.logo { font-family: var(--wp--preset--font-family--heading); font-weight: 700; color: var(--wp--preset--color--contrast); text-decoration: none; font-size: 1.1rem; letter-spacing: -.02em; }
+.logo span { color: var(--wp--preset--color--primary); }
+.nav { display: flex; gap: .25rem; list-style: none; margin: 0; padding: 0; }
+.nav a { color: var(--muted); text-decoration: none; font-size: .93rem; padding: .45rem .8rem; border-radius: 999px; }
+.nav a:hover { color: var(--wp--preset--color--contrast); background: var(--glass-hi); }
+.nav a.btn--primary, .nav a.btn--primary:hover { color: var(--wp--preset--color--base); background: var(--wp--preset--color--primary); padding: .55rem 1.1rem; }
+@media (max-width: 860px) { .nav li:not(.nav-cta) { display: none; } }
+
+/* ---------- Buttons & pills ---------- */
+.buttons { display: flex; flex-wrap: wrap; gap: .8rem; }
+.btn {
+  display: inline-flex; align-items: center; gap: .55rem; padding: .85rem 1.4rem; border-radius: 999px;
+  font-weight: 600; text-decoration: none; font-size: .98rem; border: 1px solid transparent;
+  transition: transform .2s ease, box-shadow .2s ease, background .2s ease;
+}
+.btn svg { width: 1.1em; height: 1.1em; }
+.btn--primary { background: var(--wp--preset--color--primary); color: var(--wp--preset--color--base); box-shadow: 0 10px 30px -10px var(--wp--preset--color--primary); }
+.btn--primary:hover { transform: translateY(-2px); box-shadow: 0 16px 40px -12px var(--wp--preset--color--primary); }
+.btn--ghost { color: var(--wp--preset--color--contrast); border-color: var(--glass-line); background: var(--glass-hi); }
+.btn--ghost:hover { border-color: var(--wp--preset--color--primary); }
+.btn--sm { padding: .55rem 1rem; font-size: .9rem; }
+
+.status-pill {
+  display: inline-flex; align-items: center; gap: .65rem; padding: .5rem 1rem .5rem .8rem; border-radius: 999px;
+  font-size: .9rem; font-weight: 600; color: var(--wp--preset--color--contrast);
+  background: color-mix(in srgb, var(--wp--preset--color--primary) 14%, var(--wp--preset--color--base));
+  border: 1px solid color-mix(in srgb, var(--wp--preset--color--primary) 55%, transparent);
+  box-shadow: 0 0 28px -4px color-mix(in srgb, var(--wp--preset--color--primary) 55%, transparent);
+}
+.status-pill .dot { width: .6rem; height: .6rem; border-radius: 50%; background: var(--wp--preset--color--primary); box-shadow: 0 0 0 0 var(--wp--preset--color--primary); animation: ping 2.2s ease-out infinite; }
+@keyframes ping { 0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--wp--preset--color--primary) 70%, transparent); } 100% { box-shadow: 0 0 0 .7rem transparent; } }
+
+.tags { display: flex; flex-wrap: wrap; gap: .45rem; list-style: none; margin: 0; padding: 0; }
+.tags li { font-size: .82rem; padding: .3rem .7rem; border-radius: 999px; background: var(--glass-hi); border: 1px solid var(--glass-line); color: var(--wp--preset--color--contrast); }
+
+/* ---------- Hero ---------- */
+.hero { padding-top: clamp(3.5rem, 9vw, 7rem); }
+.hero h1 { font-size: clamp(2.7rem, 1.4rem + 6.4vw, 6.2rem); letter-spacing: -.045em; line-height: .98; margin: 1.6rem 0 1.2rem; max-width: 12ch; }
+.hero h1 .grad {
+  background: linear-gradient(100deg, var(--wp--preset--color--primary), var(--wp--preset--color--secondary) 55%, var(--wp--preset--color--accent));
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.hero .role { font-family: var(--wp--preset--font-family--heading); font-size: clamp(1.15rem, 1rem + .8vw, 1.5rem); color: var(--wp--preset--color--contrast); margin-bottom: .8rem; }
+.hero .lede { margin-bottom: 2rem; }
+.hero-meta { display: flex; flex-wrap: wrap; gap: .5rem 1.6rem; margin-top: 2.6rem; padding: 0; list-style: none; color: var(--muted); font-size: .93rem; }
+.hero-meta li { display: flex; align-items: center; gap: .45rem; }
+.hero-meta svg { width: 1.05rem; height: 1.05rem; color: var(--wp--preset--color--primary); }
+
+/* ---------- About ---------- */
+.about-grid { display: grid; gap: clamp(1.5rem, 4vw, 3.5rem); grid-template-columns: minmax(0, 380px) 1fr; align-items: center; }
+@media (max-width: 780px) { .about-grid { grid-template-columns: 1fr; } }
+.avatar-frame { position: relative; border-radius: 32px; padding: 6px; background: linear-gradient(140deg, var(--wp--preset--color--primary), var(--wp--preset--color--secondary), var(--wp--preset--color--accent)); max-width: 380px; }
+.avatar-frame img { border-radius: 27px; width: 100%; aspect-ratio: 1; object-fit: cover; }
+.avatar-frame figcaption { position: absolute; left: 1rem; bottom: 1rem; right: 1rem; padding: .7rem 1rem; border-radius: 16px; font-size: .88rem; }
+.facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: .8rem; margin-top: 1.8rem; }
+.fact { padding: 1rem 1.1rem; }
+.fact strong { display: block; font-family: var(--wp--preset--font-family--heading); font-size: 1.7rem; color: var(--wp--preset--color--primary); line-height: 1.1; }
+.fact span { font-size: .88rem; color: var(--muted); }
+
+/* ---------- Skills ---------- */
+.skill-card h3 { font-size: 1.15rem; display: flex; align-items: center; gap: .6rem; }
+.skill-card h3 .ic { width: 2.2rem; height: 2.2rem; border-radius: 12px; display: grid; place-items: center; background: color-mix(in srgb, var(--wp--preset--color--secondary) 22%, transparent); color: var(--wp--preset--color--secondary); }
+.skill-card h3 .ic svg { width: 1.15rem; height: 1.15rem; }
+.skill-card p { color: var(--muted); font-size: .93rem; }
+.level { list-style: none; margin: 0; padding: 0; display: grid; gap: .75rem; }
+.level li { display: grid; grid-template-columns: 1fr auto; gap: .3rem .6rem; font-size: .93rem; }
+.level .bar { grid-column: 1 / -1; height: 6px; border-radius: 6px; background: var(--glass-line); overflow: hidden; }
+.level .bar i { display: block; height: 100%; width: var(--v); border-radius: inherit; background: linear-gradient(90deg, var(--wp--preset--color--primary), var(--wp--preset--color--secondary)); }
+.level small { color: var(--muted); }
+
+/* ---------- Projects ---------- */
+.project { padding: 0; overflow: hidden; display: flex; flex-direction: column; }
+.project figure { margin: 0; position: relative; }
+.project img { aspect-ratio: 3 / 2; object-fit: cover; width: 100%; transition: transform .6s ease; }
+.project:hover img { transform: scale(1.04); }
+.project .num { position: absolute; top: 1rem; left: 1rem; font-family: var(--wp--preset--font-family--heading); font-size: .8rem; padding: .3rem .7rem; border-radius: 999px; background: var(--wp--preset--color--base); color: var(--wp--preset--color--contrast); border: 1px solid var(--glass-line); }
+.project .body { padding: clamp(1.25rem, 3vw, 1.75rem); display: flex; flex-direction: column; gap: 1rem; flex: 1; }
+.project h3 { font-size: 1.35rem; margin: 0; }
+.pr { margin: 0; display: grid; gap: .7rem; }
+.pr div { padding-left: .9rem; border-left: 2px solid var(--glass-line); }
+.pr dt { font-family: var(--wp--preset--font-family--heading); font-size: .75rem; letter-spacing: .14em; text-transform: uppercase; color: var(--wp--preset--color--accent); }
+.pr div:last-child { border-color: var(--wp--preset--color--primary); }
+.pr div:last-child dt { color: var(--wp--preset--color--primary); }
+.pr dd { margin: .15rem 0 0; font-size: .95rem; color: var(--wp--preset--color--contrast); }
+.project .links { margin-top: auto; display: flex; gap: 1.2rem; font-weight: 600; font-size: .93rem; }
+
+/* ---------- Experience (stacked cards w/ rail) ---------- */
+.xp-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 1rem; }
+.xp { display: grid; grid-template-columns: 200px 1fr; gap: 1.5rem; }
+@media (max-width: 700px) { .xp { grid-template-columns: 1fr; gap: .4rem; } }
+.xp .when { font-family: var(--wp--preset--font-family--heading); color: var(--wp--preset--color--primary); font-size: .93rem; }
+.xp .when small { display: block; color: var(--muted); font-family: var(--wp--preset--font-family--body); }
+.xp h3 { font-size: 1.25rem; margin-bottom: .2rem; }
+.xp .org { color: var(--muted); margin-bottom: .9rem; }
+.xp ul.points { margin: 0 0 1rem; padding-left: 1.1rem; }
+.xp ul.points li { margin-bottom: .35rem; }
+.xp ul.points li::marker { color: var(--wp--preset--color--secondary); }
+
+/* ---------- Education ---------- */
+.edu-main h3 { font-size: clamp(1.4rem, 1.1rem + 1vw, 1.9rem); }
+.cgpa { display: flex; align-items: baseline; gap: .5rem; margin: 1rem 0 1.4rem; }
+.cgpa strong { font-family: var(--wp--preset--font-family--heading); font-size: clamp(2.6rem, 2rem + 2vw, 3.6rem); line-height: 1; color: var(--wp--preset--color--primary); }
+.cgpa span { color: var(--muted); }
+.courses { columns: 2 200px; padding-left: 1.1rem; margin: 0; }
+.courses li { margin-bottom: .35rem; break-inside: avoid; }
+.edu-side { display: grid; gap: 1rem; }
+.edu-side h3 { font-size: 1.1rem; margin-bottom: .25rem; }
+.edu-side p { color: var(--muted); margin: 0; font-size: .93rem; }
+
+/* ---------- Contributions ---------- */
+.contrib { display: flex; flex-direction: column; gap: .6rem; }
+.contrib .badge { align-self: flex-start; font-size: .78rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; padding: .3rem .7rem; border-radius: 999px; color: var(--wp--preset--color--base); background: var(--wp--preset--color--secondary); }
+.contrib h3 { font-size: 1.15rem; margin: .2rem 0 0; }
+.contrib p { color: var(--muted); font-size: .94rem; margin: 0; }
+.contrib a { margin-top: auto; font-weight: 600; font-size: .93rem; }
+
+/* ---------- Achievements ---------- */
+.ach { display: flex; gap: 1rem; align-items: flex-start; }
+.ach .medal { flex: none; width: 3rem; height: 3rem; border-radius: 14px; display: grid; place-items: center; color: var(--wp--preset--color--base); background: linear-gradient(140deg, var(--wp--preset--color--accent), var(--wp--preset--color--secondary)); }
+.ach .medal svg { width: 1.4rem; height: 1.4rem; }
+.ach h3 { font-size: 1.05rem; margin-bottom: .2rem; }
+.ach p { margin: 0; color: var(--muted); font-size: .9rem; }
+
+/* ---------- Testimonials ---------- */
+.quote { margin: 0; display: flex; flex-direction: column; gap: 1.4rem; }
+.quote blockquote { margin: 0; font-size: 1.12rem; line-height: 1.6; }
+.quote blockquote::before { content: "\201C"; display: block; font-family: var(--wp--preset--font-family--heading); font-size: 4rem; line-height: .6; color: var(--wp--preset--color--secondary); margin-bottom: .5rem; }
+.quote figcaption { display: flex; align-items: center; gap: .9rem; margin-top: auto; }
+.initials { width: 2.8rem; height: 2.8rem; border-radius: 50%; display: grid; place-items: center; font-weight: 700; font-family: var(--wp--preset--font-family--heading); color: var(--wp--preset--color--base); background: linear-gradient(140deg, var(--wp--preset--color--primary), var(--wp--preset--color--secondary)); }
+.quote cite { font-style: normal; font-weight: 600; display: block; }
+.quote small { color: var(--muted); }
+
+/* ---------- Posts ---------- */
+.post { padding: 0; overflow: hidden; display: flex; flex-direction: column; }
+.post img { aspect-ratio: 3 / 2; object-fit: cover; width: 100%; }
+.post .body { padding: 1.3rem 1.4rem 1.5rem; display: flex; flex-direction: column; gap: .5rem; flex: 1; }
+.post .meta { font-size: .82rem; color: var(--muted); }
+.post h3 { font-size: 1.15rem; margin: 0; }
+.post h3 a { color: var(--wp--preset--color--contrast); text-decoration: none; }
+.post h3 a::after { content: ""; position: absolute; inset: 0; }
+.post { position: relative; transition: border-color .2s ease, transform .2s ease; }
+.post:hover, .post:focus-within { border-color: var(--wp--preset--color--primary); transform: translateY(-3px); }
+.post p { color: var(--muted); font-size: .93rem; margin: 0; }
+
+/* ---------- Contact ---------- */
+.contact-card { isolation: isolate; text-align: center; padding: clamp(2rem, 6vw, 4.5rem) clamp(1.25rem, 5vw, 4rem); position: relative; overflow: hidden; }
+.contact-card::before { content: ""; position: absolute; inset: -40% 10% auto; height: 80%; background: radial-gradient(closest-side, color-mix(in srgb, var(--wp--preset--color--secondary) 35%, transparent), transparent); z-index: -1; }
+.contact-card h2 { font-size: clamp(2.1rem, 1.3rem + 3.6vw, 4rem); max-width: 16ch; margin-inline: auto; }
+.contact-card .lede { margin-inline: auto; }
+.contact-card .buttons { justify-content: center; margin-top: 2rem; }
+.socials { display: flex; justify-content: center; gap: .6rem; list-style: none; padding: 0; margin: 2rem 0 0; }
+.socials a { width: 2.8rem; height: 2.8rem; display: grid; place-items: center; border-radius: 50%; color: var(--wp--preset--color--contrast); background: var(--glass-hi); border: 1px solid var(--glass-line); }
+.socials a:hover { color: var(--wp--preset--color--primary); border-color: var(--wp--preset--color--primary); }
+.socials svg { width: 1.2rem; height: 1.2rem; }
+.site-footer { padding: 2rem 0 3rem; color: var(--muted); font-size: .88rem; text-align: center; }
+
+/* ---------- Motion ---------- */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+  .blob { animation-play-state: paused !important; }
+}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<div class="aurora" aria-hidden="true">
+  <span class="blob blob--1"></span>
+  <span class="blob blob--2"></span>
+  <span class="blob blob--3"></span>
+</div>
+
+<header class="site-header">
+  <div class="wrap glass">
+    <a class="logo" href="#top">nusrat<span>.</span>dev</a>
+    <nav aria-label="Main">
+      <ul class="nav">
+        <li><a href="#about">About</a></li>
+        <li><a href="#projects">Projects</a></li>
+        <li><a href="#experience">Experience</a></li>
+        <li><a href="#posts">Writing</a></li>
+        <li class="nav-cta"><a class="btn btn--primary btn--sm" href="#contact">Hire me</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+
+<!-- HERO -->
+<section data-section="hero" class="hero" id="top">
+  <div class="wrap">
+    <p class="status-pill"><span class="dot" aria-hidden="true"></span>Open to work — available from Jan 2027</p>
+    <h1>Hi, I'm Nusrat. I build <span class="grad">calm, fast websites.</span></h1>
+    <p class="role">Junior Frontend &amp; WordPress Developer · CSE graduate</p>
+    <p class="lede">I turn messy requirements into accessible, lightning-quick sites. Four years of CSE, one real internship, two plugins on WordPress.org and a habit of shipping things that real people use every day.</p>
+    <div class="buttons">
+      <a class="btn btn--primary" href="#projects">View projects
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+      <a class="btn btn--ghost" href="#download-cv">Download CV
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg></a>
+    </div>
+    <ul class="hero-meta">
+      <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21Z"/><circle cx="12" cy="9.5" r="2.5"/></svg>Dhaka, Bangladesh · open to remote</li>
+      <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 7l9-4 9 4-9 4-9-4Z"/><path d="M7 9v5c0 1.7 2.2 3 5 3s5-1.3 5-3V9"/></svg>B.Sc. in CSE, Dec 2026</li>
+      <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.7 2.5 15.3 0 18M12 3c-2.5 2.7-2.5 15.3 0 18"/></svg>Bangla · English (IELTS 7.5)</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section data-section="about" id="about">
+  <div class="wrap about-grid">
+    <figure class="avatar-frame" style="margin:0">
+      <img src="assets/images/avatar.webp" width="800" height="800" alt="Portrait of Nusrat Jahan Rafa smiling, wearing a teal scarf" loading="lazy">
+      <figcaption class="glass">Usually found at a WordCamp help desk</figcaption>
+    </figure>
+    <div>
+      <p class="eyebrow">About me</p>
+      <h2 class="section-title">A developer who reads the brief twice.</h2>
+      <p class="lede">I started with a broken Blogger theme in class nine and never stopped fixing things. At Daffodil Tech University I learned the theory — data structures, networks, databases — and on the side I learned the craft: block themes, React, performance budgets and how to talk to clients.</p>
+      <p class="lede">I'm looking for a first full-time role on a product or agency team where I can ship every week, get honest code reviews and grow into a strong frontend engineer.</p>
+      <div class="facts">
+        <div class="fact glass"><strong>14</strong><span>projects shipped</span></div>
+        <div class="fact glass"><strong>2</strong><span>plugins on WordPress.org</span></div>
+        <div class="fact glass"><strong>3.78</strong><span>CGPA out of 4.00</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SKILLS -->
+<section data-section="skills" id="skills">
+  <div class="wrap">
+    <div class="head">
+      <p class="eyebrow">Skills</p>
+      <h2 class="section-title">What I bring on day one.</h2>
+    </div>
+    <div class="grid grid--4">
+      <article class="glass skill-card">
+        <h3><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M8 6l-6 6 6 6M16 6l6 6-6 6"/></svg></span>Languages</h3>
+        <ul class="level">
+          <li>JavaScript / TypeScript <small>Strong</small><span class="bar"><i style="--v:85%"></i></span></li>
+          <li>HTML &amp; CSS <small>Strong</small><span class="bar"><i style="--v:92%"></i></span></li>
+          <li>PHP <small>Good</small><span class="bar"><i style="--v:72%"></i></span></li>
+          <li>SQL · Python <small>Working</small><span class="bar"><i style="--v:58%"></i></span></li>
+        </ul>
+      </article>
+      <article class="glass skill-card">
+        <h3><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg></span>Frameworks</h3>
+        <p>Where I spend most of my build time.</p>
+        <ul class="tags"><li>WordPress blocks</li><li>React</li><li>Next.js</li><li>Tailwind</li><li>Laravel (basics)</li><li>Astro</li></ul>
+      </article>
+      <article class="glass skill-card">
+        <h3><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.5 2.5-2.4-.6-.6-2.4 2.5-2.5Z"/></svg></span>Tools</h3>
+        <p>Daily drivers in my workflow.</p>
+        <ul class="tags"><li>Git &amp; GitHub</li><li>wp-env</li><li>Figma</li><li>Vite</li><li>Playwright</li><li>Lighthouse</li><li>Docker</li></ul>
+      </article>
+      <article class="glass skill-card">
+        <h3><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><path d="M16 4.5a3.5 3.5 0 0 1 0 7M18 14.5a6.5 6.5 0 0 1 3.5 5.5"/></svg></span>Soft skills</h3>
+        <p>Learned from tutoring and volunteering.</p>
+        <ul class="tags"><li>Clear writing</li><li>Teaching</li><li>Client calls</li><li>Public speaking</li><li>Time-boxing</li></ul>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- PROJECTS -->
+<section data-section="projects" id="projects">
+  <div class="wrap">
+    <div class="head">
+      <p class="eyebrow">Selected projects</p>
+      <h2 class="section-title">Problems I picked up — and how they ended.</h2>
+    </div>
+    <div class="grid grid--3">
+      <article class="glass project">
+        <figure>
+          <img src="assets/images/project-1.webp" width="1200" height="800" alt="Dashboard of the Bazar Hisab app showing weekly grocery spending" loading="lazy">
+          <span class="num">01 · Final-year project</span>
+        </figure>
+        <div class="body">
+          <h3>Bazar Hisab</h3>
+          <dl class="pr">
+            <div><dt>Problem</dt><dd>Families in my area tracked market spending in paper notebooks and lost track by mid-month.</dd></div>
+            <div><dt>Result</dt><dd>Offline-first PWA in Bangla; 1,200+ installs, average 4 entries per user per day.</dd></div>
+          </dl>
+          <ul class="tags"><li>Next.js</li><li>IndexedDB</li><li>PWA</li></ul>
+          <p class="links"><a href="#projects">Case study</a><a href="#projects">Source code</a></p>
+        </div>
+      </article>
+      <article class="glass project">
+        <figure>
+          <img src="assets/images/project-2.webp" width="1200" height="800" alt="Homepage of a local bookshop block theme with a book carousel" loading="lazy">
+          <span class="num">02 · Freelance</span>
+        </figure>
+        <div class="body">
+          <h3>Boighor block theme</h3>
+          <dl class="pr">
+            <div><dt>Problem</dt><dd>A Chattogram bookshop's old page builder site took 9 seconds to load on mobile data.</dd></div>
+            <div><dt>Result</dt><dd>Custom block theme with 11 patterns; load time down to 1.4s and online orders up 38%.</dd></div>
+          </dl>
+          <ul class="tags"><li>Block theme</li><li>theme.json</li><li>WooCommerce</li></ul>
+          <p class="links"><a href="#projects">Case study</a><a href="#projects">Live site</a></p>
+        </div>
+      </article>
+      <article class="glass project">
+        <figure>
+          <img src="assets/images/project-3.webp" width="1200" height="800" alt="Settings screen of the Quick Notice WordPress plugin" loading="lazy">
+          <span class="num">03 · Open source</span>
+        </figure>
+        <div class="body">
+          <h3>Quick Notice plugin</h3>
+          <dl class="pr">
+            <div><dt>Problem</dt><dd>Small clubs wanted a simple site-wide notice bar without a heavy plugin and its ads.</dd></div>
+            <div><dt>Result</dt><dd>A 9 KB block plugin on WordPress.org: 800+ active installs, 4.9★ from 23 reviews.</dd></div>
+          </dl>
+          <ul class="tags"><li>Gutenberg</li><li>React</li><li>PHP</li></ul>
+          <p class="links"><a href="#projects">Plugin page</a><a href="#projects">Source code</a></p>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- EXPERIENCE -->
+<section data-section="experience" id="experience">
+  <div class="wrap">
+    <div class="head">
+      <p class="eyebrow">Experience</p>
+      <h2 class="section-title">What I did before graduating.</h2>
+    </div>
+    <ol class="xp-list">
+      <li class="glass xp">
+        <p class="when">Jun – Nov 2026<small>Internship · 6 months</small></p>
+        <div>
+          <h3>Frontend Developer Intern</h3>
+          <p class="org">Shapla Digital Ltd. · Dhaka (hybrid)</p>
+          <ul class="points">
+            <li>Built 23 reusable block patterns for a news client's redesign, used on 4,000+ articles.</li>
+            <li>Cut the homepage's Largest Contentful Paint from 3.8s to 1.9s by lazy-loading ads and fonts.</li>
+            <li>Wrote the team's first Playwright smoke tests; they now run on every pull request.</li>
+          </ul>
+          <ul class="tags"><li>WordPress</li><li>React</li><li>Playwright</li></ul>
+        </div>
+      </li>
+      <li class="glass xp">
+        <p class="when">2024 – 2026<small>Part-time · 2 years</small></p>
+        <div>
+          <h3>Campus Ambassador</h3>
+          <p class="org">CodeMela Bangladesh · Daffodil Tech University chapter</p>
+          <ul class="points">
+            <li>Ran 9 hands-on workshops (Git, HTML, WordPress) for 450+ first-year students.</li>
+            <li>Grew the chapter's Discord from 60 to 700 members and kept a weekly help hour going.</li>
+          </ul>
+          <ul class="tags"><li>Event planning</li><li>Teaching</li></ul>
+        </div>
+      </li>
+      <li class="glass xp">
+        <p class="when">2022 – present<small>Freelance &amp; tutoring</small></p>
+        <div>
+          <h3>Freelance Web Developer &amp; Maths Tutor</h3>
+          <p class="org">Self-employed · Dhaka &amp; remote</p>
+          <ul class="points">
+            <li>Delivered 8 small business sites (bookshop, clinic, two NGOs) with on-time, fixed-price quotes.</li>
+            <li>Tutored 12 HSC students in maths and ICT; 10 of them got GPA-5.</li>
+          </ul>
+          <ul class="tags"><li>Client work</li><li>WordPress</li><li>Mentoring</li></ul>
+        </div>
+      </li>
+    </ol>
+  </div>
+</section>
+
+<!-- EDUCATION -->
+<section data-section="education" id="education">
+  <div class="wrap">
+    <div class="head">
+      <p class="eyebrow">Education</p>
+      <h2 class="section-title">The theory behind the craft.</h2>
+    </div>
+    <div class="grid grid--2">
+      <article class="glass edu-main">
+        <p class="eyebrow" style="margin-bottom:.4rem">2023 – Dec 2026</p>
+        <h3>B.Sc. in Computer Science &amp; Engineering</h3>
+        <p style="color:var(--muted)">Daffodil Tech University, Dhaka</p>
+        <div class="cgpa"><strong>3.78</strong><span>/ 4.00 CGPA · Dean's List, 5 semesters</span></div>
+        <h4 style="font-size:1rem">Relevant courses</h4>
+        <ul class="courses">
+          <li>Web Engineering</li>
+          <li>Human–Computer Interaction</li>
+          <li>Software Engineering</li>
+          <li>Database Systems</li>
+          <li>Data Structures &amp; Algorithms</li>
+          <li>Computer Networks</li>
+        </ul>
+      </article>
+      <div class="edu-side">
+        <article class="glass">
+          <h3>Thesis: Making Bangla web forms accessible</h3>
+          <p>Tested 40 government forms with screen readers; proposed 12 fixes that cut task time by 31% in a 24-person study. Supervised by Dr. Farhana Islam.</p>
+        </article>
+        <article class="glass">
+          <h3>HSC — Science, GPA 5.00</h3>
+          <p>Notre Dame College, Dhaka · 2022</p>
+        </article>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTRIBUTIONS -->
+<section data-section="contributions" id="contributions">
+  <div class="wrap">
+    <div class="head">
+      <p class="eyebrow">Community &amp; open source</p>
+      <h2 class="section-title">Giving back to the tools I learn from.</h2>
+    </div>
+    <div class="grid grid--3">
+      <article class="glass contrib">
+        <span class="badge">WordPress Core</span>
+        <h3>Props in WordPress 6.9 &amp; 7.0</h3>
+        <p>Three merged patches on Trac: a block editor focus bug, RTL spacing in the admin and a docs fix.</p>
+        <a href="#contributions">See my Trac profile →</a>
+      </article>
+      <article class="glass contrib">
+        <span class="badge">Polyglots</span>
+        <h3>Bangla translation editor</h3>
+        <p>Translated and reviewed 6,000+ strings for core, Gutenberg and popular plugins into Bangla.</p>
+        <a href="#contributions">Translation stats →</a>
+      </article>
+      <article class="glass contrib">
+        <span class="badge">Events</span>
+        <h3>WordCamp Dhaka 2026 volunteer</h3>
+        <p>Led the help desk team of 8 and gave a lightning talk: “Your first block theme in 30 minutes”.</p>
+        <a href="#contributions">Watch the talk →</a>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ACHIEVEMENTS -->
+<section data-section="achievements" id="achievements">
+  <div class="wrap">
+    <div class="head">
+      <p class="eyebrow">Achievements &amp; certificates</p>
+      <h2 class="section-title">A few proud moments.</h2>
+    </div>
+    <div class="grid grid--2">
+      <div class="glass ach"><span class="medal" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0V4ZM7 6H4a3 3 0 0 0 3 4M17 6h3a3 3 0 0 1-3 4"/></svg></span><div><h3>1st runner-up, ICT Division Hackathon 2025</h3><p>Built a flood-alert SMS service in 36 hours with a team of three.</p></div></div>
+      <div class="glass ach"><span class="medal" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="9" r="6"/><path d="M8.5 14 7 22l5-3 5 3-1.5-8"/></svg></span><div><h3>Vice-Chancellor's Merit Scholarship</h3><p>Awarded for four consecutive years for academic results.</p></div></div>
+      <div class="glass ach"><span class="medal" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="M8 21h8M12 17v4M7 9l2 2 4-4"/></svg></span><div><h3>Meta Front-End Developer Certificate</h3><p>Coursera professional certificate, 9 courses · 2025</p></div></div>
+      <div class="glass ach"><span class="medal" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 3 4 7v5c0 5 3.5 8 8 9 4.5-1 8-4 8-9V7l-8-4Z"/><path d="m9 12 2 2 4-4"/></svg></span><div><h3>Web Accessibility (W3Cx WAI0.1x)</h3><p>Introduction to Web Accessibility, verified certificate · 2026</p></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section data-section="testimonials" id="testimonials">
+  <div class="wrap">
+    <div class="head">
+      <p class="eyebrow">Kind words</p>
+      <h2 class="section-title">What mentors say.</h2>
+    </div>
+    <div class="grid grid--2">
+      <figure class="glass quote">
+        <blockquote><p>Nusrat asked the best questions of any intern I've had. By month three she was reviewing other people's pull requests and catching real bugs. Any team would be lucky to have her.</p></blockquote>
+        <figcaption><span class="initials" aria-hidden="true">TA</span><span><cite>Tanvir Ahmed</cite><small>Lead Developer, Shapla Digital Ltd.</small></span></figcaption>
+      </figure>
+      <figure class="glass quote">
+        <blockquote><p>Her thesis on accessible Bangla forms was careful, original and genuinely useful. She combines solid engineering with real care for the people using what she builds.</p></blockquote>
+        <figcaption><span class="initials" aria-hidden="true">FI</span><span><cite>Dr. Farhana Islam</cite><small>Associate Professor, CSE, Daffodil Tech University</small></span></figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<!-- POSTS -->
+<section data-section="posts" id="posts">
+  <div class="wrap">
+    <div class="head">
+      <p class="eyebrow">Latest writing</p>
+      <h2 class="section-title">Notes from the build.</h2>
+    </div>
+    <div class="grid grid--3">
+      <article class="glass post">
+        <img src="assets/images/post-1.webp" width="1200" height="800" alt="" loading="lazy">
+        <div class="body">
+          <p class="meta"><time datetime="2026-10-28">28 Oct 2026</time> · 6 min read</p>
+          <h3><a href="#posts">What six months of internship taught me about code review</a></h3>
+          <p>Small pull requests, kind comments and why “nit:” is my favourite word.</p>
+        </div>
+      </article>
+      <article class="glass post">
+        <img src="assets/images/post-2.webp" width="1200" height="800" alt="" loading="lazy">
+        <div class="body">
+          <p class="meta"><time datetime="2026-09-12">12 Sep 2026</time> · 8 min read</p>
+          <h3><a href="#posts">Bangla typography on the web: line height, fonts and fallbacks</a></h3>
+          <p>A practical guide with the settings I now use on every project.</p>
+        </div>
+      </article>
+      <article class="glass post">
+        <img src="assets/images/post-3.webp" width="1200" height="800" alt="" loading="lazy">
+        <div class="body">
+          <p class="meta"><time datetime="2026-07-03">3 Jul 2026</time> · 5 min read</p>
+          <h3><a href="#posts">My first WordPress Core patch, step by step</a></h3>
+          <p>From finding a ticket to seeing my name in the release credits.</p>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section data-section="contact" id="contact">
+  <div class="wrap">
+    <div class="glass contact-card">
+      <p class="status-pill"><span class="dot" aria-hidden="true"></span>Open to work — available from Jan 2027</p>
+      <h2 style="margin-top:1.4rem">Let's build something good together.</h2>
+      <p class="lede">Hiring a junior frontend or WordPress developer? I reply to every message within a day.</p>
+      <div class="buttons">
+        <a class="btn btn--primary" href="mailto:hello@nusrat.example">hello@nusrat.example</a>
+        <a class="btn btn--ghost" href="#download-cv">Download CV (PDF)</a>
+      </div>
+      <ul class="socials">
+        <li><a href="#contact" aria-label="GitHub"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-3.16 19.49c.5.09.68-.22.68-.48v-1.7c-2.78.6-3.37-1.34-3.37-1.34-.45-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.9 1.53 2.35 1.09 2.92.83.09-.65.35-1.09.64-1.34-2.22-.25-4.55-1.11-4.55-4.94 0-1.09.39-1.98 1.03-2.68-.1-.25-.45-1.27.1-2.65 0 0 .84-.27 2.75 1.02a9.5 9.5 0 0 1 5 0c1.91-1.3 2.75-1.02 2.75-1.02.55 1.38.2 2.4.1 2.65.64.7 1.03 1.59 1.03 2.68 0 3.84-2.34 4.68-4.57 4.93.36.31.68.92.68 1.85v2.74c0 .27.18.58.69.48A10 10 0 0 0 12 2Z"/></svg></a></li>
+        <li><a href="#contact" aria-label="LinkedIn"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M4.98 3.5a2.5 2.5 0 1 1 0 5 2.5 2.5 0 0 1 0-5ZM3 9.75h4v11H3v-11Zm6.5 0h3.8v1.5h.06c.53-1 1.83-2.05 3.77-2.05 4.03 0 4.77 2.65 4.77 6.1v5.95h-4v-5.27c0-1.26-.02-2.88-1.75-2.88-1.76 0-2.03 1.37-2.03 2.79v5.36h-4v-11Z"/></svg></a></li>
+        <li><a href="#contact" aria-label="WordPress.org profile"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20ZM3.5 12c0-1.23.26-2.4.73-3.46l4.05 11.1A8.5 8.5 0 0 1 3.5 12Zm8.5 8.5c-.83 0-1.64-.12-2.4-.35l2.55-7.4 2.6 7.14.06.12c-.88.32-1.82.49-2.81.49Zm1.17-12.49c.51-.03.97-.08.97-.08.46-.06.4-.73-.05-.7 0 0-1.37.1-2.26.1-.83 0-2.23-.1-2.23-.1-.46-.03-.51.67-.05.7 0 0 .43.05.89.08l1.32 3.62-1.86 5.57L6.8 8.01c.51-.03.97-.08.97-.08.46-.06.4-.73-.05-.7 0 0-1.37.1-2.25.1h-.55A8.5 8.5 0 0 1 17.7 5.7l-.11-.01c-.83 0-1.42.73-1.42 1.5 0 .7.4 1.29.83 1.98.32.57.7 1.29.7 2.34 0 .73-.28 1.57-.65 2.75l-.85 2.85-3.04-9.1Zm3.1 11.35 2.6-7.5c.48-1.21.65-2.18.65-3.04 0-.31-.02-.6-.06-.87A8.5 8.5 0 0 1 16.27 19.36Z"/></svg></a></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">© 2026 Nusrat Jahan Rafa · Built with care in Dhaka · All names and links on this page are made up.</div>
+</footer>
+</body>
+</html>

@@ -2,6 +2,7 @@ import { luminance } from '../color';
 import { fontDef, fontPath, type FontKey } from '../fonts';
 import { PALETTES } from '../presets';
 import type { Palette, Style } from '../types';
+import { mergeJson, type LookDef } from './looks';
 
 /**
  * theme.json points at the trunk schema, as Ipsum does: "$schema" only drives
@@ -52,7 +53,7 @@ const SPACING_SIZES = [
 
 const color = (slug: string) => `var:preset|color|${slug}`;
 
-export function themeJson(style: Style): string {
+export function themeJson(style: Style, look: Pick<LookDef, 'settings' | 'styles'> = {}): string {
   const { palette, fonts } = style;
   const fontKeys = Array.from(new Set<FontKey>([fonts.heading, fonts.body]));
 
@@ -156,7 +157,13 @@ export function themeJson(style: Style): string {
     ],
   };
 
-  return `${JSON.stringify(json, null, '\t')}\n`;
+  // The look's presets and styles go on top (generator/looks.ts).
+  const merged = {
+    ...json,
+    settings: look.settings ? mergeJson(json.settings, look.settings(style)) : json.settings,
+    styles: look.styles ? mergeJson(json.styles, look.styles(style)) : json.styles,
+  };
+  return `${JSON.stringify(merged, null, '\t')}\n`;
 }
 
 /**

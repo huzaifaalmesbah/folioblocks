@@ -1,12 +1,10 @@
-import { useState, type ReactNode } from 'react';
+import type { ReactNode } from 'react';
 import { tr } from '../i18n/ui';
 import { IMAGE_LIMITS, resizeImage } from '../images';
 import { profileCompleteness } from '../profile';
 import { storageStatus, useBuilder } from '../store';
 import type { Socials } from '../types';
-import { bioPrompt, FILL_PROMPT, projectPrompt, taglinePrompt } from '../ai/prompts';
-import { parseProfile } from '../layout';
-import { CopyButton, Field, ImageField, inputCls, Repeater } from './fields';
+import { Field, ImageField, Repeater } from './fields';
 
 const SOCIAL_FIELDS: { key: keyof Socials; label: string; placeholder: string }[] = [
   { key: 'github', label: 'GitHub', placeholder: 'https://github.com/username' },
@@ -57,88 +55,6 @@ function Meter() {
   );
 }
 
-/**
- * Fill the whole form from a CV with any AI chat: copy our prompt, paste it
- * with the CV into the chat, paste the answer back. Nothing is sent anywhere
- * by FolioBlocks itself.
- */
-function FillWithAi() {
-  const [answer, setAnswer] = useState('');
-  const [error, setError] = useState('');
-  const [done, setDone] = useState(false);
-
-  function fill() {
-    setError('');
-    setDone(false);
-    try {
-      const { info, setInfo } = useBuilder.getState();
-      const next = parseProfile(answer, info);
-      if (!confirm(tr('Fill your profile as "{name}"? This replaces the text you have now. Your photos stay.', { name: next.name }))) return;
-      setInfo(next);
-      setAnswer('');
-      setDone(true);
-    } catch (e) {
-      setError(e instanceof Error ? e.message : String(e));
-    }
-  }
-
-  return (
-    <details className="group rounded-xl border border-blue-200 bg-blue-50/60 open:pb-4">
-      <summary className="flex cursor-pointer list-none items-center gap-2 px-4 py-3">
-        <span className="flex-1">
-          <span className="block text-sm font-semibold text-slate-900">✨ Fill with AI</span>
-          <span className="block text-xs text-slate-600">Have a CV or LinkedIn? Let an AI chat fill this form for you.</span>
-        </span>
-        <span aria-hidden className="text-slate-400 transition group-open:rotate-90">›</span>
-      </summary>
-      <ol className="list-decimal space-y-3 px-4 pl-9 text-sm text-slate-700">
-        <li>
-          <CopyButton
-            text={FILL_PROMPT}
-            className="rounded-md bg-slate-900 px-3 py-1.5 text-xs font-semibold text-white hover:bg-slate-700"
-          >
-            Copy the prompt
-          </CopyButton>
-        </li>
-        <li>Paste it into any AI chat (Claude, ChatGPT, Gemini…), then paste your CV or notes under it and send.</li>
-        <li>
-          <label className="block">
-            Paste the AI's answer here:
-            <textarea
-              className={`${inputCls} font-mono text-xs`}
-              rows={4}
-              placeholder='{ "name": "…", "tagline": "…" }'
-              value={answer}
-              onChange={(e) => setAnswer(e.target.value)}
-            />
-          </label>
-          <button
-            type="button"
-            disabled={!answer.trim()}
-            onClick={fill}
-            className="mt-2 rounded-md bg-blue-700 px-3 py-1.5 text-xs font-semibold text-white hover:bg-blue-800 disabled:opacity-50"
-          >
-            Fill my profile
-          </button>
-        </li>
-      </ol>
-      {error && (
-        <p role="alert" className="mt-2 px-4 text-xs text-red-700">
-          {error}
-        </p>
-      )}
-      {done && (
-        <p role="status" className="mt-2 px-4 text-xs text-green-700">
-          Done. Read it through and fix anything the AI got wrong.
-        </p>
-      )}
-      <p className="mt-3 px-4 text-xs text-slate-500">
-        Your CV goes only to the AI chat you choose, not to FolioBlocks. Leave out anything private, such as your phone number or address.
-      </p>
-    </details>
-  );
-}
-
 export function InfoStep() {
   const info = useBuilder((s) => s.info);
   const setInfo = useBuilder((s) => s.setInfo);
@@ -146,7 +62,6 @@ export function InfoStep() {
   return (
     <div className="space-y-4">
       <Meter />
-      <FillWithAi />
 
       <Tier title="The basics" note="Five things, about two minutes. Enough for a finished site." open>
         <Field label="Full name" value={info.name} onChange={(name) => setInfo({ name })} />
@@ -156,7 +71,6 @@ export function InfoStep() {
           value={info.tagline}
           onChange={(tagline) => setInfo({ tagline })}
         />
-        <CopyButton text={() => taglinePrompt(useBuilder.getState().info)}>✨ Copy a prompt to write taglines with AI</CopyButton>
         <Field
           label="Short bio"
           textarea
@@ -164,7 +78,6 @@ export function InfoStep() {
           value={info.bio}
           onChange={(bio) => setInfo({ bio })}
         />
-        <CopyButton text={() => bioPrompt(useBuilder.getState().info)}>✨ Copy a prompt to write your bio with AI</CopyButton>
         <ImageField
           label="Profile photo"
           value={info.avatar}
@@ -200,7 +113,6 @@ export function InfoStep() {
           ]}
           renderExtra={(item, i) => (
             <>
-            <CopyButton text={() => projectPrompt(item)}>✨ Copy a prompt to describe this project with AI</CopyButton>
             <ImageField
               label="Image"
               aspect="wide"

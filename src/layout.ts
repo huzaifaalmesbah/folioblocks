@@ -5,6 +5,7 @@
  */
 import { defaultState } from './defaults';
 import { FONT_KEYS } from './fonts';
+import { LOOK_KEYS } from './generator/looks';
 import { SECTIONS } from './generator/sections';
 import type { BuilderState, FooterVariant, HeaderVariant, Info, PageKey, Section, SectionType, Style } from './types';
 
@@ -109,7 +110,8 @@ function style(v: unknown): Style {
   const f = isObj(v.fonts) ? v.fonts : {};
   const font = (x: unknown, fb: Style['fonts']['heading']) => (FONT_KEYS.includes(x as never) ? (x as typeof fb) : fb);
   const radius = ['none', 'sm', 'md', 'lg'].includes(v.radius as string) ? (v.radius as Style['radius']) : d.radius;
-  return { palette, fonts: { heading: font(f.heading, d.fonts.heading), body: font(f.body, d.fonts.body) }, radius };
+  const look = LOOK_KEYS.includes(v.look as never) ? (v.look as Style['look']) : undefined;
+  return { palette, fonts: { heading: font(f.heading, d.fonts.heading), body: font(f.body, d.fonts.body) }, radius, ...(look && { look }) };
 }
 
 function pages(v: unknown): Record<PageKey, Section[]> {
@@ -178,39 +180,6 @@ export function sanitizeInfo(raw: unknown): Info {
         )
       : {},
     avatar: image(i.avatar),
-  };
-}
-
-/**
- * Read a profile from an AI chat's answer. The answer may wrap the JSON in
- * a code fence or a sentence, and may be a whole settings file, `{ "info": … }`
- * or the profile object itself. Photos can't come from a chat, so the current
- * ones are kept (project photos by matching title).
- */
-export function parseProfile(text: string, current: Info): Info {
-  const start = text.indexOf('{');
-  const end = text.lastIndexOf('}');
-  if (start === -1 || end <= start) throw new Error('No JSON found. Paste the whole answer from the AI, including the { } block.');
-  let data: unknown;
-  try {
-    data = JSON.parse(text.slice(start, end + 1));
-  } catch {
-    throw new Error('The JSON is incomplete or broken. Ask the AI to "send the JSON again, complete and valid", then paste it here.');
-  }
-  const root = isObj(data) ? data : {};
-  const raw = isObj(root.state) && isObj(root.state.info) ? root.state.info : isObj(root.info) ? root.info : root;
-  if (!isObj(raw) || typeof raw.name !== 'string' || !raw.name.trim()) {
-    throw new Error('This JSON has no "name". Make sure you pasted the answer to the FolioBlocks prompt.');
-  }
-  const info = sanitizeInfo(raw);
-  return {
-    ...info,
-    skills: Array.isArray(raw.skills) ? info.skills : [],
-    avatar: current.avatar ?? '',
-    projects: info.projects.map((p) => {
-      const old = current.projects.find((c) => c.title.trim() && c.title.trim().toLowerCase() === p.title.trim().toLowerCase());
-      return old?.image ? { ...p, image: old.image } : { title: p.title, description: p.description, url: p.url };
-    }),
   };
 }
 

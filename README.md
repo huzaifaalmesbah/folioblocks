@@ -19,7 +19,7 @@ Nothing is sent to a server. Everything stays in the browser.
 | 3.5 | Photos (profile, projects), featured images, four distinct designs | ✅ done |
 | 4 | Drag-and-drop layout customizer, saved layouts, draft import/export | ✅ done |
 | 5 | Tiered profile form, 8 templates, Bengali, template gallery | ✅ done |
-| 6 | AI fill-in prompts, download check and next steps, mobile builder | ✅ done |
+| 6 | AI fill-in prompts (removed later), download check and next steps, mobile builder | ✅ done |
 | 7 | Twelve templates, services and testimonials, student beta guide | ✅ done |
 | 8 | Bengali app interface | ✅ done |
 | 9 | Run the student beta ([guide](docs/beta-test.md)) | ⏳ next |
@@ -110,15 +110,9 @@ The theme's own words (headings, buttons, menu, page titles) can be written in E
 
 The app's own interface is separate: it can be shown in English or Bengali with the switch in the header (`src/i18n/`). Components stay plain English; `src/i18n/bn.ts` is a dictionary keyed by the English text, applied to the rendered page, with `tr()` for messages built in code. Text without a translation stays English. Prompts, code and product names are not translated.
 
-### AI help (no API, no key)
+### AI agents
 
-FolioBlocks never calls an AI. It gives students prompts to paste into the AI chat they already use (`src/ai/prompts.ts`):
-
-- **Fill with AI**: a prompt that turns a CV or notes into our profile JSON. The student pastes the answer back and `parseProfile()` reads it (tolerating code fences and extra words), keeps only known fields, and keeps their photos.
-- **Field prompts** for the tagline, bio and each project description, pre-filled with what the student has entered.
-- Every theme ships an **AGENTS.md** (`src/generator/agentsMd.ts`) with the theme's rules for coding agents, and the home page's guide prompts fill in the student's theme folder and name.
-
-All prompts tell the AI to use only the student's facts and never invent any.
+FolioBlocks never calls an AI, and the builder's form has no AI prompts. Every theme ships an **AGENTS.md** (`src/generator/agentsMd.ts`) with the theme's rules for coding agents, and the home page's AI guide has prompts that fill in the student's theme folder and name.
 
 ### Download check, next steps and small screens
 

@@ -1,0 +1,585 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ayan Chowdhury — Graphic &amp; Brand Design Student</title>
+<meta name="description" content="Ayan Chowdhury is a graphic and brand design student in Chattogram looking for a design internship. Brand identities, poster series, packaging, motion and more.">
+<style>
+/* Fonts: local files only */
+@font-face { font-family: "Space Grotesk"; src: url("assets/fonts/space-grotesk.woff2") format("woff2"); font-weight: 300 700; font-style: normal; font-display: swap; }
+@font-face { font-family: "DM Sans"; src: url("assets/fonts/dm-sans.woff2") format("woff2"); font-weight: 100 1000; font-style: normal; font-display: swap; }
+
+:root {
+  /* theme.json presets */
+  --wp--preset--color--base: #fff5e1;      /* cream */
+  --wp--preset--color--contrast: #111111;  /* ink */
+  --wp--preset--color--primary: #ffd23f;   /* yellow, ink text 13:1 */
+  --wp--preset--color--secondary: #ff70b0; /* pink, ink text 7.5:1 */
+  --wp--preset--color--accent: #2c4bff;    /* blue, white text 6:1 */
+  --wp--preset--font-family--heading: "Space Grotesk", "Arial Black", system-ui, sans-serif;
+  --wp--preset--font-family--body: "DM Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  /* extra brand colours */
+  --color-green: #3ddc97;   /* ink text 11:1 */
+  --color-orange: #ff8a3d;  /* ink text 8:1 */
+  --color-white: #ffffff;
+
+  /* the brutal kit */
+  --border: 3px solid var(--wp--preset--color--contrast);
+  --shadow: 6px 6px 0 var(--wp--preset--color--contrast);
+  --shadow-lg: 10px 10px 0 var(--wp--preset--color--contrast);
+  --radius: 14px;
+  --gutter: clamp(1rem, 4vw, 2.5rem);
+  --wide: 1200px;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; scroll-padding-top: 5.5rem; -webkit-text-size-adjust: 100%; overflow-x: clip; }
+body { overflow-x: clip; }
+body {
+  margin: 0;
+  background-color: var(--wp--preset--color--base);
+  background-image: radial-gradient(color-mix(in srgb, var(--wp--preset--color--contrast) 14%, transparent) 1.2px, transparent 1.2px);
+  background-size: 22px 22px;
+  color: var(--wp--preset--color--contrast);
+  font-family: var(--wp--preset--font-family--body);
+  font-size: clamp(1rem, .96rem + .2vw, 1.0625rem);
+  line-height: 1.6;
+}
+img { display: block; max-width: 100%; height: auto; }
+a { color: inherit; text-underline-offset: .2em; text-decoration-thickness: 2px; }
+:focus-visible { outline: 3px solid var(--wp--preset--color--accent); outline-offset: 3px; box-shadow: 0 0 0 6px var(--wp--preset--color--primary); }
+::selection { background: var(--wp--preset--color--secondary); color: var(--wp--preset--color--contrast); }
+
+h1, h2, h3 { font-family: var(--wp--preset--font-family--heading); font-weight: 700; line-height: 1; letter-spacing: -0.035em; margin: 0; }
+p { margin: 0 0 1em; }
+
+.skip { position: absolute; left: -999px; top: 0; z-index: 100; background: var(--wp--preset--color--primary); border: var(--border); padding: .6rem 1rem; font-weight: 700; }
+.skip:focus { left: 1rem; top: 1rem; }
+
+.wrap { width: min(100% - 2 * var(--gutter), var(--wide)); margin-inline: auto; }
+
+/* Reusable bits */
+.card { background: var(--color-white); border: var(--border); border-radius: var(--radius); box-shadow: var(--shadow); }
+.bg-yellow { background: var(--wp--preset--color--primary); }
+.bg-pink { background: var(--wp--preset--color--secondary); }
+.bg-blue { background: var(--wp--preset--color--accent); color: var(--color-white); }
+.bg-green { background: var(--color-green); }
+.bg-orange { background: var(--color-orange); }
+.bg-ink { background: var(--wp--preset--color--contrast); color: var(--wp--preset--color--base); }
+
+.btn {
+  display: inline-flex; align-items: center; gap: .55rem;
+  font-family: var(--wp--preset--font-family--heading); font-weight: 700; font-size: 1rem;
+  padding: .85rem 1.35rem; text-decoration: none; cursor: pointer;
+  color: var(--wp--preset--color--contrast); background: var(--wp--preset--color--primary);
+  border: var(--border); border-radius: 999px; box-shadow: var(--shadow);
+  transition: transform .12s ease, box-shadow .12s ease;
+}
+.btn:hover { transform: translate(3px, 3px); box-shadow: 3px 3px 0 var(--wp--preset--color--contrast); }
+.btn:active { transform: translate(6px, 6px); box-shadow: 0 0 0 var(--wp--preset--color--contrast); }
+.btn.pink { background: var(--wp--preset--color--secondary); }
+.btn.white { background: var(--color-white); }
+.btn.blue { background: var(--wp--preset--color--accent); color: var(--color-white); }
+.buttons { display: flex; flex-wrap: wrap; gap: 1rem; }
+
+.sticker {
+  display: inline-block; font-family: var(--wp--preset--font-family--heading); font-weight: 700;
+  text-transform: uppercase; letter-spacing: .02em; font-size: .875rem;
+  padding: .5rem .9rem; border: var(--border); border-radius: 999px; box-shadow: 4px 4px 0 var(--wp--preset--color--contrast);
+  transform: rotate(-4deg);
+}
+.chip { display: inline-block; font-size: .8125rem; font-weight: 700; padding: .2rem .65rem; border: 2px solid var(--wp--preset--color--contrast); border-radius: 999px; background: var(--color-white); }
+
+/* Header */
+.site-header { position: sticky; top: 0; z-index: 50; padding-block: .75rem; }
+.site-header .bar {
+  display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+  background: var(--color-white); border: var(--border); border-radius: 999px; box-shadow: var(--shadow);
+  padding: .5rem .5rem .5rem 1.25rem;
+}
+.logo { font-family: var(--wp--preset--font-family--heading); font-weight: 700; font-size: 1.25rem; text-decoration: none; letter-spacing: -0.03em; }
+.logo span { background: var(--wp--preset--color--secondary); padding: 0 .3rem; border: 2px solid var(--wp--preset--color--contrast); border-radius: 6px; margin-left: .15rem; }
+.site-nav ul { list-style: none; display: flex; align-items: center; gap: .25rem; margin: 0; padding: 0; }
+.site-nav a { display: block; text-decoration: none; font-weight: 700; font-size: .9375rem; padding: .45rem .8rem; border-radius: 999px; border: 2px solid transparent; }
+.site-nav a:hover { border-color: var(--wp--preset--color--contrast); background: var(--wp--preset--color--primary); }
+.site-nav .cta { background: var(--wp--preset--color--contrast); color: var(--wp--preset--color--base); }
+.site-nav .cta:hover { background: var(--wp--preset--color--secondary); color: var(--wp--preset--color--contrast); }
+@media (max-width: 760px) { .site-nav li:not(.keep) { display: none; } }
+
+/* Sections */
+section { padding-block: clamp(3.5rem, 8vw, 6.5rem); }
+.section-title { display: flex; flex-wrap: wrap; align-items: center; gap: .75rem 1rem; margin-bottom: clamp(2rem, 5vw, 3.25rem); }
+.section-title h2 { font-size: clamp(2.5rem, 1.6rem + 4vw, 4.75rem); }
+.section-title .label { font-family: var(--wp--preset--font-family--heading); font-weight: 700; font-size: .875rem; padding: .3rem .7rem; border: var(--border); border-radius: 8px; background: var(--color-white); }
+
+/* Hero */
+.hero { padding-top: clamp(2rem, 5vw, 3.5rem); }
+.hero-grid { display: grid; gap: clamp(2.5rem, 6vw, 4rem); align-items: center; }
+.hero h1 { font-size: clamp(3.25rem, 1.2rem + 9vw, 8.5rem); line-height: .9; letter-spacing: -0.05em; }
+.hero h1 .hl { display: inline-block; background: var(--wp--preset--color--primary); border: var(--border); border-radius: 18px; padding: 0 .15em .05em; box-shadow: var(--shadow); transform: rotate(-2deg); }
+.hero h1 .ul { background: linear-gradient(transparent 62%, var(--wp--preset--color--secondary) 62%, var(--wp--preset--color--secondary) 92%, transparent 92%); }
+.hero .lede { font-size: clamp(1.125rem, 1rem + .5vw, 1.375rem); max-width: 34ch; margin: 1.75rem 0 2rem; font-weight: 500; }
+.hero-art { position: relative; max-width: 26rem; justify-self: center; width: 100%; }
+.hero-art .photo { border: var(--border); border-radius: 24px; box-shadow: var(--shadow-lg); overflow: hidden; background: var(--wp--preset--color--secondary); transform: rotate(2deg); }
+.hero-art .photo img { width: 100%; aspect-ratio: 1; object-fit: cover; }
+.hero-art .sticker { position: absolute; }
+.hero-art .s1 { top: -1.1rem; left: -.75rem; background: var(--color-green); transform: rotate(-8deg); font-size: 1rem; }
+.hero-art .s2 { bottom: 1.5rem; right: -1rem; background: var(--wp--preset--color--primary); transform: rotate(6deg); }
+.hero-art .s3 { bottom: -1.25rem; left: 1.5rem; transform: rotate(-3deg); background: var(--color-white); text-transform: none; }
+.star { position: absolute; top: 18%; right: -1.25rem; width: 4.5rem; height: 4.5rem; animation: spin 14s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+@media (min-width: 900px) { .hero-grid { grid-template-columns: 1.35fr 1fr; } }
+
+/* Marquee */
+.marquee { border-block: var(--border); background: var(--wp--preset--color--contrast); color: var(--wp--preset--color--primary); overflow: hidden; transform: rotate(-1.5deg); margin-block: 1rem 0; }
+.marquee-track { display: flex; width: max-content; animation: marquee 30s linear infinite; }
+.marquee ul { display: flex; align-items: center; list-style: none; margin: 0; padding: 1rem 0; }
+.marquee li { font-family: var(--wp--preset--font-family--heading); font-weight: 700; font-size: clamp(1.25rem, 1rem + 1.4vw, 2rem); white-space: nowrap; padding-inline: 1.25rem; display: flex; align-items: center; gap: 2.5rem; }
+.marquee li::after { content: "\2726"; color: var(--wp--preset--color--secondary); }
+@keyframes marquee { to { transform: translateX(-50%); } }
+
+/* About */
+.about-grid { display: grid; gap: 1.5rem; }
+.about-main { padding: clamp(1.5rem, 4vw, 2.5rem); }
+.about-main .big { font-family: var(--wp--preset--font-family--heading); font-weight: 700; font-size: clamp(1.5rem, 1.1rem + 1.5vw, 2.25rem); line-height: 1.15; letter-spacing: -0.025em; margin-bottom: 1.25rem; }
+.about-main mark { background: var(--wp--preset--color--primary); padding: 0 .2em; border-radius: 6px; }
+.about-side { display: grid; gap: 1.5rem; }
+.stat { padding: 1.5rem; }
+.stat strong { display: block; font-family: var(--wp--preset--font-family--heading); font-size: 3rem; line-height: 1; letter-spacing: -0.04em; }
+.stat span { font-weight: 600; }
+@media (min-width: 900px) { .about-grid { grid-template-columns: 1.7fr 1fr; } }
+
+/* Skills */
+.skills-grid { display: grid; gap: 1.25rem; grid-template-columns: repeat(auto-fill, minmax(min(100%, 13rem), 1fr)); }
+.tool { padding: 1.25rem; display: grid; gap: .75rem; transition: transform .15s ease; }
+.tool:nth-child(odd) { transform: rotate(-1deg); }
+.tool:nth-child(even) { transform: rotate(1deg); }
+.tool:hover { transform: rotate(0) translateY(-4px); }
+.tool-top { display: flex; align-items: center; gap: .75rem; }
+.tool-icon { width: 2.75rem; height: 2.75rem; border: var(--border); border-radius: 10px; display: grid; place-items: center; font-family: var(--wp--preset--font-family--heading); font-weight: 700; font-size: 1rem; flex: none; }
+.tool h3 { font-size: 1.25rem; letter-spacing: -0.02em; }
+.meter { height: 14px; border: 2px solid var(--wp--preset--color--contrast); border-radius: 999px; background: var(--wp--preset--color--base); overflow: hidden; }
+.meter span { display: block; height: 100%; background: var(--wp--preset--color--contrast); border-right: 2px solid var(--wp--preset--color--contrast); }
+.tool p { margin: 0; font-size: .875rem; font-weight: 600; }
+
+/* Projects */
+.projects-grid { display: grid; gap: clamp(1.75rem, 3vw, 2.25rem); grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr)); }
+.project { overflow: hidden; display: flex; flex-direction: column; transition: transform .15s ease, box-shadow .15s ease; }
+.project:hover { transform: translate(-3px, -3px); box-shadow: 9px 9px 0 var(--wp--preset--color--contrast); }
+.project figure { margin: 0; border-bottom: var(--border); position: relative; }
+.project img { width: 100%; aspect-ratio: 3 / 2; object-fit: cover; }
+.project figure .sticker { position: absolute; top: .9rem; right: .9rem; font-size: .75rem; transform: rotate(5deg); }
+.project-body { padding: 1.35rem 1.35rem 1.5rem; display: flex; flex-direction: column; gap: .8rem; flex: 1; }
+.project h3 { font-size: 1.625rem; }
+.project p { margin: 0; }
+.project .chips { display: flex; flex-wrap: wrap; gap: .4rem; list-style: none; margin: 0; padding: 0; }
+.project .more { margin-top: auto; font-family: var(--wp--preset--font-family--heading); font-weight: 700; text-decoration: none; display: inline-flex; gap: .4rem; align-self: flex-start; padding-top: .25rem; border-bottom: 3px solid var(--wp--preset--color--contrast); }
+.project .more:hover { background: var(--wp--preset--color--primary); }
+
+/* Experience + education (two columns) */
+.two-col { display: grid; gap: clamp(2.5rem, 6vw, 3.5rem); }
+@media (min-width: 960px) { .two-col { grid-template-columns: 1.4fr 1fr; align-items: start; } }
+.stack { display: grid; gap: 1.25rem; list-style: none; margin: 0; padding: 0; }
+.entry { padding: 1.35rem 1.5rem; display: grid; gap: .4rem; }
+.entry .when { justify-self: start; font-family: var(--wp--preset--font-family--heading); font-weight: 700; font-size: .8125rem; padding: .15rem .6rem; border: 2px solid var(--wp--preset--color--contrast); border-radius: 6px; background: var(--wp--preset--color--base); }
+.entry h3 { font-size: 1.375rem; letter-spacing: -0.02em; }
+.entry .where { font-weight: 700; }
+.entry p { margin: 0; font-size: .9375rem; }
+.sub-title { font-size: 2rem; margin-bottom: 1.25rem; }
+
+/* Achievements */
+.awards { display: grid; gap: 1.5rem; grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr)); list-style: none; margin: 0; padding: 0; }
+.award { padding: 1.5rem; display: grid; gap: .5rem; align-content: start; }
+.award .medal { font-family: var(--wp--preset--font-family--heading); font-size: 3.25rem; line-height: 1; font-weight: 700; letter-spacing: -0.05em; }
+.award h3 { font-size: 1.25rem; letter-spacing: -0.02em; }
+.award p { margin: 0; font-size: .9375rem; font-weight: 500; }
+
+/* Services */
+.services-grid { display: grid; gap: 1.5rem; grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr)); }
+.service { padding: 1.75rem; display: grid; gap: .75rem; align-content: start; }
+.service .num { font-family: var(--wp--preset--font-family--heading); font-weight: 700; width: 3rem; height: 3rem; display: grid; place-items: center; border: var(--border); border-radius: 50%; background: var(--color-white); color: var(--wp--preset--color--contrast); }
+.service h3 { font-size: 1.75rem; }
+.service ul { margin: 0; padding-left: 1.1rem; font-weight: 500; }
+.service .price { font-family: var(--wp--preset--font-family--heading); font-weight: 700; margin-top: .5rem; }
+
+/* Testimonials */
+.quotes { display: grid; gap: 1.75rem; grid-template-columns: repeat(auto-fit, minmax(min(100%, 19rem), 1fr)); }
+.quote { margin: 0; padding: 1.75rem; display: grid; gap: 1.25rem; align-content: space-between; }
+.quote:nth-child(1) { transform: rotate(-1.2deg); }
+.quote:nth-child(3) { transform: rotate(1.2deg); }
+.quote blockquote { margin: 0; font-family: var(--wp--preset--font-family--heading); font-weight: 500; font-size: 1.25rem; line-height: 1.35; letter-spacing: -0.015em; }
+.quote blockquote::before { content: "\201C"; display: block; font-size: 4rem; line-height: .7; font-weight: 700; }
+.quote figcaption { display: flex; align-items: center; gap: .75rem; font-size: .9375rem; }
+.quote figcaption .ini { width: 2.75rem; height: 2.75rem; flex: none; display: grid; place-items: center; border: var(--border); border-radius: 50%; background: var(--color-white); font-family: var(--wp--preset--font-family--heading); font-weight: 700; color: var(--wp--preset--color--contrast); }
+.quote figcaption strong { display: block; }
+
+/* Contact */
+.contact-box { padding: clamp(1.75rem, 5vw, 3.5rem); display: grid; gap: 2.5rem; position: relative; }
+.contact-box h2 { font-size: clamp(2.5rem, 1.4rem + 5vw, 5.5rem); }
+.contact-box .sticker { position: absolute; top: -1.2rem; right: 1.5rem; background: var(--wp--preset--color--secondary); transform: rotate(6deg); }
+.fake-form { display: grid; gap: 1rem; }
+.field { display: grid; gap: .35rem; }
+.field .lbl { font-family: var(--wp--preset--font-family--heading); font-weight: 700; font-size: .875rem; }
+.field .val { background: var(--color-white); border: var(--border); border-radius: 10px; padding: .8rem 1rem; font-weight: 500; word-break: break-word; }
+.field .val a { font-weight: 700; }
+.socials { display: flex; flex-wrap: wrap; gap: .75rem; list-style: none; margin: 0; padding: 0; }
+.socials a { display: inline-flex; align-items: center; gap: .5rem; text-decoration: none; font-weight: 700; padding: .5rem .9rem; border: var(--border); border-radius: 999px; background: var(--color-white); box-shadow: 3px 3px 0 var(--wp--preset--color--contrast); transition: transform .12s ease, box-shadow .12s ease; }
+.socials a:hover { transform: translate(3px, 3px); box-shadow: none; background: var(--wp--preset--color--primary); }
+.socials svg { width: 1.1rem; height: 1.1rem; }
+@media (min-width: 900px) { .contact-box { grid-template-columns: 1fr 1fr; align-items: start; } }
+
+.site-footer { padding-block: 2rem 3rem; }
+.site-footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 1rem; font-weight: 700; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+  .marquee-track { flex-wrap: wrap; width: auto; }
+  .marquee ul[aria-hidden="true"] { display: none; }
+  .marquee ul { flex-wrap: wrap; justify-content: center; }
+}
+@media (max-width: 480px) {
+  .hero-art .s2 { right: -.25rem; }
+  .star { right: -.25rem; }
+}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="site-header">
+  <div class="wrap">
+    <div class="bar">
+      <a class="logo" href="#top">ayan<span>.design</span></a>
+      <nav class="site-nav" aria-label="Main">
+        <ul>
+          <li><a href="#work">Work</a></li>
+          <li><a href="#about">About</a></li>
+          <li><a href="#experience">Experience</a></li>
+          <li><a href="#services">Services</a></li>
+          <li class="keep"><a class="cta" href="#contact">Hire me</a></li>
+        </ul>
+      </nav>
+    </div>
+  </div>
+</header>
+
+<main id="main">
+
+  <!-- Hero -->
+  <section data-section="hero" class="hero" id="top">
+    <div class="wrap hero-grid">
+      <div>
+        <span class="sticker bg-pink">Graphic &amp; brand designer</span>
+        <h1 style="margin-top:1.5rem">Loud ideas, <span class="hl">clean</span> <span class="ul">systems.</span></h1>
+        <p class="lede">I'm Ayan, a third-year graphic design student in Chattogram. I make brand identities, posters and packaging that people actually stop and look at.</p>
+        <div class="buttons">
+          <a class="btn" href="#work">See my work <span aria-hidden="true">&rarr;</span></a>
+          <a class="btn white" href="cv.pdf" download>Download CV <span aria-hidden="true">&darr;</span></a>
+        </div>
+      </div>
+      <div class="hero-art">
+        <div class="photo"><img src="assets/images/avatar.webp" width="800" height="800" alt="Portrait of Ayan Chowdhury"></div>
+        <span class="sticker s1">Open for internship!</span>
+        <span class="sticker s2">Summer 2027 &#9728;</span>
+        <span class="sticker s3">Based in Chattogram, BD</span>
+        <svg class="star" viewBox="0 0 100 100" aria-hidden="true" focusable="false">
+          <path d="M50 3 61 33 93 26 70 50 93 74 61 67 50 97 39 67 7 74 30 50 7 26 39 33Z" fill="var(--wp--preset--color--accent)" stroke="var(--wp--preset--color--contrast)" stroke-width="4" stroke-linejoin="round"/>
+        </svg>
+      </div>
+    </div>
+  </section>
+
+  <!-- Skills strip -->
+  <div class="marquee" role="region" aria-label="Skills at a glance">
+    <div class="marquee-track">
+      <ul>
+        <li>Brand identity</li><li>Logo design</li><li>Poster design</li><li>Packaging</li><li>Typography</li><li>Motion graphics</li><li>3D in Blender</li><li>Social media kits</li><li>Illustration</li>
+      </ul>
+      <ul aria-hidden="true">
+        <li>Brand identity</li><li>Logo design</li><li>Poster design</li><li>Packaging</li><li>Typography</li><li>Motion graphics</li><li>3D in Blender</li><li>Social media kits</li><li>Illustration</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- About -->
+  <section data-section="about" id="about" aria-labelledby="about-title">
+    <div class="wrap">
+      <div class="section-title"><h2 id="about-title">About me</h2><span class="label">01</span></div>
+      <div class="about-grid">
+        <div class="card about-main">
+          <p class="big">I grew up drawing on my dad's shop receipts. Now I design <mark>whole brands</mark>, and I still love a good receipt.</p>
+          <p>I'm studying for a BFA in Graphic Design at Karnaphuli Institute of Fine Arts. I'm happiest when a brief is small and specific: a tea stall that needs a logo, a club that needs posters by Friday, a home bakery that needs a box people keep.</p>
+          <p>I like bold colour, strong grids and Bangla lettering, and I care just as much about the boring parts: file naming, print specs and handing over clean source files.</p>
+          <p style="margin:0">Right now I'm looking for a <strong>3–6 month design internship</strong> at a studio or in-house brand team, in Chattogram, Dhaka or remote.</p>
+        </div>
+        <div class="about-side">
+          <div class="card stat bg-yellow"><strong>24+</strong><span>projects for real clients</span></div>
+          <div class="card stat bg-green"><strong>3</strong><span>design competitions won</span></div>
+          <div class="card stat bg-blue"><strong>1.2k</strong><span>people at the fest I branded</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Skills -->
+  <section data-section="skills" id="skills" aria-labelledby="skills-title">
+    <div class="wrap">
+      <div class="section-title"><h2 id="skills-title">My toolbox</h2><span class="label">02</span></div>
+      <div class="skills-grid">
+        <article class="card tool">
+          <div class="tool-top"><span class="tool-icon bg-pink" aria-hidden="true">Fi</span><h3>Figma</h3></div>
+          <div class="meter" role="img" aria-label="Level 90 out of 100"><span style="width:90%"></span></div>
+          <p>Layouts, social kits, decks</p>
+        </article>
+        <article class="card tool">
+          <div class="tool-top"><span class="tool-icon bg-orange" aria-hidden="true">Ai</span><h3>Illustrator</h3></div>
+          <div class="meter" role="img" aria-label="Level 92 out of 100"><span style="width:92%"></span></div>
+          <p>Logos, lettering, vectors</p>
+        </article>
+        <article class="card tool">
+          <div class="tool-top"><span class="tool-icon bg-blue" aria-hidden="true">Ps</span><h3>Photoshop</h3></div>
+          <div class="meter" role="img" aria-label="Level 85 out of 100"><span style="width:85%"></span></div>
+          <p>Mockups, retouching, collage</p>
+        </article>
+        <article class="card tool">
+          <div class="tool-top"><span class="tool-icon bg-yellow" aria-hidden="true">Id</span><h3>InDesign</h3></div>
+          <div class="meter" role="img" aria-label="Level 75 out of 100"><span style="width:75%"></span></div>
+          <p>Zines, brand books, print</p>
+        </article>
+        <article class="card tool">
+          <div class="tool-top"><span class="tool-icon bg-green" aria-hidden="true">Ae</span><h3>After Effects</h3></div>
+          <div class="meter" role="img" aria-label="Level 65 out of 100"><span style="width:65%"></span></div>
+          <p>Logo animation, reels</p>
+        </article>
+        <article class="card tool">
+          <div class="tool-top"><span class="tool-icon bg-pink" aria-hidden="true">Bl</span><h3>Blender</h3></div>
+          <div class="meter" role="img" aria-label="Level 55 out of 100"><span style="width:55%"></span></div>
+          <p>Packaging renders, 3D type</p>
+        </article>
+        <article class="card tool">
+          <div class="tool-top"><span class="tool-icon bg-orange" aria-hidden="true">Pc</span><h3>Procreate</h3></div>
+          <div class="meter" role="img" aria-label="Level 80 out of 100"><span style="width:80%"></span></div>
+          <p>Sketching, illustration</p>
+        </article>
+        <article class="card tool">
+          <div class="tool-top"><span class="tool-icon bg-blue" aria-hidden="true">Aa</span><h3>Typography</h3></div>
+          <div class="meter" role="img" aria-label="Level 85 out of 100"><span style="width:85%"></span></div>
+          <p>Latin and Bangla type pairing</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- Projects -->
+  <section data-section="projects" id="work" aria-labelledby="work-title">
+    <div class="wrap">
+      <div class="section-title"><h2 id="work-title">Selected projects</h2><span class="label">03</span></div>
+      <div class="projects-grid">
+        <article class="card project">
+          <figure>
+            <img src="assets/images/project-1.webp" width="1200" height="800" alt="Cha Kotha tea stall brand identity: logo, cups and signage" loading="lazy">
+            <span class="sticker bg-yellow">Client work</span>
+          </figure>
+          <div class="project-body">
+            <h3>Cha Kotha — tea stall identity</h3>
+            <p>A full identity for a busy roadside tea stall in Agrabad: hand-lettered Bangla logo, cup sleeves, menu board and a stamp the owner uses on everything. Sales of the new "special" cup went up by a third.</p>
+            <ul class="chips" aria-label="Tags"><li class="chip">Brand identity</li><li class="chip">Lettering</li><li class="chip">Signage</li></ul>
+            <a class="more" href="#project-cha-kotha">View project <span aria-hidden="true">&rarr;</span></a>
+          </div>
+        </article>
+        <article class="card project">
+          <figure>
+            <img src="assets/images/project-2.webp" width="1200" height="800" alt="A series of bold colourful posters for Noishobdo music festival" loading="lazy">
+            <span class="sticker bg-pink">Poster series</span>
+          </figure>
+          <div class="project-body">
+            <h3>Noishobdo — music fest posters</h3>
+            <p>Twelve posters and a social kit for a campus indie music festival. One flexible grid, three colours, a custom display type. Printed as risograph posters and animated for Instagram.</p>
+            <ul class="chips" aria-label="Tags"><li class="chip">Poster</li><li class="chip">Risograph</li><li class="chip">Motion</li></ul>
+            <a class="more" href="#project-noishobdo">View project <span aria-hidden="true">&rarr;</span></a>
+          </div>
+        </article>
+        <article class="card project">
+          <figure>
+            <img src="assets/images/project-3.webp" width="1200" height="800" alt="Mishti Ghor sweet box packaging rendered in 3D" loading="lazy">
+            <span class="sticker bg-green">Packaging</span>
+          </figure>
+          <div class="project-body">
+            <h3>Mishti Ghor — sweet box packaging</h3>
+            <p>A fold-flat box family for a home bakery, in three sizes from one die-line. Patterns are drawn from nakshi kantha stitching. Modelled and rendered in Blender before the first print run.</p>
+            <ul class="chips" aria-label="Tags"><li class="chip">Packaging</li><li class="chip">Pattern</li><li class="chip">3D render</li></ul>
+            <a class="more" href="#project-mishti-ghor">View project <span aria-hidden="true">&rarr;</span></a>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- Experience + Education -->
+  <div class="wrap two-col">
+    <section data-section="experience" id="experience" aria-labelledby="exp-title" style="padding-bottom:0">
+      <div class="section-title"><h2 id="exp-title">Experience</h2><span class="label">04</span></div>
+      <ol class="stack">
+        <li class="card entry">
+          <span class="when">2024 — now</span>
+          <h3>Freelance Graphic Designer</h3>
+          <span class="where">Self-employed, Chattogram</span>
+          <p>Logos, menus and social kits for 15+ local shops, cafés and small brands. I handle the brief, the invoice and the print shop.</p>
+        </li>
+        <li class="card entry">
+          <span class="when">2025 — now</span>
+          <h3>Design Lead</h3>
+          <span class="where">KIFA Design &amp; Photography Club</span>
+          <p>Lead a team of 8 designers. Branded our annual fest for 1,200 visitors and set up the club's shared templates.</p>
+        </li>
+        <li class="card entry">
+          <span class="when">2023 — 2024</span>
+          <h3>Part-time Junior Designer</h3>
+          <span class="where">Print Pata Press, Chattogram</span>
+          <p>Prepared print files, fixed client artwork and learned paper, ink and finishing the hard way, 20 hours a week.</p>
+        </li>
+      </ol>
+    </section>
+
+    <section data-section="education" id="education" aria-labelledby="edu-title" style="padding-bottom:0">
+      <div class="section-title"><h2 id="edu-title">Education</h2><span class="label">05</span></div>
+      <ul class="stack">
+        <li class="card entry bg-yellow">
+          <span class="when">2023 — 2027</span>
+          <h3>BFA, Graphic Design</h3>
+          <span class="where">Karnaphuli Institute of Fine Arts</span>
+          <p>Third year. CGPA 3.78 / 4.00. Focus on identity and typography.</p>
+        </li>
+        <li class="card entry">
+          <span class="when">2025</span>
+          <h3>Bangla Lettering Workshop</h3>
+          <span class="where">Akkhor Type Lab, online</span>
+          <p>Six weeks on Bangla letterforms and logotypes.</p>
+        </li>
+        <li class="card entry">
+          <span class="when">2022</span>
+          <h3>HSC, Humanities</h3>
+          <span class="where">Chattogram City College</span>
+          <p>GPA 5.00. Ran the college wall magazine.</p>
+        </li>
+      </ul>
+    </section>
+  </div>
+
+  <!-- Achievements -->
+  <section data-section="achievements" id="achievements" aria-labelledby="ach-title">
+    <div class="wrap">
+      <div class="section-title"><h2 id="ach-title">Wins &amp; shout-outs</h2><span class="label">06</span></div>
+      <ul class="awards">
+        <li class="card award bg-yellow">
+          <span class="medal">1st</span>
+          <h3>National Student Poster Award</h3>
+          <p>Climate category, 2026. Out of 340 entries.</p>
+        </li>
+        <li class="card award bg-pink">
+          <span class="medal">1st</span>
+          <h3>Rebrand My City Challenge</h3>
+          <p>A new identity for Chattogram's ferry service, 2025.</p>
+        </li>
+        <li class="card award bg-green">
+          <span class="medal">2nd</span>
+          <h3>Packaging Design Sprint</h3>
+          <p>48-hour sprint by Bangladesh Packaging Forum, 2025.</p>
+        </li>
+        <li class="card award">
+          <span class="medal">Top 50</span>
+          <h3>Asia Type Week Showcase</h3>
+          <p>Bangla display typeface "Jhor" selected, 2026.</p>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- Services -->
+  <section data-section="services" id="services" aria-labelledby="services-title">
+    <div class="wrap">
+      <div class="section-title"><h2 id="services-title">What I can make for you</h2><span class="label">07</span></div>
+      <div class="services-grid">
+        <article class="card service bg-pink">
+          <span class="num">A</span>
+          <h3>Logo &amp; identity</h3>
+          <ul><li>Logo and wordmark</li><li>Colour and type system</li><li>Mini brand guide (PDF)</li></ul>
+          <p class="price">From 2 weeks</p>
+        </article>
+        <article class="card service bg-yellow">
+          <span class="num">B</span>
+          <h3>Social media kit</h3>
+          <ul><li>Post and story templates</li><li>Highlight covers</li><li>Editable Figma or Canva files</li></ul>
+          <p class="price">From 1 week</p>
+        </article>
+        <article class="card service bg-blue">
+          <span class="num">C</span>
+          <h3>Posters &amp; print</h3>
+          <ul><li>Event posters and flyers</li><li>Menus and leaflets</li><li>Print-ready files, checked</li></ul>
+          <p class="price">From 3 days</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- Testimonials -->
+  <section data-section="testimonials" id="testimonials" aria-labelledby="test-title">
+    <div class="wrap">
+      <div class="section-title"><h2 id="test-title">People said nice things</h2><span class="label">08</span></div>
+      <div class="quotes">
+        <figure class="card quote bg-yellow">
+          <blockquote>Ayan listened to my customers before drawing anything. Now people take photos of my cups.</blockquote>
+          <figcaption><span class="ini" aria-hidden="true">JM</span><span><strong>Jamal Mia</strong>Owner, Cha Kotha</span></figcaption>
+        </figure>
+        <figure class="card quote">
+          <blockquote>One of the most organised students I have taught. The ideas are bold, the files are always clean.</blockquote>
+          <figcaption><span class="ini bg-pink" aria-hidden="true">NS</span><span><strong>Nazia Sultana</strong>Lecturer, Typography, KIFA</span></figcaption>
+        </figure>
+        <figure class="card quote bg-green">
+          <blockquote>Our posters sold out before the fest did. He delivered twelve designs in ten days.</blockquote>
+          <figcaption><span class="ini" aria-hidden="true">RD</span><span><strong>Rafi Das</strong>Organiser, Noishobdo Fest</span></figcaption>
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <!-- Contact -->
+  <section data-section="contact" id="contact" aria-labelledby="contact-title">
+    <div class="wrap">
+      <div class="card contact-box bg-yellow">
+        <span class="sticker">Replies in 24h</span>
+        <div>
+          <h2 id="contact-title">Got an internship? Let's talk!</h2>
+          <p style="margin:1.25rem 0 2rem;font-size:1.125rem;font-weight:500;max-width:34ch">Studios, in-house teams and small brands: send me a note. I can start in January 2027.</p>
+          <div class="buttons">
+            <a class="btn pink" href="mailto:hi@ayan.design?subject=Internship%20at%20our%20studio">Email me <span aria-hidden="true">&rarr;</span></a>
+            <a class="btn white" href="cv.pdf" download>Download CV <span aria-hidden="true">&darr;</span></a>
+          </div>
+        </div>
+        <div class="fake-form" role="group" aria-label="Contact details">
+          <div class="field"><span class="lbl">Email</span><span class="val"><a href="mailto:hi@ayan.design">hi@ayan.design</a></span></div>
+          <div class="field"><span class="lbl">Phone / WhatsApp</span><span class="val"><a href="tel:+8801700000000">+880 1700-000000</a></span></div>
+          <div class="field"><span class="lbl">Where</span><span class="val">Chattogram, Bangladesh. Happy to work remote.</span></div>
+          <ul class="socials" aria-label="Social links">
+            <li><a href="https://www.behance.net/ayanchowdhury"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="currentColor" d="M8.2 11.4c.9-.4 1.5-1.2 1.5-2.3C9.7 7 8.2 6 6 6H1v12h5.3c2.3 0 4.1-1.1 4.1-3.4 0-1.5-.8-2.6-2.2-3.2zM3.6 8.1h2c.9 0 1.6.3 1.6 1.2s-.6 1.3-1.5 1.3H3.6V8.1zm2.3 7.8H3.6v-3.1H6c1.1 0 1.8.5 1.8 1.6 0 1.1-.8 1.5-1.9 1.5zM15 7h5.5v1.4H15zm2.8 2.3c-2.6 0-4.4 1.8-4.4 4.4 0 2.7 1.7 4.4 4.4 4.4 2 0 3.4-.9 4-2.8h-2.1c-.2.6-1 1-1.8 1-1.3 0-2-.7-2.1-2.1h6.1c.2-2.8-1.3-4.9-4.1-4.9zm-2 3.4c.1-1.1.8-1.7 1.9-1.7 1.1 0 1.7.6 1.8 1.7h-3.7z"/></svg>Behance</a></li>
+            <li><a href="https://www.instagram.com/ayan.makes"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="currentColor" d="M12 2.2c3.2 0 3.6 0 4.8.1 3.2.1 4.8 1.7 4.9 4.9.1 1.3.1 1.6.1 4.8s0 3.6-.1 4.8c-.1 3.2-1.7 4.8-4.9 4.9-1.3.1-1.6.1-4.8.1s-3.6 0-4.8-.1c-3.3-.1-4.8-1.7-4.9-4.9C2.2 15.6 2.2 15.2 2.2 12s0-3.6.1-4.8C2.4 3.9 3.9 2.4 7.2 2.3c1.2-.1 1.6-.1 4.8-.1zM12 0C8.7 0 8.3 0 7.1.1 2.7.3.3 2.7.1 7.1 0 8.3 0 8.7 0 12s0 3.7.1 4.9c.2 4.4 2.6 6.8 7 7 1.2.1 1.6.1 4.9.1s3.7 0 4.9-.1c4.4-.2 6.8-2.6 7-7 .1-1.2.1-1.6.1-4.9s0-3.7-.1-4.9c-.2-4.4-2.6-6.8-7-7C15.7 0 15.3 0 12 0zm0 5.8a6.2 6.2 0 1 0 0 12.4 6.2 6.2 0 0 0 0-12.4zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.4-11.8a1.4 1.4 0 1 0 0 2.9 1.4 1.4 0 0 0 0-2.9z"/></svg>Instagram</a></li>
+            <li><a href="https://dribbble.com/ayanchowdhury"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="currentColor" d="M12 0a12 12 0 1 0 0 24 12 12 0 0 0 0-24zm7.9 5.5a10.2 10.2 0 0 1 2.3 6.4c-.3-.1-3.7-.8-7.1-.3-.3-.7-.6-1.3-.9-2 3.8-1.6 5.5-3.8 5.7-4.1zM12 1.8c2.6 0 5 1 6.8 2.6-.2.2-1.7 2.3-5.4 3.7a54.7 54.7 0 0 0-3.8-6.1c.8-.1 1.6-.2 2.4-.2zM7.6 2.8c.3.4 2 2.7 3.8 6C6.6 10.1 2.4 10 1.9 10a10.3 10.3 0 0 1 5.7-7.2zM1.8 12v-.3c.5 0 5.4.1 10.5-1.4.3.6.6 1.2.8 1.8-.1 0-.3.1-.4.1-5.2 1.7-8 6.3-8.3 6.7A10.1 10.1 0 0 1 1.8 12zM12 22.2c-2.3 0-4.5-.8-6.2-2.1.2-.4 2.2-4.3 7.9-6.3h.1c1.4 3.7 2 6.8 2.2 7.7-1.2.5-2.6.7-4 .7zm5.7-1.7c-.1-.6-.6-3.6-2-7.4 3.2-.5 6 .3 6.4.4a10.2 10.2 0 0 1-4.4 7z"/></svg>Dribbble</a></li>
+            <li><a href="https://www.linkedin.com/in/ayan-chowdhury-design"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="currentColor" d="M20.4 20.5h-3.6v-5.6c0-1.3 0-3-1.8-3s-2.1 1.4-2.1 2.9v5.7H9.3V9h3.4v1.6c.5-.9 1.6-1.8 3.4-1.8 3.6 0 4.3 2.4 4.3 5.5v6.2zM5.3 7.4a2.1 2.1 0 1 1 0-4.2 2.1 2.1 0 0 1 0 4.2zm1.8 13.1H3.6V9h3.5v11.5zM22.2 0H1.8C.8 0 0 .8 0 1.7v20.6c0 .9.8 1.7 1.8 1.7h20.4c1 0 1.8-.8 1.8-1.7V1.7C24 .8 23.2 0 22.2 0z"/></svg>LinkedIn</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <span>&copy; 2026 Ayan Chowdhury. Made with too much chai.</span>
+    <a href="#top">Back to top &uarr;</a>
+  </div>
+</footer>
+</body>
+</html>

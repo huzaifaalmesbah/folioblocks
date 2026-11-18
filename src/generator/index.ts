@@ -7,7 +7,8 @@ import { imageAssets } from './images';
 type ImageCredit = { title: string; creator: string; source: string; openverse: string; license: string; licenseUrl: string };
 import { patterns } from './patterns';
 import { agentsMd } from './agentsMd';
-import { colorVariations, themeJson } from './themeJson';
+import { lookDef } from './looks';
+import { colorVariations, THEME_JSON_SCHEMA, themeJson } from './themeJson';
 import { headerSafe, themeSlug } from './utils';
 
 export { themeSlug };
@@ -136,6 +137,17 @@ ${fontCredits(state)}
 `;
 }
 
+/** The look's block style variations, as Ipsum keeps them: one styles/blocks/<slug>.json each. */
+function blockStyles(state: BuilderState): ThemeFiles {
+  const defs = lookDef(state.style).blockStyles?.(state.style) ?? [];
+  return Object.fromEntries(
+    defs.map((d) => [
+      `styles/blocks/${d.slug}.json`,
+      `${JSON.stringify({ $schema: THEME_JSON_SCHEMA, version: 3, title: d.title, slug: d.slug, blockTypes: d.blockTypes, styles: d.styles }, null, '\t')}\n`,
+    ]),
+  );
+}
+
 /** Ipsum-style functions.php: each function wrapped in function_exists, with @since. */
 function functionsPhp(slug: string): string {
   const fn = slug.replace(/-/g, '_');
@@ -188,7 +200,8 @@ export function generateTheme(
   const p = patterns(state, slug);
   const files: ThemeFiles = {
     'style.css': styleCss(state, slug),
-    'theme.json': themeJson(state.style),
+    'theme.json': themeJson(state.style, lookDef(state.style)),
+    ...blockStyles(state),
     ...colorVariations(state.style),
     'functions.php': functionsPhp(slug),
     'AGENTS.md': agentsMd(state, slug),

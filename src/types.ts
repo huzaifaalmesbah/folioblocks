@@ -54,10 +54,15 @@ export type Palette = {
 
 export type Radius = 'none' | 'sm' | 'md' | 'lg';
 
+/** Extra theme CSS that gives a design its character (see generator/looks.ts). */
+export type Look = 'plain' | 'profile' | 'terminal' | 'bento' | 'sheet' | 'editorial' | 'aurora' | 'brutal' | 'journey';
+
 export type Style = {
   palette: Palette;
   fonts: { heading: FontKey; body: FontKey };
   radius: Radius;
+  /** Missing in older drafts: treated as 'plain'. */
+  look?: Look;
 };
 
 export type SectionType =

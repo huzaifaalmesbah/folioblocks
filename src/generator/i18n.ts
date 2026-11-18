@@ -39,6 +39,10 @@ const BN: Record<string, string> = {
   Services: 'সেবা',
   'Kind words': 'অন্যরা যা বলেন',
   Home: 'হোম',
+  'Based in': 'যেখানে থাকি',
+  'Find me online': 'অনলাইনে আমি',
+  'View project': 'প্রজেক্ট দেখুন',
+  whoami: 'whoami',
   About: 'পরিচিতি',
 };
 

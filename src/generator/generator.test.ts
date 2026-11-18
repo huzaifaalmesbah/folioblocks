@@ -180,3 +180,22 @@ describe('buildZip', () => {
     expect(names.every((n) => n.startsWith(`${slug}/`))).toBe(true);
   });
 });
+
+describe('optional text', () => {
+  it('leaves no empty paragraph when the tagline and other optional text are blank', async () => {
+    const { PRESETS } = await import('../presets');
+    const info = {
+      ...defaultState.info,
+      tagline: '',
+      projects: [{ title: 'P', description: '', url: '' }],
+      contributions: [{ team: 'Polyglots', description: '' }],
+      education: [{ degree: 'BSc', school: '', period: '' }],
+    };
+    for (const p of PRESETS) {
+      const { files } = generateTheme({ ...defaultState, info, preset: p.key, style: p.style, header: p.header, footer: p.footer, pages: p.pages });
+      for (const [path, content] of Object.entries(files)) {
+        expect(content.includes("esc_html__( '', "), `${p.key} ${path}`).toBe(false);
+      }
+    }
+  });
+});

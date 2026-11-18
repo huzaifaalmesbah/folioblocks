@@ -67,6 +67,13 @@ describe('settings files', () => {
     expect(parsed.layouts).toEqual(layouts);
   });
 
+  it('keeps the look, and drops one it does not know', () => {
+    const state = { ...defaultState, style: { ...defaultState.style, look: 'terminal' as const } };
+    expect(parseSettings(exportSettings(state, [])).state.style.look).toBe('terminal');
+    const bad = exportSettings({ ...state, style: { ...state.style, look: 'nope' as never } }, []);
+    expect(parseSettings(bad).state.style.look).toBeUndefined();
+  });
+
   it('rejects files that are not FolioBlocks settings', () => {
     expect(() => parseSettings('not json')).toThrow('not valid JSON');
     expect(() => parseSettings('{"hello":1}')).toThrow('not a FolioBlocks settings file');

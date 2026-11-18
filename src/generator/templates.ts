@@ -6,6 +6,9 @@
 import { block, container, group, heading, join, metaText, paragraph, pattern, separator, templatePart } from './blocks';
 import { postTemplate } from './sections';
 import type { Php } from './utils';
+import type { LookDef } from './looks';
+
+type Frame = LookDef['frame'];
 
 export type PatternDef = {
   /** Slug without the theme prefix, e.g. "hidden-single". */
@@ -37,6 +40,29 @@ function frame(php: Php, main: string, opts: { full?: boolean } = {}): string {
     }),
     footer,
   );
+}
+
+/**
+ * The frame of the Home, About and Contact templates, by look: full width
+ * (sections set their own widths), constrained (sections become cards at the
+ * content width), or a white sheet with a shadow on the page ground.
+ */
+function pageFrame(php: Php, main: string, kind?: Frame): string {
+  if (kind === 'constrained') {
+    return join(header, group(main, { name: php.name('Body'), tagName: 'main', noMargin: true, padY: 50, layout: { type: 'constrained' } }), footer);
+  }
+  if (kind === 'sheet') {
+    const sheet = group(main, {
+      name: php.name('Body'),
+      tagName: 'main',
+      background: 'accent-5',
+      shadow: 'paper',
+      pad: 50,
+      layout: { type: 'constrained' },
+    });
+    return join(header, group(sheet, { name: php.name('Sheet'), padY: 30, layout: { type: 'constrained', contentSize: '900px' } }), footer);
+  }
+  return frame(php, main, { full: true });
 }
 
 function searchForm(php: Php): string {
@@ -125,7 +151,7 @@ function comments(): string {
 }
 
 /** The hidden patterns that fill each template, and the one-line template delegates. */
-export function templates(php: Php, slug: string): { patterns: PatternDef[]; files: Record<string, string> } {
+export function templates(php: Php, slug: string, kind?: Frame): { patterns: PatternDef[]; files: Record<string, string> } {
   const hidden = (
     template: string,
     title: string,
@@ -160,19 +186,19 @@ export function templates(php: Php, slug: string): { patterns: PatternDef[]; fil
       'front-page',
       'Front Page',
       'The Front Page template. It shows the Home page pattern, full width, between the theme header and footer.',
-      frame(php, pattern(`${slug}/page-home`), { full: true }),
+      pageFrame(php, pattern(`${slug}/page-home`), kind),
     ),
     hidden(
       'page-about',
       'About',
       'The About page template. It shows the About page pattern, full width, between the theme header and footer.',
-      frame(php, pattern(`${slug}/page-about`), { full: true }),
+      pageFrame(php, pattern(`${slug}/page-about`), kind),
     ),
     hidden(
       'page-contact',
       'Contact',
       'The Contact page template. It shows the Contact page pattern, full width, between the theme header and footer.',
-      frame(php, pattern(`${slug}/page-contact`), { full: true }),
+      pageFrame(php, pattern(`${slug}/page-contact`), kind),
     ),
     hidden(
       'page',

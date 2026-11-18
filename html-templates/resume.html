@@ -1,0 +1,413 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nadia Rahman — Senior Project &amp; Operations Manager · CV</title>
+<meta name="description" content="One-page CV of Nadia Rahman, a PMP-certified project and operations manager in Dhaka with eight years of experience running logistics, retail and healthcare operations.">
+<style>
+@font-face { font-family: "Lora"; src: url("assets/fonts/lora.woff2") format("woff2"); font-weight: 400 700; font-style: normal; font-display: swap; }
+@font-face { font-family: "Inter"; src: url("assets/fonts/inter.woff2") format("woff2"); font-weight: 100 900; font-style: normal; font-display: swap; }
+
+:root {
+	/* theme.json presets */
+	--wp--preset--color--base: #ffffff;
+	--wp--preset--color--contrast: #1b1f24;
+	--wp--preset--color--primary: #1f4e5f;
+	--wp--preset--color--secondary: #eef1ef;
+	--wp--preset--color--accent: #b5652a;
+	--wp--preset--font-family--heading: "Lora", Georgia, "Times New Roman", serif;
+	--wp--preset--font-family--body: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+
+	/* derived tokens */
+	--ink: var(--wp--preset--color--contrast);
+	--ink-2: color-mix(in oklab, var(--ink) 78%, var(--wp--preset--color--base));
+	--ink-3: color-mix(in oklab, var(--ink) 60%, var(--wp--preset--color--base));
+	--line: color-mix(in oklab, var(--ink) 13%, var(--wp--preset--color--base));
+	--side-bg: color-mix(in oklab, var(--wp--preset--color--primary) 6%, var(--wp--preset--color--secondary));
+	--desk: color-mix(in oklab, var(--wp--preset--color--secondary) 70%, var(--wp--preset--color--primary) 8%);
+
+	/* sheet type scale (fixed so screen and print match) */
+	--fs-xs: 7.6pt;
+	--fs-sm: 8.3pt;
+	--fs-base: 8.9pt;
+	--fs-md: 10.2pt;
+	--fs-lg: 12pt;
+	--fs-name: 24pt;
+	--sheet-pad: 13mm;
+	--side-w: 60mm;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+	margin: 0;
+	min-height: 100vh;
+	background:
+		radial-gradient(60% 50% at 15% 0%, color-mix(in oklab, var(--wp--preset--color--accent) 10%, transparent), transparent 70%),
+		radial-gradient(50% 50% at 100% 100%, color-mix(in oklab, var(--wp--preset--color--primary) 12%, transparent), transparent 70%),
+		var(--desk);
+	color: var(--ink);
+	font-family: var(--wp--preset--font-family--body);
+	font-size: var(--fs-base);
+	line-height: 1.5;
+	-webkit-font-smoothing: antialiased;
+	font-feature-settings: "cv11", "tnum";
+	padding: clamp(16px, 5vw, 56px) clamp(12px, 3vw, 32px) clamp(80px, 10vw, 96px);
+}
+h1, h2, h3 { margin: 0; font-family: var(--wp--preset--font-family--heading); font-weight: 600; line-height: 1.2; color: var(--ink); }
+p, ul, ol, dl, dd, figure { margin: 0; padding: 0; }
+ul, ol { list-style: none; }
+img { display: block; max-width: 100%; height: auto; }
+a { color: inherit; text-decoration: none; }
+a:hover { color: var(--wp--preset--color--primary); text-decoration: underline; text-underline-offset: 2px; }
+:focus-visible { outline: 2px solid var(--wp--preset--color--accent); outline-offset: 2px; border-radius: 3px; }
+.visually-hidden { position: absolute !important; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.icon { width: 1.05em; height: 1.05em; flex: none; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+
+/* ---------- the paper sheet ---------- */
+.sheet {
+	width: 210mm;
+	min-height: 297mm;
+	margin: 0 auto;
+	background: var(--wp--preset--color--base);
+	box-shadow:
+		0 1px 2px rgb(16 24 32 / 0.06),
+		0 18px 40px -12px rgb(16 24 32 / 0.18),
+		0 50px 90px -40px rgb(16 24 32 / 0.25);
+	border-radius: 3px;
+	display: grid;
+	grid-template-columns: var(--side-w) 1fr;
+	overflow: hidden;
+	position: relative;
+}
+.sheet::before { /* thin accent rule along the top edge */
+	content: ""; position: absolute; inset: 0 0 auto 0; height: 4px;
+	background: linear-gradient(90deg, var(--wp--preset--color--primary) 0 var(--side-w), var(--wp--preset--color--accent) var(--side-w) calc(var(--side-w) + 26mm), transparent calc(var(--side-w) + 26mm));
+}
+
+/* ---------- side column ---------- */
+.side {
+	background: var(--side-bg);
+	padding: var(--sheet-pad) 8mm var(--sheet-pad) 9mm;
+	display: flex; flex-direction: column; gap: 6.2mm;
+	border-right: 1px solid var(--line);
+}
+.photo { width: 34mm; aspect-ratio: 1; border-radius: 50%; overflow: hidden; border: 1.2mm solid var(--wp--preset--color--base); box-shadow: 0 0 0 1px var(--line); margin-bottom: -1mm; }
+.photo img { width: 100%; height: 100%; object-fit: cover; }
+.side h2 {
+	font-family: var(--wp--preset--font-family--body);
+	font-size: var(--fs-xs); font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase;
+	color: var(--wp--preset--color--primary);
+	padding-bottom: 1.6mm; margin-bottom: 2.6mm;
+	border-bottom: 1px solid color-mix(in oklab, var(--wp--preset--color--primary) 25%, transparent);
+}
+.contact-list { display: grid; gap: 2mm; font-size: var(--fs-sm); }
+.contact-list li { display: grid; grid-template-columns: 4.2mm 1fr; gap: 2mm; align-items: start; overflow-wrap: anywhere; line-height: 1.35; }
+.contact-list .icon { margin-top: 0.3mm; color: var(--wp--preset--color--primary); }
+.skills { display: grid; gap: 2.2mm; }
+.skill { display: grid; grid-template-columns: 1fr auto; gap: 0.8mm 2mm; font-size: var(--fs-sm); line-height: 1.25; }
+.skill span { color: var(--ink-3); font-size: var(--fs-xs); }
+.bar { grid-column: 1 / -1; height: 1.3mm; border-radius: 1mm; background: color-mix(in oklab, var(--wp--preset--color--primary) 14%, var(--wp--preset--color--base)); overflow: hidden; }
+.bar::before { content: ""; display: block; height: 100%; width: var(--level); background: var(--wp--preset--color--primary); border-radius: inherit; }
+.tags { display: flex; flex-wrap: wrap; gap: 1.4mm; }
+.tags li { font-size: var(--fs-xs); padding: 0.5mm 2mm; border-radius: 3mm; background: var(--wp--preset--color--base); border: 1px solid var(--line); color: var(--ink-2); }
+.langs { display: grid; gap: 1.4mm; font-size: var(--fs-sm); }
+.langs li { display: flex; justify-content: space-between; gap: 2mm; }
+.langs span { color: var(--ink-3); }
+.certs { display: grid; gap: 2.2mm; font-size: var(--fs-sm); line-height: 1.35; }
+.certs strong { display: block; font-weight: 600; }
+.certs span { color: var(--ink-3); font-size: var(--fs-xs); }
+
+/* ---------- main column ---------- */
+.main { padding: var(--sheet-pad) var(--sheet-pad) var(--sheet-pad) 10mm; display: flex; flex-direction: column; gap: 5.4mm; }
+.head { padding-top: 1mm; }
+.head h1 { font-size: var(--fs-name); font-weight: 600; letter-spacing: -0.01em; line-height: 1.05; }
+.head .role { margin-top: 1.8mm; font-size: var(--fs-md); font-weight: 600; color: var(--wp--preset--color--accent); letter-spacing: 0.01em; }
+.summary { margin-top: -2.4mm; color: var(--ink-2); line-height: 1.55; }
+.keys { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2.5mm; margin-top: 3.6mm; }
+.keys li { border-left: 2px solid var(--wp--preset--color--accent); padding: 0.4mm 0 0.4mm 2.6mm; font-size: var(--fs-xs); color: var(--ink-3); line-height: 1.3; }
+.keys strong { display: block; font: 600 var(--fs-lg)/1.1 var(--wp--preset--font-family--heading); color: var(--ink); }
+
+.main h2 {
+	display: flex; align-items: center; gap: 3mm;
+	font-size: var(--fs-lg); font-weight: 600;
+	margin-bottom: 2.6mm;
+}
+.main h2::after { content: ""; flex: 1; height: 1px; background: var(--line); }
+
+.entries { display: grid; gap: 3.4mm; }
+.entry { break-inside: avoid; page-break-inside: avoid; }
+.entry__head { display: flex; justify-content: space-between; align-items: baseline; gap: 3mm; }
+.entry h3 { font-family: var(--wp--preset--font-family--body); font-size: var(--fs-md); font-weight: 650; letter-spacing: -0.005em; }
+.entry .when { flex: none; font-size: var(--fs-xs); font-weight: 600; color: var(--wp--preset--color--primary); letter-spacing: 0.02em; white-space: nowrap; }
+.entry .org { font-size: var(--fs-sm); color: var(--ink-3); margin-top: 0.3mm; }
+.entry .org b { color: var(--ink-2); font-weight: 600; }
+.bullets { margin-top: 1.4mm; display: grid; gap: 0.9mm; }
+.bullets li { position: relative; padding-left: 3.6mm; color: var(--ink-2); line-height: 1.45; }
+.bullets li::before { content: ""; position: absolute; left: 0.4mm; top: 0.62em; width: 1.3mm; height: 1.3mm; border-radius: 50%; background: var(--wp--preset--color--accent); }
+.bullets strong { color: var(--ink); font-weight: 600; }
+
+.projects { display: grid; grid-template-columns: 1fr 1fr; gap: 3mm; }
+.project { break-inside: avoid; padding: 2.6mm 3mm; border: 1px solid var(--line); border-radius: 2mm; }
+.project h3 { font-family: var(--wp--preset--font-family--body); font-size: var(--fs-base); font-weight: 650; }
+.project p { margin-top: 0.8mm; font-size: var(--fs-sm); color: var(--ink-2); line-height: 1.42; }
+.project a { display: inline-block; margin-top: 1mm; font-size: var(--fs-xs); color: var(--wp--preset--color--primary); font-weight: 600; }
+
+.split { display: grid; grid-template-columns: 1fr 1fr; gap: 5mm; }
+.edu { display: grid; gap: 2.4mm; }
+.edu li { break-inside: avoid; font-size: var(--fs-sm); line-height: 1.38; }
+.edu strong { display: block; font-size: var(--fs-base); font-weight: 650; color: var(--ink); }
+.edu span { color: var(--ink-3); }
+.awards { display: grid; gap: 1.6mm; }
+.awards li { break-inside: avoid; display: grid; grid-template-columns: 3.8mm 1fr; gap: 1.6mm; font-size: var(--fs-sm); color: var(--ink-2); line-height: 1.38; }
+.awards .icon { color: var(--wp--preset--color--accent); margin-top: 0.3mm; }
+.awards strong { color: var(--ink); font-weight: 600; }
+
+.foot { margin-top: auto; padding-top: 2mm; font-size: var(--fs-xs); color: var(--ink-3); border-top: 1px dashed var(--line); }
+
+/* ---------- floating download button ---------- */
+.print-btn {
+	position: fixed; right: clamp(14px, 3vw, 32px); bottom: clamp(14px, 3vw, 32px); z-index: 10;
+	display: inline-flex; align-items: center; gap: 10px;
+	padding: 13px 20px 13px 16px; border: 0; border-radius: 999px; cursor: pointer;
+	background: var(--wp--preset--color--primary); color: var(--wp--preset--color--base);
+	font: 600 15px/1 var(--wp--preset--font-family--body);
+	box-shadow: 0 10px 30px -8px color-mix(in oklab, var(--wp--preset--color--primary) 70%, transparent), 0 2px 6px rgb(0 0 0 / 0.12);
+	transition: transform .18s ease, box-shadow .18s ease, background-color .18s ease;
+}
+.print-btn:hover { transform: translateY(-2px); background: color-mix(in oklab, var(--wp--preset--color--primary) 85%, black); }
+.print-btn:focus-visible { outline: 3px solid var(--wp--preset--color--accent); outline-offset: 3px; }
+.print-btn .icon { width: 18px; height: 18px; }
+.print-hint { max-width: 210mm; margin: 14px auto 0; text-align: center; font-size: 13px; color: color-mix(in oklab, var(--ink) 62%, var(--desk)); }
+
+/* ---------- smaller screens: the sheet becomes a fluid card ---------- */
+@media screen and (max-width: 860px) {
+	:root { --fs-xs: 0.74rem; --fs-sm: 0.82rem; --fs-base: 0.9rem; --fs-md: 1rem; --fs-lg: clamp(1.05rem, 1rem + 0.4vw, 1.2rem); --fs-name: clamp(1.7rem, 1.3rem + 2.2vw, 2.2rem); --sheet-pad: clamp(20px, 5vw, 36px); }
+	.sheet { width: 100%; max-width: 720px; min-height: 0; grid-template-columns: 1fr; border-radius: 12px; }
+	.sheet::before { background: linear-gradient(90deg, var(--wp--preset--color--primary) 0 40%, var(--wp--preset--color--accent) 40% 60%, transparent 60%); }
+	.side { order: 2; border-right: 0; border-top: 1px solid var(--line); padding: var(--sheet-pad); display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr)); gap: 24px 28px; }
+	.side .photo { display: none; }
+	.main { order: 1; padding: var(--sheet-pad); gap: 26px; }
+	.head { display: grid; grid-template-columns: auto 1fr; column-gap: 16px; align-items: center; }
+	.head::before { content: ""; grid-row: 1 / span 2; grid-column: 1; width: 64px; height: 64px; border-radius: 50%; background: url("assets/images/avatar.webp") center / cover; }
+	.summary { margin-top: -10px; }
+	.keys { gap: 10px; }
+	.entries { gap: 18px; }
+	.bullets { gap: 6px; margin-top: 8px; }
+	.bullets li { padding-left: 16px; }
+	.bullets li::before { width: 6px; height: 6px; left: 2px; }
+	.projects, .split { gap: 14px; }
+	.project { padding: 12px 14px; border-radius: 10px; }
+	.side h2 { padding-bottom: 6px; margin-bottom: 10px; }
+	.contact-list, .skills, .certs { gap: 9px; }
+	.contact-list li { grid-template-columns: 18px 1fr; gap: 8px; }
+	.awards li { grid-template-columns: 16px 1fr; gap: 8px; }
+	.bar { height: 5px; }
+	.tags { gap: 6px; } .tags li { padding: 2px 9px; border-radius: 99px; }
+	.print-hint { display: none; }
+}
+@media screen and (max-width: 560px) {
+	.projects, .split { grid-template-columns: 1fr; }
+	.keys { grid-template-columns: 1fr 1fr 1fr; }
+	.entry__head { flex-direction: column; gap: 2px; }
+	.print-btn span { display: none; }
+	.print-btn { padding: 15px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+	*, *::before, *::after { transition: none !important; animation: none !important; }
+}
+
+/* ---------- print: exactly one A4 page ---------- */
+@page { size: A4; margin: 10mm 12mm; }
+@media print {
+	:root { --sheet-pad: 0mm; --fs-base: 8.6pt; --fs-sm: 8.1pt; --fs-md: 9.9pt; --fs-lg: 11.5pt; --fs-name: 23pt; }
+	.main { gap: 4.2mm; }
+	.side { gap: 5.2mm; }
+	.entries { gap: 2.8mm; }
+	.bullets { gap: 0.6mm; margin-top: 1.1mm; }
+	.bullets li { line-height: 1.4; }
+	.main h2 { margin-bottom: 2mm; }
+	.keys { margin-top: 3mm; }
+	html, body { background: #fff !important; padding: 0; margin: 0; min-height: 0; }
+	body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+	.print-btn, .print-hint { display: none !important; }
+	.sheet { width: auto; min-height: 0; height: auto; box-shadow: none; border-radius: 0; background: none; overflow: visible; grid-template-columns: 56mm 1fr; }
+	.sheet::before { display: none; }
+	.side { background: none; padding: 0 6mm 0 0; border-right: 0.6pt solid var(--line); }
+	.main { padding: 0 0 0 7mm; }
+	.photo { width: 30mm; box-shadow: none; border: 0.6pt solid var(--line); }
+	.tags li { background: none; }
+	.project { border-width: 0.6pt; }
+	a { text-decoration: none !important; color: inherit !important; }
+	/* show the address of links whose visible text is not already the address */
+	a[data-print]::after { content: " · " attr(data-print); font-weight: 500; color: var(--ink-3); }
+	.entry, .project, .edu li, .awards li, .skill, .certs li { break-inside: avoid; page-break-inside: avoid; }
+	h2 { break-after: avoid; page-break-after: avoid; }
+	.foot { border-top-width: 0.6pt; }
+}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+	<symbol id="i-mail" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="m4 7 8 6 8-6"/></symbol>
+	<symbol id="i-phone" viewBox="0 0 24 24"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z"/></symbol>
+	<symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></symbol>
+	<symbol id="i-link" viewBox="0 0 24 24"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></symbol>
+	<symbol id="i-in" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M8 10.5V16M8 7.6v.1M12 16v-3.2a2.3 2.3 0 0 1 4.6 0V16M12 10.5V16"/></symbol>
+	<symbol id="i-award" viewBox="0 0 24 24"><circle cx="12" cy="9" r="6"/><path d="m8.5 14-1.5 7 5-3 5 3-1.5-7"/></symbol>
+	<symbol id="i-download" viewBox="0 0 24 24"><path d="M12 4v11m0 0-4.5-4.5M12 15l4.5-4.5M5 20h14"/></symbol>
+</svg>
+
+<main>
+<article class="sheet" aria-label="Curriculum vitae of Nadia Rahman">
+
+	<!-- SIDE COLUMN -->
+	<aside class="side">
+		<figure class="photo"><img src="assets/images/avatar.webp" width="800" height="800" alt="Portrait of Nadia Rahman"></figure>
+
+		<section data-section="contact" aria-labelledby="h-contact">
+			<h2 id="h-contact">Contact</h2>
+			<ul class="contact-list">
+				<li><svg class="icon" aria-hidden="true"><use href="#i-mail"/></svg><a href="mailto:nadia.rahman@mailbox.bd">nadia.rahman@mailbox.bd</a></li>
+				<li><svg class="icon" aria-hidden="true"><use href="#i-phone"/></svg><a href="tel:+8801800000000">+880 1800-000000</a></li>
+				<li><svg class="icon" aria-hidden="true"><use href="#i-pin"/></svg><span>Uttara, Dhaka 1230, Bangladesh</span></li>
+				<li><svg class="icon" aria-hidden="true"><use href="#i-in"/></svg><a href="https://www.linkedin.com/in/nadiarahman-pm">linkedin.com/in/nadiarahman-pm</a></li>
+				<li><svg class="icon" aria-hidden="true"><use href="#i-link"/></svg><a href="https://nadiarahman.work">nadiarahman.work</a></li>
+			</ul>
+		</section>
+
+		<section data-section="skills" aria-labelledby="h-skills">
+			<h2 id="h-skills">Core skills</h2>
+			<ul class="skills">
+				<li class="skill">Project delivery (PMBOK, Agile) <span>Expert</span><i class="bar" style="--level: 95%" aria-hidden="true"></i></li>
+				<li class="skill">Process improvement / Lean <span>Expert</span><i class="bar" style="--level: 90%" aria-hidden="true"></i></li>
+				<li class="skill">Budgeting &amp; vendor management <span>Advanced</span><i class="bar" style="--level: 82%" aria-hidden="true"></i></li>
+				<li class="skill">Stakeholder &amp; team leadership <span>Advanced</span><i class="bar" style="--level: 85%" aria-hidden="true"></i></li>
+				<li class="skill">Data &amp; reporting (SQL, Power BI) <span>Proficient</span><i class="bar" style="--level: 70%" aria-hidden="true"></i></li>
+			</ul>
+		</section>
+
+		<div class="side-group">
+			<h2 id="h-tools">Tools</h2>
+			<ul class="tags">
+				<li>Jira</li><li>Asana</li><li>MS Project</li><li>Power BI</li><li>Excel / Sheets</li><li>SAP MM</li><li>Odoo</li><li>Miro</li>
+			</ul>
+		</div>
+
+		<div class="side-group">
+			<h2 id="h-langs">Languages</h2>
+			<ul class="langs">
+				<li>Bangla <span>Native</span></li>
+				<li>English <span>Fluent (C1)</span></li>
+				<li>Hindi / Urdu <span>Conversational</span></li>
+			</ul>
+		</div>
+
+		<div class="side-group">
+			<h2 id="h-certs">Certifications</h2>
+			<ul class="certs">
+				<li><strong>PMP® — Project Management Professional</strong><span>PMI · 2022</span></li>
+				<li><strong>Lean Six Sigma Green Belt</strong><span>IASSC · 2021</span></li>
+				<li><strong>Professional Scrum Master I</strong><span>Scrum.org · 2023</span></li>
+			</ul>
+		</div>
+	</aside>
+
+	<!-- MAIN COLUMN -->
+	<div class="main">
+		<section data-section="hero" class="head" aria-labelledby="h-name">
+			<h1 id="h-name">Nadia Rahman</h1>
+			<p class="role">Senior Project &amp; Operations Manager</p>
+		</section>
+
+		<section data-section="about" class="intro" aria-label="Summary">
+			<div class="summary">
+				<p>PMP-certified operations lead with 8 years running logistics, retail and healthcare projects in Bangladesh. I turn messy processes into calm, measurable ones: clear owners, honest dashboards and teams that hit their dates. Looking for a Head of Operations or Senior PM role in a growing company.</p>
+			</div>
+			<ul class="keys">
+				<li><strong>৳18 cr</strong>yearly costs saved across programmes</li>
+				<li><strong>42</strong>projects delivered, 93% on time</li>
+				<li><strong>120+</strong>people led across 6 sites</li>
+			</ul>
+		</section>
+
+		<section data-section="experience" aria-labelledby="h-exp">
+			<h2 id="h-exp">Experience</h2>
+			<ol class="entries">
+				<li class="entry">
+					<div class="entry__head"><h3>Senior Project Manager, Operations</h3><span class="when">Jan 2023 — Present</span></div>
+					<p class="org"><b>Meghna Freight &amp; Logistics Ltd.</b> · Tejgaon, Dhaka</p>
+					<ul class="bullets">
+						<li>Led the roll-out of a warehouse management system across <strong>4 depots (310,000 sq ft)</strong>; picking errors fell from <strong>3.1% to 0.6%</strong> in six months.</li>
+						<li>Re-planned the Dhaka–Chattogram linehaul schedule, raising truck utilisation from <strong>64% to 86%</strong> and saving <strong>৳7.4 crore a year</strong>.</li>
+						<li>Run a portfolio of 9 projects (৳22 crore budget) with a monthly steering group of the CEO, CFO and two client sponsors.</li>
+					</ul>
+				</li>
+				<li class="entry">
+					<div class="entry__head"><h3>Project Manager</h3><span class="when">Mar 2020 — Dec 2022</span></div>
+					<p class="org"><b>Shapla Retail Group</b> · 140 supermarkets nationwide</p>
+					<ul class="bullets">
+						<li>Opened <strong>27 new stores in 30 months</strong>, each within ±5% of budget, by building a reusable launch playbook and vendor scorecard.</li>
+						<li>Moved stock replenishment to a weekly demand forecast in Power BI, cutting out-of-stock items by <strong>41%</strong>.</li>
+						<li>Kept home delivery running through COVID-19 by setting up 3 dark stores in <strong>19 days</strong>.</li>
+					</ul>
+				</li>
+				<li class="entry">
+					<div class="entry__head"><h3>Operations Executive → Senior Executive</h3><span class="when">Jul 2017 — Feb 2020</span></div>
+					<p class="org"><b>Padma Diagnostic &amp; Health Network</b> · Dhaka</p>
+					<ul class="bullets">
+						<li>Redesigned the patient sample flow for 12 collection points, cutting average report time from <strong>36 to 20 hours</strong>.</li>
+						<li>Negotiated reagent contracts with 6 suppliers, lowering yearly purchasing cost by <strong>14%</strong>.</li>
+					</ul>
+				</li>
+			</ol>
+		</section>
+
+		<section data-section="projects" aria-labelledby="h-proj">
+			<h2 id="h-proj">Selected projects</h2>
+			<ul class="projects">
+				<li class="project">
+					<h3>Last-mile delivery pilot, Sylhet</h3>
+					<p>Ran a 90-day pilot with 40 riders and route software; cost per parcel fell by 23% and the model was rolled out to 3 more cities.</p>
+					<a href="https://nadiarahman.work/case/last-mile" data-print="nadiarahman.work/case/last-mile">Case study</a>
+				</li>
+				<li class="project">
+					<h3>Paperless store audits</h3>
+					<p>Replaced paper checklists with a mobile form and live dashboard for 140 stores, saving about 1,100 manager hours a year.</p>
+					<a href="https://nadiarahman.work/case/store-audits" data-print="nadiarahman.work/case/store-audits">Case study</a>
+				</li>
+			</ul>
+		</section>
+
+		<div class="split">
+			<section data-section="education" aria-labelledby="h-edu">
+				<h2 id="h-edu">Education</h2>
+				<ul class="edu">
+					<li><strong>MBA, Operations &amp; Supply Chain</strong>Institute of Business Studies, Dhaka<br><span>2018 — 2020 · CGPA 3.82 / 4.00</span></li>
+					<li><strong>BSc in Industrial &amp; Production Eng.</strong>Jamuna University of Engineering<br><span>2012 — 2016 · First class</span></li>
+				</ul>
+			</section>
+
+			<section data-section="achievements" aria-labelledby="h-ach">
+				<h2 id="h-ach">Achievements</h2>
+				<ul class="awards">
+					<li><svg class="icon" aria-hidden="true"><use href="#i-award"/></svg><span><strong>Operations Leader of the Year</strong>, Meghna Freight, 2024</span></li>
+					<li><svg class="icon" aria-hidden="true"><use href="#i-award"/></svg><span><strong>Speaker</strong>, Bangladesh Supply Chain Summit, 2025</span></li>
+					<li><svg class="icon" aria-hidden="true"><use href="#i-award"/></svg><span><strong>Mentor</strong> to 15 young women in the WiLead programme</span></li>
+				</ul>
+			</section>
+		</div>
+
+		<p class="foot">References available on request · Updated November 2026</p>
+	</div>
+</article>
+<p class="print-hint">Tip: in the print dialog choose “Save as PDF”, paper size A4, and turn off headers and footers.</p>
+</main>
+
+<button class="print-btn" type="button" onclick="window.print()">
+	<svg class="icon" aria-hidden="true"><use href="#i-download"/></svg><span>Download PDF</span>
+</button>
+</body>
+</html>
