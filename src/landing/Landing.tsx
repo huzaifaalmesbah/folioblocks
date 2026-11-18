@@ -1,6 +1,7 @@
 import { useEffect, useState, type ReactNode } from 'react';
 import { PRESETS } from '../presets';
 import { DesignMock } from '../ui/DesignMock';
+import { PublishGuide } from '../ui/PublishGuide';
 import { themeSlug } from '../generator/utils';
 import { REPO_URL } from '../config';
 import { LangToggle } from '../i18n/LangToggle';
@@ -12,9 +13,7 @@ import {
   PROMPTS,
   SKILLS,
   SKILLS_REPO,
-  STUDIO_STEPS,
   WPCOM_LINKS,
-  WPCOM_UPLOAD_STEPS,
 } from './content';
 
 const REPO = REPO_URL;
@@ -120,7 +119,7 @@ export function Landing() {
           <div className="hidden items-center gap-5 text-sm text-slate-600 md:flex">
             <a href="#designs" className="hover:text-slate-900">Templates</a>
             <a href="#ai" className="hover:text-slate-900">AI guide</a>
-            <a href="#wordpress-com" className="hover:text-slate-900">WordPress.com</a>
+            <a href="#/guide" className="hover:text-slate-900">Guide</a>
             <a href="#/translate" className="hover:text-slate-900">Translate</a>
             <a href={REPO} className="hover:text-slate-900">GitHub</a>
           </div>
@@ -238,8 +237,8 @@ export function Landing() {
                 </article>
               ))}
             </div>
-            <ol className="mx-auto mt-16 grid max-w-4xl gap-4 sm:grid-cols-4">
-              {['Add your info and photos', 'Choose colours and fonts', 'Arrange your pages', 'Download, or open in Playground'].map((t, i) => (
+            <ol className="mx-auto mt-16 grid max-w-5xl gap-4 sm:grid-cols-5">
+              {['Pick a template', 'Add your info and photos', 'Choose colours and fonts', 'Arrange your pages', 'Download and publish'].map((t, i) => (
                 <li key={t} className="rounded-lg bg-slate-50 p-4 text-sm">
                   <span className="font-bold text-blue-700">Step {i + 1}</span>
                   <span className="mt-1 block text-slate-700">{t}</span>
@@ -339,48 +338,26 @@ export function Landing() {
           </div>
         </section>
 
-        {/* WordPress.com */}
+        {/* Publish */}
         <section className="py-20">
           <div className="mx-auto max-w-3xl px-4 sm:px-6">
-            <SectionHeading id="wordpress-com" eyebrow="Publish" title="Put your theme on WordPress.com" />
-
+            {/* Older links point at #wordpress-com. */}
+            <span id="wordpress-com" />
+            <SectionHeading id="publish" eyebrow="Publish" title="From zip to a live site">
+              Install your theme on any WordPress site, make it yours in the Site Editor, and add pages and posts.
+            </SectionHeading>
             <p className="mt-10 rounded-xl border border-blue-200 bg-blue-50 p-4 text-slate-800">
               <span aria-hidden>🎓 </span>
               <strong>Students:</strong> the free WordPress.com Student plan (first year free) can upload themes.{' '}
               <a className="text-blue-800 underline" href={WPCOM_LINKS.studentPlan}>Details</a>
             </p>
-
-            <div className="mt-6 rounded-xl border border-slate-200 p-6 shadow-sm">
-              <h3 className="text-lg font-semibold">Upload your theme</h3>
-              <ol className="mt-4 list-decimal space-y-2 pl-5 text-slate-700">
-                {WPCOM_UPLOAD_STEPS.map((s) => (
-                  <li key={s}>{s}</li>
-                ))}
-              </ol>
-              <p className="mt-4 text-sm text-slate-600">Tip: change colours, fonts and text any time in Appearance → Editor.</p>
+            <div className="mt-6">
+              <PublishGuide />
             </div>
-
-            <details className="group mt-4 rounded-xl border border-slate-200">
-              <summary className="flex cursor-pointer list-none items-center gap-3 px-6 py-4">
-                <span className="flex-1 font-semibold">Advanced: build locally with WordPress Studio</span>
-                <span aria-hidden className="text-slate-400 transition group-open:rotate-90">›</span>
-              </summary>
-              <div className="px-6 pb-6">
-                <ol className="list-decimal space-y-2 pl-5 text-slate-700">
-                  {STUDIO_STEPS.map((s) => (
-                    <li key={s}>{s}</li>
-                  ))}
-                </ol>
-                <p className="mt-3 text-sm text-slate-600">
-                  Publish only your theme the first time: "Content and settings" replaces the live site's content.{' '}
-                  <a className="text-blue-700 underline" href={WPCOM_LINKS.studioSync}>Studio Sync docs</a>
-                </p>
-              </div>
-            </details>
-
-            <p className="mt-6 text-sm text-slate-500">
-              Not a student? Theme upload needs the Personal plan or higher; the Free plan can't upload themes.{' '}
-              <a className="underline" href={WPCOM_LINKS.upload}>WordPress.com guide</a>
+            <p className="mt-6 text-center">
+              <a href="#/guide" className="inline-block rounded-lg border border-slate-300 px-5 py-2.5 font-semibold text-slate-800 hover:bg-slate-50">
+                Read the full guide →
+              </a>
             </p>
           </div>
         </section>

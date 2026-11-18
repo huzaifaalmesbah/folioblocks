@@ -121,20 +121,6 @@ Then build it following WordPress' Ipsum conventions: templates and parts delega
 
 Run it with wp-env, check every template in the Site Editor for invalid blocks, and finally zip it with the theme folder at the root of the zip.`;
 
-export const WPCOM_UPLOAD_STEPS = [
-  'Download your zip from FolioBlocks. Don\'t unzip it.',
-  'In WordPress.com, go to Appearance → Themes → Add Theme → Upload Theme, choose the zip, click "Install Now", then "Activate".',
-  'Create the pages Home, About, Blog and Contact. Give About and Contact the "About" and "Contact" template.',
-  'In Settings → Reading, choose "A static page": Homepage = Home, Posts page = Blog.',
-]
-
-export const STUDIO_STEPS = [
-  'Install WordPress Studio (free, from wordpress.studio) and create a local site.',
-  'Open the local site\'s WP Admin and install your zip the same way: Appearance → Themes → Add New Theme → Upload Theme → Activate.',
-  'Customize locally, by hand or with an AI agent and the prompts above.',
-  'Click "Publish" in Studio, connect your WordPress.com site, choose "Choose files…", tick your theme under themes, and publish.',
-];
-
 export const WPCOM_LINKS = {
   upload: 'https://wordpress.com/support/themes/uploading-setting-up-custom-themes/',
   studio: 'https://wordpress.studio/',
@@ -166,7 +152,7 @@ export const INSTALL_PLACES: GuidePart[] = [
   {
     id: 'wpcom',
     title: 'WordPress.com',
-    text: 'Uploading a theme needs a plan that allows it. Students: the free WordPress.com Student plan can upload themes.',
+    text: 'Theme upload needs the Personal plan or higher; the Free plan can\'t. Students: the free WordPress.com Student plan (first year free) can upload themes.',
     steps: [
       'In WordPress.com, go to Appearance → Themes.',
       'Click "Add Theme", then "Upload Theme", and choose your zip.',
@@ -184,7 +170,7 @@ export const INSTALL_PLACES: GuidePart[] = [
     steps: [
       'Install WordPress Studio and create a local site.',
       'Open the site\'s WP Admin: Appearance → Themes → Add New Theme → Upload Theme → Activate.',
-      'When you are happy, publish it to WordPress.com from Studio.',
+      'When you are happy, publish it to WordPress.com from Studio. The first time, publish only your theme: "Content and settings" replaces the live site\'s content.',
     ],
     links: [
       { label: 'WordPress Studio', url: WPCOM_LINKS.studio },

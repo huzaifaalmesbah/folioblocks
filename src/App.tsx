@@ -6,18 +6,22 @@ import { useBuilder } from './store';
 
 // The builder (generator, zip, drag-and-drop) loads only when it is opened, so the home page stays light.
 const Builder = lazy(() => import('./Builder').then((m) => ({ default: m.Builder })));
+const GuidePage = lazy(() => import('./guide/GuidePage').then((m) => ({ default: m.GuidePage })));
 const TranslatePage = lazy(() => import('./translate/TranslatePage').then((m) => ({ default: m.TranslatePage })));
 
 /**
- * Three views on one static page (GitHub Pages has no server routing):
- * `#/build` is the builder, `#/translate` the translation page; anything
- * else is the home page, whose own section links (#ai, #wordpress-com)
- * scroll within it.
+ * Views on one static page (GitHub Pages has no server routing): `#/build`
+ * is the builder, `#/guide` the publishing guide, `#/translate` the
+ * translation page; anything else is the home page, whose own section
+ * links (#ai, #publish) scroll within it.
  */
-type View = 'home' | 'builder' | 'translate';
+type View = 'home' | 'builder' | 'guide' | 'translate';
 function currentView(): View {
   const h = window.location.hash;
-  return h.startsWith('#/build') ? 'builder' : h.startsWith('#/translate') ? 'translate' : 'home';
+  if (h.startsWith('#/build')) return 'builder';
+  if (h.startsWith('#/guide')) return 'guide';
+  if (h.startsWith('#/translate')) return 'translate';
+  return 'home';
 }
 
 export default function App() {
@@ -51,6 +55,8 @@ export default function App() {
         ? tr('Build your theme · FolioBlocks')
         : view === 'translate'
           ? tr('Help translate · FolioBlocks')
+          : view === 'guide'
+            ? tr('Publish your site · FolioBlocks')
           : tr('FolioBlocks: build your WordPress portfolio theme');
     document.documentElement.lang = lang;
     document.documentElement.dir = languageMeta(lang).dir;
@@ -67,6 +73,10 @@ export default function App() {
       {builder ? (
         <Suspense fallback={<p className="p-8 text-slate-600">Loading the builder…</p>}>
           <Builder />
+        </Suspense>
+      ) : view === 'guide' ? (
+        <Suspense fallback={<p className="p-8 text-slate-600">Loading…</p>}>
+          <GuidePage />
         </Suspense>
       ) : view === 'translate' ? (
         <Suspense fallback={<p className="p-8 text-slate-600">Loading…</p>}>

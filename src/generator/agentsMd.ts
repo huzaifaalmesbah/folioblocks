@@ -1,5 +1,6 @@
 import { fontDef, type FontKey } from '../fonts';
 import { languageMeta, SOURCE } from '../i18n/languages';
+import { DEV_DOCS } from '../landing/content';
 import type { BuilderState } from '../types';
 import { headerSafe } from './utils';
 
@@ -48,6 +49,10 @@ npx skills add WordPress/agent-skills --skill wp-block-themes wp-patterns wp-env
 - **Leave out editor leftovers**: \`queryId\`, \`theme\` and \`area\` on template parts, \`patternName\`.
 - **New fonts or images** must be GPL-compatible (OFL fonts, CC0 images) and credited in \`readme.txt\`.
 - **Do not invent facts** about ${name}. Ask for missing details.
+
+## WordPress docs
+
+${DEV_DOCS.map((d) => `- ${d.label}: ${d.url}`).join('\n')}
 
 ## Checking your work
 

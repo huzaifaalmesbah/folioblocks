@@ -1,4 +1,6 @@
 import { fontAssets, fontDef, type ThemeAsset } from '../fonts';
+import { SITE_URL } from '../config';
+import { USER_DOCS } from '../landing/content';
 import { withSamples } from '../samples';
 import type { BuilderState, ThemeFiles } from '../types';
 import IMAGE_CREDITS from './imageCredits.json';
@@ -102,6 +104,12 @@ A block theme with home, about, contact, blog and single post layouts, and colou
 2. Choose the zip file, click Install Now, then Activate.
 3. Create the pages Home, About (template: About), Blog and Contact (template: Contact).
 4. In Settings > Reading, choose "A static page": Homepage = Home, Posts page = Blog.
+5. To change colours, fonts, the menu or any section, go to Appearance > Editor.
+
+Step-by-step guide: ${SITE_URL}#/guide
+
+WordPress help:
+${USER_DOCS.map((d) => `* ${d.label}: ${d.url}`).join('\n')}
 
 == Changelog ==
 
