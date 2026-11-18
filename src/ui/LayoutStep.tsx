@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { tr } from '../i18n/ui';
 import { fontDef } from '../fonts';
-import { PRESETS } from '../presets';
+import { presetByKey, PRESETS } from '../presets';
 import { useBuilder } from '../store';
 import type { FooterVariant, HeaderVariant, PageKey } from '../types';
 import { inputCls, SectionTitle, Select } from './fields';
@@ -19,14 +19,14 @@ export function LayoutStep() {
 
   function chooseSaved(key: string) {
     if (key === preset) return;
-    if (confirm(tr('Switch to this saved layout? This replaces your colours, fonts and sections. Your info stays.'))) {
+    if (confirm(tr('Use this saved design? Your colours, fonts, section style and page sections change to it. Your info stays.'))) {
       applyLayout(key);
     }
   }
 
   function choosePreset(key: string) {
     if (key === preset) return;
-    if (confirm(tr('Switch layout? This replaces your colours, fonts and section choices. Your info stays.'))) {
+    if (confirm(tr('Use the {name} template? Your colours, fonts, section style and page sections change to the template\'s. Your info stays.', { name: tr(presetByKey(key).label) }))) {
       applyPreset(key);
     }
   }
@@ -72,7 +72,7 @@ export function LayoutStep() {
       </section>
 
       <section className="space-y-3">
-        <SectionTitle>My layouts</SectionTitle>
+        <SectionTitle>My saved designs</SectionTitle>
         {savedLayouts.length > 0 && (
           <ul className="space-y-2">
             {savedLayouts.map((l) => (
@@ -98,8 +98,8 @@ export function LayoutStep() {
                 </button>
                 <button
                   type="button"
-                  aria-label={tr('Delete saved layout {name}', { name: l.label })}
-                  onClick={() => confirm(tr('Delete the saved layout "{name}"?', { name: l.label })) && deleteLayout(l.key)}
+                  aria-label={tr('Delete saved design {name}', { name: l.label })}
+                  onClick={() => confirm(tr('Delete the saved design "{name}"?', { name: l.label })) && deleteLayout(l.key)}
                   className="rounded-md px-2 py-1 text-xs text-red-700 hover:bg-red-50"
                 >
                   Delete
@@ -117,10 +117,10 @@ export function LayoutStep() {
           }}
         >
           <label className="flex-1">
-            <span className="sr-only">Name for this layout</span>
+            <span className="sr-only">Name for this design</span>
             <input
               className={`${inputCls} mt-0`}
-              placeholder="Name this layout, e.g. Night mode"
+              placeholder="Name this design, e.g. Night mode"
               value={layoutName}
               maxLength={60}
               onChange={(e) => setLayoutName(e.target.value)}
@@ -133,7 +133,7 @@ export function LayoutStep() {
             Save current
           </button>
         </form>
-        <p className="text-xs text-slate-500">Saves your colours, fonts and sections (not your info) so you can switch back later.</p>
+        <p className="text-xs text-slate-500">Saves your colours, fonts, section style and sections (not your info) so you can switch back later.</p>
       </section>
 
       <section className="space-y-3">

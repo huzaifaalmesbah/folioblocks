@@ -70,7 +70,7 @@ export const LOOKS: Record<Look, LookDef> = {
   plain: { label: 'Plain', description: 'Just your colours and fonts.' },
 
   profile: {
-    label: 'Profile',
+    label: 'Cards',
     description: 'Each section on its own card, like a social profile.',
     settings: () => ({
       layout: { contentSize: '880px' },
@@ -84,8 +84,8 @@ export const LOOKS: Record<Look, LookDef> = {
   },
 
   terminal: {
-    label: 'Terminal',
-    description: 'A terminal window, $ prompts before headings, outlined panes and buttons.',
+    label: 'Code panes',
+    description: 'A $ before each heading, outlined panes and buttons, like a code editor.',
     settings: () => ({
       layout: { contentSize: '960px' },
       shadow: { defaultPresets: false, presets: [{ slug: 'deep', name: 'Deep', shadow: '0 30px 80px -40px rgba(0, 0, 0, 0.6)' }] },
@@ -107,8 +107,8 @@ export const LOOKS: Record<Look, LookDef> = {
   },
 
   bento: {
-    label: 'Bento',
-    description: 'Everything on rounded tiles in a grid.',
+    label: 'Rounded tiles',
+    description: 'Each section on a big rounded tile.',
     settings: () => ({ layout: { contentSize: '1280px' } }),
     styles: () => ({ elements: { button: pillButton } }),
     blockStyles: () => [sectionCard('section-tile', 'Tile', '28px')],
@@ -118,7 +118,7 @@ export const LOOKS: Record<Look, LookDef> = {
   },
 
   sheet: {
-    label: 'Résumé sheet',
+    label: 'Paper sheet',
     description: 'Your pages sit on a white sheet, with small caps section headings.',
     settings: () => ({
       shadow: { defaultPresets: false, presets: [{ slug: 'paper', name: 'Paper', shadow: '0 24px 60px -28px rgba(0, 0, 0, 0.35)' }] },
@@ -135,8 +135,8 @@ export const LOOKS: Record<Look, LookDef> = {
   },
 
   editorial: {
-    label: 'Editorial',
-    description: 'Huge headlines, numbered sections, fine rules and outline buttons.',
+    label: 'Numbered with lines',
+    description: 'Huge headlines, numbered sections, fine lines and outline buttons.',
     styles: () => ({
       elements: {
         h1: { typography: { fontSize: 'clamp(3rem, 3rem + ((1vw - 0.2rem) * 4), 7rem)', lineHeight: '0.95', fontWeight: '500', letterSpacing: '-0.035em' } },
@@ -161,8 +161,8 @@ export const LOOKS: Record<Look, LookDef> = {
   },
 
   aurora: {
-    label: 'Aurora',
-    description: 'Soft colour glows behind see-through cards, pill buttons that glow.',
+    label: 'Soft glow',
+    description: 'Soft colour glows in the background and glowing round buttons.',
     settings: () => ({
       shadow: { defaultPresets: false, presets: [{ slug: 'glow', name: 'Glow', shadow: `0 10px 34px -12px ${cssColor('accent-1')}` }] },
     }),
@@ -180,8 +180,8 @@ export const LOOKS: Record<Look, LookDef> = {
   },
 
   brutal: {
-    label: 'Brutal',
-    description: 'Thick borders, hard shadows, uppercase headings and loud colour.',
+    label: 'Bold borders',
+    description: 'Thick borders, hard shadows and uppercase headings.',
     settings: () => ({
       shadow: { defaultPresets: false, presets: [{ slug: 'hard', name: 'Hard', shadow: `6px 6px 0 ${cssColor('contrast')}` }] },
     }),
@@ -204,8 +204,8 @@ export const LOOKS: Record<Look, LookDef> = {
   },
 
   journey: {
-    label: 'Journey',
-    description: 'Calm bordered cards for your career story.',
+    label: 'Soft cards',
+    description: 'Calm cards with a thin border.',
     card: { border: { color: 'accent-6', width: '1px' } },
   },
 };

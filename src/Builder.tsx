@@ -83,7 +83,7 @@ export function Builder() {
     setNotice('');
     try {
       const parsed = parseSettings(await file.text());
-      if (!confirm(tr('Load this draft? It replaces your info and design. Your saved layouts are kept.'))) return;
+      if (!confirm(tr('Load this draft? It replaces your info and design. Your saved designs are kept.'))) return;
       useBuilder.getState().importSettings(parsed.state, parsed.layouts);
       setNotice(tr('Loaded {file}.', { file: file.name }));
     } catch (err) {

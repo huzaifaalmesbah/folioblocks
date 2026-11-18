@@ -60,7 +60,7 @@ export const PALETTES: PaletteDef[] = [
   },
   {
     key: 'terminal',
-    label: 'Terminal',
+    label: 'Night Green',
     palette: { primary: '#4ade80', secondary: '#38bdf8', base: '#0b0f14', contrast: '#d6e2ee', accent: '#111820' },
   },
   {
@@ -80,7 +80,7 @@ export const PALETTES: PaletteDef[] = [
   },
   {
     key: 'aurora',
-    label: 'Aurora',
+    label: 'Deep Night',
     palette: { primary: '#5eead4', secondary: '#a78bfa', base: '#0b1028', contrast: '#e7ecff', accent: '#18204a' },
   },
   {

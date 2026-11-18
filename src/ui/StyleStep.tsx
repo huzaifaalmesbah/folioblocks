@@ -125,8 +125,8 @@ export function StyleStep() {
       )}
 
       <section className="space-y-3">
-        <SectionTitle>Look</SectionTitle>
-        <div className="grid grid-cols-3 gap-2" role="radiogroup" aria-label="Look">
+        <SectionTitle>Section style</SectionTitle>
+        <div className="grid grid-cols-3 gap-2" role="radiogroup" aria-label="Section style">
           {LOOK_KEYS.map((k) => {
             const active = (style.look ?? 'plain') === k;
             return (
