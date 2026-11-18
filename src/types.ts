@@ -87,8 +87,11 @@ export type PageKey = 'home' | 'about' | 'contact';
 export type HeaderVariant = 'inline' | 'centered';
 export type FooterVariant = 'centered' | 'split';
 
-/** The language of the theme's own words (headings, buttons, menu). The student's text is used as written. */
-export type Language = 'en' | 'bn';
+/**
+ * The language of the theme's own words (headings, buttons, menu): a code
+ * from src/i18n/locales/. The student's text is used as written.
+ */
+export type Language = string;
 
 export type BuilderState = {
   info: Info;

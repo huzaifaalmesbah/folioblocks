@@ -78,7 +78,6 @@ export const useBuilder = create<Store>()(
           header: p.header,
           footer: p.footer,
           pages: structuredClone(p.pages),
-          // A template written for a language switches to it; the others keep the student's choice.
         });
       },
       setLanguage: (language) => set({ language }),

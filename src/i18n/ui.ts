@@ -1,7 +1,8 @@
 /**
  * The app's own interface language (separate from the language of the
  * student's site). English is the source; other languages are dictionaries
- * keyed by the English text, applied in two ways:
+ * keyed by the English text, from src/i18n/locales/ (see languages.ts),
+ * applied in two ways:
  *
  * - `tr()` for strings built in code (messages with names or numbers in them).
  * - A DOM translator for everything else: it swaps the text of rendered
@@ -12,20 +13,24 @@
  */
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { BN } from './bn';
+import { appDict, fill, isEnabled, SOURCE, type LangCode } from './languages';
 
-export type UiLang = 'en' | 'bn';
+export type UiLang = LangCode;
 
 export const useUi = create<{ lang: UiLang; setLang: (lang: UiLang) => void }>()(
-  persist((set) => ({ lang: 'en', setLang: (lang) => set({ lang }) }), { name: 'folioblocks-ui' }),
+  persist((set) => ({ lang: SOURCE, setLang: (lang) => set({ lang }) }), {
+    name: 'folioblocks-ui',
+    // A language saved earlier may have been switched off since: fall back to English.
+    merge: (saved, current) => {
+      const lang = (saved as { lang?: unknown } | undefined)?.lang;
+      return { ...current, lang: isEnabled(lang) ? lang : SOURCE };
+    },
+  }),
 );
-
-const DICTS: Record<UiLang, Record<string, string>> = { en: {}, bn: BN };
 
 /** Translate a string built in code. `{name}` placeholders are filled from `vars` after translation. */
 export function tr(text: string, vars: Record<string, string | number> = {}): string {
-  const out = DICTS[useUi.getState().lang][text] ?? text;
-  return out.replace(/\{(\w+)\}/g, (m, k: string) => (k in vars ? String(vars[k]) : m));
+  return fill(appDict(useUi.getState().lang)[text] ?? text, vars);
 }
 
 const SKIP = new Set(['SCRIPT', 'STYLE', 'TEXTAREA', 'PRE', 'CODE', 'IFRAME']);
@@ -65,8 +70,8 @@ function translateNode(dict: Record<string, string>, node: Node) {
 
 /** Translate `root` now and keep it translated as React updates it. Returns a stop function. */
 export function startDomTranslator(root: Element, lang: UiLang): () => void {
-  const dict = DICTS[lang];
-  if (lang === 'en') return () => {};
+  const dict = appDict(lang);
+  if (lang === SOURCE) return () => {};
   translateNode(dict, root);
   const observer = new MutationObserver((records) => {
     for (const r of records) {

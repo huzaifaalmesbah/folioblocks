@@ -1,5 +1,6 @@
 import { FONT_KEYS, FONTS, type FontKey } from '../fonts';
 import { LOOK_KEYS, LOOKS } from '../generator/looks';
+import { enabledLanguages, languageMeta } from '../i18n/languages';
 import { PALETTES } from '../presets';
 import { useBuilder } from '../store';
 import type { Language, Palette, Radius } from '../types';
@@ -30,6 +31,7 @@ function sameColours(a: Palette, b: Palette) {
 export function StyleStep() {
   const style = useBuilder((s) => s.style);
   const language = useBuilder((s) => s.language ?? 'en');
+  const languages = enabledLanguages();
   const { setPalette, applyPalette, setStyle, setLanguage } = useBuilder.getState();
 
   const textRatio = contrastRatio(style.palette.contrast, style.palette.base);
@@ -104,23 +106,23 @@ export function StyleStep() {
         />
       </section>
 
-      <section className="space-y-3">
-        <SectionTitle>Site language</SectionTitle>
-        <Select<Language>
-          label="Headings, buttons and menu"
-          value={language}
-          options={[
-            { value: 'en', label: 'English' },
-            { value: 'bn', label: 'বাংলা (Bengali)' },
-          ]}
-          onChange={(v) => {
-            setLanguage(v);
-            // Bengali text needs a font that has Bengali letters.
-            if (v === 'bn') setStyle({ fonts: { heading: 'noto-sans-bengali', body: 'noto-sans-bengali' } });
-          }}
-        />
-        <p className="text-xs text-slate-500">Your own text is used exactly as you write it, in any language.</p>
-      </section>
+      {languages.length > 1 && (
+        <section className="space-y-3">
+          <SectionTitle>Site language</SectionTitle>
+          <Select<Language>
+            label="Headings, buttons and menu"
+            value={language}
+            options={languages.map((l) => ({ value: l.code, label: l.code === l.name ? l.name : `${l.name} (${l.englishName})` }))}
+            onChange={(v) => {
+              setLanguage(v);
+              // Some scripts need a font that has their letters.
+              const font = languageMeta(v).font;
+              if (font && FONT_KEYS.includes(font as FontKey)) setStyle({ fonts: { heading: font as FontKey, body: font as FontKey } });
+            }}
+          />
+          <p className="text-xs text-slate-500">Your own text is used exactly as you write it, in any language.</p>
+        </section>
+      )}
 
       <section className="space-y-3">
         <SectionTitle>Look</SectionTitle>

@@ -13,7 +13,8 @@
     "try": "bash scripts/try-in-playground.sh",
     "link": "tsx scripts/playground-link.ts",
     "fonts": "node scripts/copy-fonts.mjs",
-    "validate": "tsx scripts/validate-themes.ts"
+    "validate": "tsx scripts/validate-themes.ts",
+    "i18n:extract": "tsx scripts/i18n-extract.ts"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",

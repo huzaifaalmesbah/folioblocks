@@ -1,0 +1,350 @@
+/**
+ * Build the English files in src/i18n/locales/en/ from the code, so English
+ * never has to be kept by hand, and regenerate src/i18n/locales/index.ts so
+ * every language folder is loaded. Each language has the same small files:
+ *
+ * - `home.json`: the home page. `builder.json`: the builder.
+ *   Read from the source with Rolldown's parser: JSX text, the attributes
+ *   the DOM translator handles, label-like props and object properties,
+ *   and `tr('…')` calls.
+ * - `templates.json`: the names of templates, sections, looks and palettes.
+ * - `theme.json`: the words the generated theme writes itself. Collected by
+ *   generating themes with every section variant, header and footer, and
+ *   recording what goes through the theme's translation function.
+ * - `language.json`: the language's name, direction, font and whether it is on.
+ *
+ * It also keeps every other language's files in step with English (new
+ * strings added as English, unused ones dropped, translations kept).
+ *
+ * Usage: npm run i18n:extract            (write the files)
+ *        npm run i18n:extract -- --check (fail if they are out of date; used by CI)
+ */
+import { existsSync, mkdirSync, readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
+import { join, relative } from 'node:path';
+import { parseAst } from 'rolldown/parseAst';
+import { defaultState } from '../src/defaults';
+import { generateTheme } from '../src/generator';
+import { collectThemeStrings } from '../src/generator/i18n';
+import { LOOKS } from '../src/generator/looks';
+import { SECTION_LABELS, SECTIONS } from '../src/generator/sections';
+import { buildBlueprint } from '../src/playground/blueprint';
+import { PALETTES, PRESETS } from '../src/presets';
+import type { BuilderState, Info, Section, SectionType } from '../src/types';
+
+const LOCALES = 'src/i18n/locales';
+const check = process.argv.includes('--check');
+
+/* ---------- app: read from the source ---------- */
+
+/** Attributes the DOM translator translates (see src/i18n/ui.ts), plus our components' text props. */
+const TEXT_ATTRS = new Set(['placeholder', 'aria-label', 'title', 'alt', 'label', 'note', 'hint', 'addLabel', 'description', 'bestFor', 'eyebrow']);
+/** Object properties that hold text the interface shows. */
+const TEXT_PROPS = new Set(['label', 'title', 'note', 'hint', 'description', 'bestFor', 'text', 'placeholder', 'addLabel', 'body', 'name', 'use', 'eyebrow']);
+/** Calls whose first argument is shown to the person: tr(), the checklist's fix(), thrown errors. */
+const TEXT_CALLS = new Set(['tr', 'fix', 'tip', 'Error']);
+
+const collapse = (s: string) => s.replace(/\s+/g, ' ').trim();
+/**
+ * Interface text has letters in it; class names, URLs, paths and keys don't
+ * count. `sure` skips the key check for strings we know are shown (JSX
+ * text, tr(), messages), where a single lowercase word is still text.
+ */
+function isText(s: string, sure = false): boolean {
+  if (!/\p{L}/u.test(s)) return false;
+  if (/^(https?:|mailto:|#|\/|\.\/|data:|var\()/.test(s)) return false;
+  if (/^[\w-]+(\.[\w-]+)+$/.test(s)) return false; // file names
+  if (sure) return true;
+  const tokens = s.split(' ');
+  // Tailwind classes: lowercase tokens, some with - or :, none a plain sentence word with a capital.
+  if (tokens.every((t) => /^[a-z0-9:/[\]().%!#-]+$/.test(t)) && tokens.some((t) => /[-:]/.test(t)) && !/[.!?…]$/.test(s)) return false;
+  if (/^[a-z0-9-]+$/.test(s)) return false; // slugs and keys
+  return true;
+}
+
+/** Strings some libraries put on the page (dnd-kit's screen reader instructions). */
+const LIBRARY_TEXT = [
+  'To pick up a draggable item, press the space bar. While dragging, use the arrow keys to move the item. Press space again to drop the item in its new position, or press escape to cancel.',
+];
+
+function sourceFiles(dir: string): string[] {
+  return readdirSync(dir).flatMap((f) => {
+    const p = join(dir, f);
+    if (statSync(p).isDirectory()) return p.includes('generator') || p.includes('locales') ? [] : sourceFiles(p);
+    return /\.(tsx?|ts)$/.test(f) && !/\.test\./.test(f) && !/\.d\.ts$/.test(f) ? [p] : [];
+  });
+}
+
+type Node = { type: string; [k: string]: unknown };
+const isNode = (v: unknown): v is Node => !!v && typeof v === 'object' && typeof (v as Node).type === 'string';
+
+function stringValue(node: Node): string | null {
+  if (node.type === 'Literal' && typeof node.value === 'string') return node.value;
+  if (node.type === 'TemplateLiteral' && (node.expressions as unknown[]).length === 0) {
+    return ((node.quasis as { value: { cooked: string } }[])[0]?.value.cooked) ?? null;
+  }
+  return null;
+}
+
+/**
+ * String literals reachable through conditionals and `??`/`||`, e.g.
+ * {open ? 'Hide' : 'Show'}. Strings from arrays go to `weak`: those can be
+ * keys as well as text (['edit', 'preview'].map(…)).
+ */
+function literalsIn(node: Node | null | undefined, out: string[], weak: string[] = out): void {
+  if (!node) return;
+  const v = stringValue(node);
+  if (v !== null) out.push(v);
+  else if (node.type === 'ConditionalExpression') {
+    literalsIn(node.consequent as Node, out, weak);
+    literalsIn(node.alternate as Node, out, weak);
+  } else if (node.type === 'LogicalExpression') {
+    literalsIn(node.left as Node, out, weak);
+    literalsIn(node.right as Node, out, weak);
+  } else if (node.type === 'ParenthesizedExpression' || node.type === 'TSAsExpression') {
+    literalsIn(node.expression as Node, out, weak);
+  } else if (node.type === 'ArrayExpression') {
+    for (const e of node.elements as (Node | null)[]) {
+      const s = e && stringValue(e);
+      if (s !== null && s !== undefined) weak.push(s);
+    }
+  } else if (node.type === 'CallExpression' && isNode(node.callee) && node.callee.type === 'MemberExpression') {
+    // ['A', 'B'].map(…): the array's strings.
+    literalsIn(node.callee.object as Node, weak, weak);
+  }
+}
+
+/** JSX text keeps HTML entities as written; the page shows them decoded. */
+const decode = (s: string) =>
+  s.replace(/&(amp|lt|gt|quot|apos|nbsp|#39);/g, (_m, e: string) => ({ amp: '&', lt: '<', gt: '>', quot: '"', apos: "'", nbsp: ' ', '#39': "'" })[e]!);
+
+const keyName = (n: unknown): string => (isNode(n) ? String(n.name ?? n.value ?? '') : '');
+
+function extractFile(file: string, add: (s: string, sure?: boolean) => void): void {
+  const ast = parseAst(readFileSync(file, 'utf8'), { lang: file.endsWith('x') ? 'tsx' : 'ts' }) as unknown as Node;
+  const lits = (n: unknown, sure = false) => {
+    const out: string[] = [];
+    const weak: string[] = [];
+    literalsIn(n as Node, out, weak);
+    out.forEach((s) => add(s, sure));
+    weak.forEach((s) => add(s));
+  };
+  let inPrompts = false;
+  const visitChildren = (node: Node) => {
+    for (const [k, v] of Object.entries(node)) {
+      if (k === 'parent') continue;
+      if (Array.isArray(v)) v.forEach((c) => isNode(c) && visit(c, node));
+      else if (isNode(v)) visit(v, node);
+    }
+  };
+  const visit = (node: Node, parent: Node | null): void => {
+    switch (node.type) {
+      case 'JSXText':
+        add(decode(String(node.value)), true);
+        break;
+      case 'JSXExpressionContainer':
+        if (parent && (parent.type === 'JSXElement' || parent.type === 'JSXFragment')) lits(node.expression, true);
+        break;
+      case 'JSXAttribute':
+        if (TEXT_ATTRS.has(keyName(node.name))) {
+          const v = node.value as Node | null;
+          if (v?.type === 'JSXExpressionContainer') lits(v.expression);
+          else lits(v);
+        }
+        break;
+      case 'Property':
+        if (TEXT_PROPS.has(keyName(node.key)) && !(inPrompts && keyName(node.key) === 'text')) lits(node.value);
+        break;
+      case 'AssignmentPattern':
+        // A default prop: function CopyButton({ label = 'Copy' }).
+        if (TEXT_PROPS.has(keyName(node.left))) lits(node.right, true);
+        break;
+      case 'VariableDeclarator':
+        // Prompts for AI agents are shown as code and stay in English; their titles are translated.
+        if (/PROMPTS?$/.test(keyName(node.id))) {
+          inPrompts = true;
+          visitChildren(node);
+          inPrompts = false;
+          return;
+        }
+        // Lists and maps of labels: const PAGE_LABELS = { home: 'Home page' }, export const STEPS = ['…'].
+        if (/LABELS?$|STEPS?$|TEXT$/.test(keyName(node.id)) && isNode(node.init)) {
+          const init = node.init as Node;
+          if (init.type === 'ObjectExpression') (init.properties as Node[]).forEach((p) => lits(p.value, true));
+          else lits(init);
+        }
+        break;
+      case 'CallExpression':
+      case 'NewExpression':
+        if (TEXT_CALLS.has(keyName(node.callee))) lits((node.arguments as Node[])[0], true);
+        break;
+    }
+    visitChildren(node);
+  };
+  visit(ast, null);
+}
+
+type Part = 'home' | 'builder' | 'templates';
+
+function extractApp(): Record<Part, Set<string>> {
+  const parts: Record<Part, Set<string>> = { home: new Set(), builder: new Set(), templates: new Set() };
+  const adder = (set: Set<string>) => (s: string, sure = false) => {
+    const c = collapse(s);
+    if (c && isText(c, sure)) set.add(c);
+  };
+  for (const file of sourceFiles('src')) extractFile(file, adder(file.includes('/landing/') ? parts.home : parts.builder));
+  LIBRARY_TEXT.forEach((s) => parts.builder.add(s));
+  // Names that live in the generator and the presets.
+  const add = adder(parts.templates);
+  const t = (s: string) => add(s, true);
+  for (const p of PRESETS) [p.label, p.description, p.bestFor].forEach(t);
+  for (const p of PALETTES) t(p.label);
+  for (const l of Object.values(LOOKS)) [l.label, l.description].forEach(t);
+  for (const label of Object.values(SECTION_LABELS)) t(label);
+  for (const variants of Object.values(SECTIONS)) for (const v of Object.values(variants)) t(v.label);
+  // Each string lives in one file only: templates, then builder, then home.
+  for (const s of parts.templates) {
+    parts.builder.delete(s);
+    parts.home.delete(s);
+  }
+  for (const s of parts.builder) parts.home.delete(s);
+  return parts;
+}
+
+/* ---------- theme: collect while generating ---------- */
+
+/** A profile with something in every field, so every section renders. Its own text is not the theme's. */
+const SAMPLE: Info = {
+  ...defaultState.info,
+  name: 'Sample Person',
+  tagline: 'Sample tagline',
+  university: 'Sample University',
+  location: 'Sample City',
+  bio: 'Sample bio.',
+  email: 'sample@example.com',
+  skills: ['Sample skill A', 'Sample skill B'],
+  contributions: [{ team: 'Sample team', description: 'Sample contribution.', date: '2026', url: 'https://example.com' }],
+  projects: [{ title: 'Sample project', description: 'Sample project text.', url: 'https://example.com' }],
+  experience: [{ role: 'Sample role', org: 'Sample org', period: '2025', description: 'Sample work.' }],
+  education: [{ degree: 'Sample degree', school: 'Sample school', period: '2024' }],
+  achievements: [{ title: 'Sample award', issuer: 'Sample issuer', year: '2023', url: 'https://example.com' }],
+  services: [{ title: 'Sample service', description: 'Sample service text.' }],
+  testimonials: [{ quote: 'Sample quote.', name: 'Sample name', role: 'Sample role' }],
+  cvUrl: 'https://example.com/cv.pdf',
+  socials: { github: 'https://github.com/example' },
+};
+
+function sampleStrings(info: Info): Set<string> {
+  const out = new Set<string>();
+  const walk = (v: unknown) => {
+    if (typeof v === 'string') out.add(v);
+    else if (Array.isArray(v)) v.forEach(walk);
+    else if (v && typeof v === 'object') Object.values(v).forEach(walk);
+  };
+  walk(info);
+  for (const s of [...out]) {
+    out.add([s].join(''));
+  }
+  return out;
+}
+
+function extractTheme(): Set<string> {
+  const found = new Set<string>();
+  collectThemeStrings(found);
+  // Every section variant once, on the home page, plus every preset and header/footer combination.
+  const every: Section[] = (Object.keys(SECTIONS) as SectionType[]).flatMap((type) =>
+    Object.keys(SECTIONS[type]).map((variant, i) => ({ id: `${type}-${variant}-${i}`, type, variant })),
+  );
+  const states: BuilderState[] = [
+    // A page with nothing to show gets a line to start from.
+    { ...defaultState, info: SAMPLE, pages: { home: [], about: [], contact: [] } },
+    ...PRESETS.map((p) => ({ ...defaultState, info: SAMPLE, preset: p.key, style: p.style, header: p.header, footer: p.footer, pages: p.pages })),
+    ...(['inline', 'centered'] as const).flatMap((header) =>
+      (['centered', 'split'] as const).map((footer) => ({ ...defaultState, info: SAMPLE, header, footer, pages: { home: every, about: every, contact: every } })),
+    ),
+  ];
+  for (const state of states) {
+    const { slug, files, assets } = generateTheme(state);
+    buildBlueprint(state, slug, files, assets, { assetBaseUrl: 'https://example.org/' });
+  }
+  collectThemeStrings(null);
+  // Combined strings (location · university) are the student's own text.
+  const own = sampleStrings(SAMPLE);
+  return new Set(
+    [...found].filter((s) => isText(s, true) && !own.has(s) && !/^Sample /.test(s) && !s.includes('Sample ') && !s.includes('@example.com')),
+  );
+}
+
+/* ---------- write ---------- */
+
+const sorted = (set: Set<string>) => Object.fromEntries([...set].sort((a, b) => a.localeCompare(b, 'en')).map((s) => [s, s]));
+const json = (v: unknown) => `${JSON.stringify(v, null, 2)}\n`;
+
+const app = extractApp();
+const enFiles: Record<string, string> = {
+  'language.json': json({ code: 'en', name: 'English', englishName: 'English', dir: 'ltr', enabled: true }),
+  'home.json': json(sorted(app.home)),
+  'builder.json': json(sorted(app.builder)),
+  'templates.json': json(sorted(app.templates)),
+  'theme.json': json(sorted(extractTheme())),
+};
+
+const PARTS = ['language', 'home', 'builder', 'templates', 'theme'] as const;
+const codes = readdirSync(LOCALES)
+  .filter((f) => statSync(join(LOCALES, f)).isDirectory())
+  .sort();
+const ident = (code: string, part: string) => `${code.replace(/[^a-zA-Z0-9]/g, '_')}_${part}`;
+const imports: string[] = [];
+const entries: string[] = [];
+for (const code of codes) {
+  const parts = PARTS.filter((p) => code === 'en' || existsSync(join(LOCALES, code, `${p}.json`)));
+  parts.forEach((p) => imports.push(`import ${ident(code, p)} from './${code}/${p}.json';`));
+  entries.push(`  '${code}': { ${parts.map((p) => `${p}: ${ident(code, p)}`).join(', ')} },`);
+}
+const indexText = `// Generated by \`npm run i18n:extract\` from the folders here. Do not edit.
+${imports.join('\n')}
+
+export const LOCALE_FILES = {
+${entries.join('\n')}
+};
+`;
+
+/**
+ * Keep every other language in step with English: new strings are added as
+ * an English copy (so they count as not translated yet), strings the code no
+ * longer uses are dropped, and translations are kept, in English's order.
+ */
+function synced(code: string, part: string): string | null {
+  const path = join(LOCALES, code, `${part}.json`);
+  if (!existsSync(path)) return null;
+  const source = JSON.parse(enFiles[`${part}.json`]) as Record<string, string>;
+  const mine = JSON.parse(readFileSync(path, 'utf8')) as Record<string, string>;
+  return json(Object.fromEntries(Object.keys(source).map((k) => [k, typeof mine[k] === 'string' && mine[k] ? mine[k] : k])));
+}
+
+const targets: Record<string, string> = {
+  ...Object.fromEntries(Object.entries(enFiles).map(([f, text]) => [join(LOCALES, 'en', f), text])),
+  [join(LOCALES, 'index.ts')]: indexText,
+};
+for (const code of codes.filter((c) => c !== 'en')) {
+  for (const part of ['home', 'builder', 'templates', 'theme']) {
+    const text = synced(code, part);
+    if (text !== null) targets[join(LOCALES, code, `${part}.json`)] = text;
+  }
+}
+const read = (p: string) => (existsSync(p) ? readFileSync(p, 'utf8') : '');
+const stale = Object.entries(targets)
+  .filter(([p, text]) => read(p) !== text)
+  .map(([p]) => relative('.', p));
+
+if (check) {
+  if (stale.length) {
+    console.error(`Out of date: ${stale.join(', ')}. Run \`npm run i18n:extract\` and commit the result.`);
+    process.exit(1);
+  }
+  console.log('English strings are up to date.');
+} else {
+  mkdirSync(join(LOCALES, 'en'), { recursive: true });
+  for (const [p, text] of Object.entries(targets)) writeFileSync(p, text);
+  const n = (f: string) => Object.keys(JSON.parse(enFiles[f])).length;
+  console.log(`en: home ${n('home.json')}, builder ${n('builder.json')}, templates ${n('templates.json')}, theme ${n('theme.json')}. Languages: ${codes.join(', ')}.`);
+}

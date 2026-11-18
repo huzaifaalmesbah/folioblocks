@@ -1,4 +1,5 @@
 import { lazy, Suspense, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { languageMeta } from './i18n/languages';
 import { startDomTranslator, tr, useUi } from './i18n/ui';
 import { Landing } from './landing/Landing';
 
@@ -35,6 +36,7 @@ export default function App() {
   useEffect(() => {
     document.title = builder ? tr('Build your theme · FolioBlocks') : tr('FolioBlocks: build your WordPress portfolio theme');
     document.documentElement.lang = lang;
+    document.documentElement.dir = languageMeta(lang).dir;
   }, [builder, lang]);
 
   // Translate before the first paint, and keep translating as the page changes.

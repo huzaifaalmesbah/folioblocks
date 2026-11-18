@@ -1,3 +1,5 @@
+import { fontDef, type FontKey } from '../fonts';
+import { languageMeta, SOURCE } from '../i18n/languages';
 import type { BuilderState } from '../types';
 import { headerSafe } from './utils';
 
@@ -7,7 +9,8 @@ import { headerSafe } from './utils';
  */
 export function agentsMd(state: BuilderState, slug: string): string {
   const name = headerSafe(state.info.name) || 'the site owner';
-  const bengali = state.language === 'bn';
+  const lang = languageMeta(state.language);
+  const font = lang.font ? fontDef(lang.font as FontKey) : null;
   return `# AGENTS.md
 
 How coding agents should work on this theme. It is a WordPress block theme for ${name}'s portfolio, made with FolioBlocks, and it follows the conventions of Ipsum, WordPress' default theme.
@@ -15,7 +18,7 @@ How coding agents should work on this theme. It is a WordPress block theme for $
 - Theme folder and text domain: \`${slug}\`
 - Pattern slug prefix: \`${slug}/\`
 - Requires WordPress 6.8 or later. Core blocks only: no plugins, no build step.
-${bengali ? "- The theme's own strings are written in Bengali. Keep new strings in Bengali, and keep the Noto Sans Bengali font for them.\n" : ''}
+${lang.code !== SOURCE ? `- The theme's own strings are written in ${lang.englishName}. Keep new strings in ${lang.englishName}${font ? `, and keep the ${font.name} font for them` : ''}.\n` : ''}
 ## Skills to use
 
 Install them from https://github.com/WordPress/agent-skills and follow them:

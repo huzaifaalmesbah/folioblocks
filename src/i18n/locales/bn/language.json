@@ -1,0 +1,8 @@
+{
+  "code": "bn",
+  "name": "বাংলা",
+  "englishName": "Bengali",
+  "dir": "ltr",
+  "font": "noto-sans-bengali",
+  "enabled": false
+}

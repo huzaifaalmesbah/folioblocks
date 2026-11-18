@@ -6,6 +6,7 @@
 import { defaultState } from './defaults';
 import { FONT_KEYS } from './fonts';
 import { LOOK_KEYS } from './generator/looks';
+import { isEnabled, SOURCE } from './i18n/languages';
 import { SECTIONS } from './generator/sections';
 import type { BuilderState, FooterVariant, HeaderVariant, Info, PageKey, Section, SectionType, Style } from './types';
 
@@ -202,7 +203,7 @@ export function parseSettings(text: string): { state: BuilderState; layouts: Sav
   const state: BuilderState = {
     info: sanitizeInfo(s.info),
     style: style(s.style),
-    language: s.language === 'bn' ? 'bn' : 'en',
+    language: isEnabled(s.language) ? s.language : SOURCE,
     preset: str(s.preset, defaultState.preset),
     header: header(s.header),
     footer: footer(s.footer),
