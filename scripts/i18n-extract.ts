@@ -74,7 +74,7 @@ const { PALETTES, PRESETS } = await import('../src/presets');
 /** Attributes the DOM translator translates (see src/i18n/ui.ts), plus our components' text props. */
 const TEXT_ATTRS = new Set(['placeholder', 'aria-label', 'title', 'alt', 'label', 'note', 'hint', 'addLabel', 'description', 'bestFor', 'eyebrow']);
 /** Object properties that hold text the interface shows. */
-const TEXT_PROPS = new Set(['label', 'title', 'note', 'hint', 'description', 'bestFor', 'text', 'placeholder', 'addLabel', 'body', 'name', 'use', 'eyebrow']);
+const TEXT_PROPS = new Set(['label', 'title', 'note', 'hint', 'description', 'bestFor', 'text', 'placeholder', 'addLabel', 'body', 'name', 'use', 'eyebrow', 'steps']);
 /** Calls whose first argument is shown to the person: tr(), the checklist's fix(), thrown errors. */
 const TEXT_CALLS = new Set(['tr', 'fix', 'tip', 'Error']);
 

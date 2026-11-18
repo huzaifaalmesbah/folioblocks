@@ -141,3 +141,196 @@ export const WPCOM_LINKS = {
   studioSync: 'https://wordpress.studio/docs/sync/',
   studentPlan: 'https://wordpress.com/support/plan-features/student-plan/',
 };
+
+/* ---------- Publish guide: shared by the Publish step and the Guide page ---------- */
+
+export type GuideLink = { label: string; url: string };
+export type GuidePart = { id: string; title: string; text?: string; steps: string[]; links: GuideLink[] };
+
+const DOCS = 'https://wordpress.org/documentation/article';
+
+/** Where to install the theme: the first part of the guide, one tab each. */
+export const INSTALL_PLACES: GuidePart[] = [
+  {
+    id: 'any',
+    title: 'Any WordPress site',
+    text: 'A site on any web host where you can log in to WP Admin.',
+    steps: [
+      'Log in to your WP Admin and go to Appearance → Themes.',
+      'Click "Add New Theme", then "Upload Theme".',
+      'Choose your zip (don\'t unzip it) and click "Install Now".',
+      'Click "Activate".',
+    ],
+    links: [{ label: 'WordPress: Work with themes', url: `${DOCS}/work-with-themes/#adding-new-themes-using-the-administration-screens` }],
+  },
+  {
+    id: 'wpcom',
+    title: 'WordPress.com',
+    text: 'Uploading a theme needs a plan that allows it. Students: the free WordPress.com Student plan can upload themes.',
+    steps: [
+      'In WordPress.com, go to Appearance → Themes.',
+      'Click "Add Theme", then "Upload Theme", and choose your zip.',
+      'Click "Install Now", then "Activate".',
+    ],
+    links: [
+      { label: 'WordPress.com: Upload a theme', url: WPCOM_LINKS.upload },
+      { label: 'The Student plan', url: WPCOM_LINKS.studentPlan },
+    ],
+  },
+  {
+    id: 'local',
+    title: 'On your computer',
+    text: 'Try it privately first with WordPress Studio (free), then publish when you are ready.',
+    steps: [
+      'Install WordPress Studio and create a local site.',
+      'Open the site\'s WP Admin: Appearance → Themes → Add New Theme → Upload Theme → Activate.',
+      'When you are happy, publish it to WordPress.com from Studio.',
+    ],
+    links: [
+      { label: 'WordPress Studio', url: WPCOM_LINKS.studio },
+      { label: 'Studio Sync', url: WPCOM_LINKS.studioSync },
+    ],
+  },
+];
+
+/** After installing: the rest of the guide, in order. */
+export const GUIDE_PARTS: GuidePart[] = [
+  {
+    id: 'pages',
+    title: 'Set up your pages',
+    text: 'Your theme has a Home, About, Blog and Contact layout. Create the pages once:',
+    steps: [
+      'Go to Pages → Add New Page and create Home, About, Blog and Contact (a title is enough).',
+      'For About, open Settings on the right → Template → choose "About". Do the same for Contact with "Contact".',
+      'Go to Settings → Reading → "A static page": Homepage = Home, Posts page = Blog. Save.',
+    ],
+    links: [
+      { label: 'WordPress: Create pages', url: `${DOCS}/create-pages/` },
+      { label: 'WordPress: Reading settings', url: `${DOCS}/settings-reading-screen/` },
+    ],
+  },
+  {
+    id: 'customize',
+    title: 'Make it yours in the Site Editor',
+    text: 'Everything the builder made can be changed later in WordPress, with blocks:',
+    steps: [
+      'Go to Appearance → Editor.',
+      'Styles: change colours and fonts, or pick one of the colour variations that come with your theme.',
+      'Navigation: choose which pages show in the menu, and their order.',
+      'Templates and Patterns: click any section to edit it, move it or remove it. Click Save when done.',
+      'A section\'s look (cards, tiles, lines…) is in that block\'s Styles panel.',
+    ],
+    links: [
+      { label: 'WordPress: Site Editor', url: `${DOCS}/site-editor/` },
+      { label: 'WordPress: Styles', url: `${DOCS}/styles-overview/` },
+      { label: 'WordPress: Navigation', url: `${DOCS}/site-editor-navigation` },
+    ],
+  },
+  {
+    id: 'new-page',
+    title: 'Add a new page',
+    steps: [
+      'Go to Pages → Add New Page and give it a title.',
+      'WordPress offers your theme\'s page designs to start from: pick one, or start empty.',
+      'Add blocks with the + button: text, images, buttons, columns.',
+      'Click Publish. To show it in the menu, add it in Appearance → Editor → Navigation.',
+    ],
+    links: [{ label: 'WordPress: Create pages', url: `${DOCS}/create-pages/` }],
+  },
+  {
+    id: 'post',
+    title: 'Write and publish a post',
+    steps: [
+      'Go to Posts → Add New Post.',
+      'Write a title and your text; add images with the + button.',
+      'In the settings on the right, set a featured image and a category.',
+      'Click Publish. The post shows on your Blog page and in "Latest posts" on your home page.',
+    ],
+    links: [{ label: 'WordPress: Writing posts', url: `${DOCS}/writing-posts/` }],
+  },
+  {
+    id: 'update',
+    title: 'Update your theme later',
+    steps: [
+      'Change your design or info here in FolioBlocks and download the zip again.',
+      'Upload it the same way. When WordPress asks, choose "Replace active with uploaded".',
+      'Your pages, posts and menu stay. Changes you made in the Site Editor stay too, and keep winning over the theme\'s.',
+    ],
+    links: [],
+  },
+];
+
+export type Course = { title: string; url: string; lessons: number; note: string };
+export type CourseGroup = { id: 'everyone' | 'designer' | 'developer' | 'contributor'; title: string; courses: Course[] };
+
+const LEARN = 'https://learn.wordpress.org/course';
+
+/** Free courses on Learn WordPress (checked November 2026), grouped by who they suit. */
+export const COURSE_GROUPS: CourseGroup[] = [
+  {
+    id: 'everyone',
+    title: 'Everyone',
+    courses: [
+      { title: 'Getting Started With WordPress: Get Set Up', url: `${LEARN}/getting-started-with-wordpress-get-setup/`, lessons: 11, note: 'Your first WordPress site, step by step.' },
+      { title: 'Getting Started With WordPress: Get Familiar', url: `${LEARN}/getting-started-with-wordpress-get-familiar/`, lessons: 18, note: 'Find your way around WP Admin.' },
+      { title: 'Beginner WordPress User', url: `${LEARN}/beginner-wordpress-user/`, lessons: 24, note: 'Pages, posts, blocks and menus.' },
+      { title: 'Intermediate WordPress User', url: `${LEARN}/intermediate-wordpress-user/`, lessons: 37, note: 'The Site Editor, patterns and more.' },
+      { title: 'Creating a 4-page business website', url: `${LEARN}/creating-a-4-page-business-website/`, lessons: 10, note: 'A small real site from start to finish.' },
+    ],
+  },
+  {
+    id: 'designer',
+    title: 'Designers',
+    courses: [
+      { title: 'Beginner WordPress Designer', url: `${LEARN}/beginner-wordpress-designer/`, lessons: 24, note: 'Design a site with blocks and the Site Editor.' },
+      { title: 'WordPress Credits Designer Track', url: `${LEARN}/wordpress-credits-designer-track/`, lessons: 39, note: 'Design work for the WordPress project.' },
+    ],
+  },
+  {
+    id: 'developer',
+    title: 'Developers',
+    courses: [
+      { title: 'Develop Your First Low-Code Block Theme', url: `${LEARN}/develop-your-first-low-code-block-theme/`, lessons: 23, note: 'Build a block theme like the one you just made.' },
+      { title: 'Beginner WordPress Developer', url: `${LEARN}/beginner-wordpress-developer/`, lessons: 59, note: 'Themes, plugins and how WordPress works.' },
+      { title: 'Intermediate Theme Developer', url: `${LEARN}/intermediate-theme-developer/`, lessons: 32, note: 'theme.json, templates and patterns in depth.' },
+      { title: 'WordPress Credits Developer Track', url: `${LEARN}/wordpress-credits-developer-track/`, lessons: 27, note: 'Code contributions to WordPress.' },
+    ],
+  },
+  {
+    id: 'contributor',
+    title: 'Contributors',
+    courses: [
+      { title: 'WordPress Credits Foundations', url: `${LEARN}/wordpress-credits-foundations/`, lessons: 26, note: 'How to start contributing to WordPress.' },
+      { title: 'WordPress Credits Translation Track', url: `${LEARN}/wordpress-credits-translation-track/`, lessons: 42, note: 'Translate WordPress, and FolioBlocks too.' },
+    ],
+  },
+];
+
+/** Three courses to suggest right after publishing. */
+export const FIRST_COURSES: Course[] = [
+  COURSE_GROUPS[0].courses[2],
+  COURSE_GROUPS[1].courses[0],
+  COURSE_GROUPS[2].courses[0],
+];
+
+/** WordPress's own help, for people using the theme. */
+export const USER_DOCS: GuideLink[] = [
+  { label: 'Block themes', url: `${DOCS}/block-themes/` },
+  { label: 'Site Editor', url: `${DOCS}/site-editor/` },
+  { label: 'Styles', url: `${DOCS}/styles-overview/` },
+  { label: 'Navigation', url: `${DOCS}/site-editor-navigation` },
+  { label: 'Create pages', url: `${DOCS}/create-pages/` },
+  { label: 'Writing posts', url: `${DOCS}/writing-posts/` },
+  { label: 'Work with themes', url: `${DOCS}/work-with-themes/` },
+];
+
+/** The Theme Handbook, for people who want to change the theme's code. */
+export const DEV_DOCS: GuideLink[] = [
+  { label: 'Theme Handbook', url: 'https://developer.wordpress.org/themes/' },
+  { label: 'Theme structure', url: 'https://developer.wordpress.org/themes/core-concepts/theme-structure/' },
+  { label: 'Templates', url: 'https://developer.wordpress.org/themes/core-concepts/templates/' },
+  { label: 'Global settings and styles (theme.json)', url: 'https://developer.wordpress.org/themes/global-settings-and-styles/' },
+  { label: 'Style variations', url: 'https://developer.wordpress.org/themes/global-settings-and-styles/style-variations/' },
+  { label: 'Block style variations', url: 'https://developer.wordpress.org/themes/features/block-style-variations/' },
+  { label: 'Patterns', url: 'https://developer.wordpress.org/themes/global-settings-and-styles/patterns/' },
+];

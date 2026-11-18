@@ -16,6 +16,7 @@ import { TemplateStep } from './ui/TemplateStep';
 import { PagesStep } from './ui/PagesStep';
 import { PublishStep } from './ui/PublishStep';
 import { MoreMenu } from './ui/MoreMenu';
+import { PublishGuide } from './ui/PublishGuide';
 import { QuickPreview } from './preview/QuickPreview';
 import { publishChecklist } from './checklist';
 import { LangToggle } from './i18n/LangToggle';
@@ -289,6 +290,12 @@ export function Builder() {
               onDownload={download}
               onFix={fix}
               onPlayground={openInPlayground}
+              guide={
+                <section className="space-y-3">
+                  <h2 className="text-lg font-semibold">Put it on your site</h2>
+                  <PublishGuide />
+                </section>
+              }
             />
           )}
           {notice && (
