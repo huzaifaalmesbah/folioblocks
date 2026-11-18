@@ -6,6 +6,11 @@
   "bin": {
     "folioblocks": "cli/folioblocks.mjs"
   },
+  "files": [
+    "cli/",
+    "public/fonts/",
+    "public/images/"
+  ],
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
