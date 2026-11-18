@@ -10,7 +10,7 @@ body:
     id: template
     attributes:
       label: Which template did you use?
-      options: [Minimal, Creative, Developer, Academic, Contributor, Resume, Writer, Bangla, Designer, Freelancer, Bold, Photographer]
+      options: [Minimal, Creative, Developer, Academic, Contributor, Resume, Writer, Designer, Freelancer, Bold, Photographer, Profile, Terminal, Bento, Résumé Sheet, Editorial, Aurora, Brutal, Journey]
     validations:
       required: true
   - type: dropdown

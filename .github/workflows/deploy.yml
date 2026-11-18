@@ -24,6 +24,9 @@ jobs:
           node-version: 24
           cache: npm
       - run: npm ci
+      # Load every language folder, including any added since the last sync.
+      - run: npm run i18n:extract
+      - run: npm run i18n:check
       - run: npm run lint
       - run: npm test
       # Check every preset's theme with Ipsum's validator (schema, pattern headers, block markup, i18n).
