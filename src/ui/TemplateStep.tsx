@@ -1,16 +1,16 @@
 import { useState } from 'react';
 import { tr } from '../i18n/ui';
-import { presetByKey, PRESETS, TRACKS, type Track } from '../presets';
+import { PRESETS, TRACKS, type Track } from '../presets';
 import { useBuilder } from '../store';
 import { DesignMock } from './DesignMock';
 import { inputCls, SectionTitle } from './fields';
 
 /**
  * Step 1: pick a design to start from, or one you saved. Your info is never
- * touched. Switching is instant: a changed design is kept in My saved
- * designs first, and the switch can be undone.
+ * touched. Switching is instant and needs no undo: a changed design is kept
+ * in My saved designs first.
  */
-export function TemplateStep({ onSwitch }: { onSwitch: (message: string, change: () => void) => void }) {
+export function TemplateStep() {
   const preset = useBuilder((s) => s.preset);
   const savedLayouts = useBuilder((s) => s.savedLayouts);
   const { applyPreset, applyLayout, saveLayout, deleteLayout } = useBuilder.getState();
@@ -21,12 +21,12 @@ export function TemplateStep({ onSwitch }: { onSwitch: (message: string, change:
 
   function choosePreset(key: string) {
     if (key === preset) return;
-    onSwitch(tr('Switched to {name}. Your info stays.', { name: tr(presetByKey(key).label) }), () => applyPreset(key));
+    applyPreset(key);
   }
 
-  function chooseSaved(key: string, label: string) {
+  function chooseSaved(key: string) {
     if (key === preset) return;
-    onSwitch(tr('Switched to {name}. Your info stays.', { name: label }), () => applyLayout(key));
+    applyLayout(key);
   }
 
   const chip = (active: boolean) =>
@@ -99,7 +99,7 @@ export function TemplateStep({ onSwitch }: { onSwitch: (message: string, change:
                 </span>
                 <button
                   type="button"
-                  onClick={() => chooseSaved(l.key, l.label)}
+                  onClick={() => chooseSaved(l.key)}
                   disabled={l.key === preset}
                   className="rounded-md border border-slate-300 px-2 py-1 text-xs text-slate-800 hover:bg-slate-100 disabled:opacity-50"
                 >

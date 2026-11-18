@@ -290,8 +290,9 @@ export function Builder() {
         </header>
 
         {/* key={step} remounts the panel so each step starts scrolled to the top. */}
-        <div key={step} className="flex-1 overflow-y-auto p-4 lg:p-6">
-          {step === 'template' && <TemplateStep onSwitch={withUndo} />}
+        {/* relative: hidden labels (sr-only, absolute) stay inside this panel instead of stretching the page. */}
+        <div key={step} className="relative flex-1 overflow-y-auto p-4 lg:p-6">
+          {step === 'template' && <TemplateStep />}
           {step === 'info' && <InfoStep />}
           {step === 'style' && <StyleStep />}
           {step === 'pages' && <PagesStep />}
