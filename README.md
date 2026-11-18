@@ -23,7 +23,8 @@ Nothing is sent to a server. Everything stays in the browser.
 | 7 | Twelve templates, services and testimonials, student beta guide | ✅ done |
 | 8 | Bengali app interface | ✅ done |
 | 9 | Translation system: per-language files, Help translate page, checks ([guide](TRANSLATING.md)) | ✅ done |
-| 10 | Run the student beta ([guide](docs/beta-test.md)) | ⏳ next |
+| 10 | Five-step builder, Publish guide, FolioBlocks skill and command line | ✅ done |
+| 11 | Run the student beta ([guide](docs/beta-test.md)) | ⏳ next |
 
 ## Development
 
@@ -117,9 +118,30 @@ FolioBlocks is in English, and anyone can translate it, with no git needed: see 
 - The interface: components stay plain English; a DOM translator swaps rendered text that matches a dictionary key, and `tr()` handles messages built in code. Prompts, code and product names are not translated.
 - The **Translations** workflow checks pull requests and, on `main`, runs `i18n:extract` and commits the result.
 
-### AI agents
+### AI agents: the FolioBlocks skill and command line
 
-FolioBlocks never calls an AI, and the builder's form has no AI prompts. Every theme ships an **AGENTS.md** (`src/generator/agentsMd.ts`) with the theme's rules for coding agents, and the home page's AI guide has prompts that fill in the student's theme folder and name.
+FolioBlocks never calls an AI. Instead, an AI coding agent (Claude Code, Codex, Cursor, Copilot) can make a theme for a student from a conversation:
+
+```bash
+npx skills add huzaifaalmesbah/folioblocks --skill folioblocks
+```
+
+Then one prompt: *"Make my portfolio website with the folioblocks skill."* The skill ([`skills/folioblocks/SKILL.md`](skills/folioblocks/SKILL.md)) has the agent interview the student a few questions at a time (in their language, never inventing facts), suggest three templates, write the answers into `folioblocks.json`, and build with the command line, never by hand. The project file is the builder's backup format, so it also opens on the website.
+
+The command line (`src/cli/`, bundled into `cli/folioblocks.mjs` so it runs with plain Node from the repo):
+
+```bash
+npx -y github:huzaifaalmesbah/folioblocks templates          # templates, sections, colours, fonts (JSON)
+npx -y github:huzaifaalmesbah/folioblocks init --template bento
+npx -y github:huzaifaalmesbah/folioblocks check              # what a visitor would notice
+npx -y github:huzaifaalmesbah/folioblocks build              # theme/<slug>/ and theme/<slug>.zip
+npx -y github:huzaifaalmesbah/folioblocks link               # opens the builder with the project loaded
+npx -y github:huzaifaalmesbah/folioblocks preview            # local WordPress (Playground CLI)
+```
+
+In this repo: `npm run cli -- <command>`; after changing `src/`, `npm run build:cli` (the Translations workflow also rebuilds it on `main`). Photos may be local paths; the theme keeps their real type. The builder loads `#/build?import=<base64url project>` links.
+
+Every theme also ships an **AGENTS.md** (`src/generator/agentsMd.ts`) with its rules for coding agents and links to the Theme Handbook; the home page's "Go further" prompts use WordPress' own agent skills.
 
 ### The builder's five steps
 
