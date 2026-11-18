@@ -13,7 +13,6 @@ import {
   PROMPTS,
   SKILLS,
   SKILLS_REPO,
-  WPCOM_LINKS,
 } from './content';
 
 const REPO = REPO_URL;
@@ -192,7 +191,7 @@ export function Landing() {
                 {
                   n: '3',
                   title: 'Publish it',
-                  text: 'Upload the zip to WordPress.com (the free Student plan works) or any WordPress host. Step by step below.',
+                  text: 'Upload the zip to any WordPress site or WordPress.com. Step by step below.',
                   link: { href: '#wordpress-com', label: 'Publishing guide' },
                 },
               ].map((c) => (
@@ -346,12 +345,7 @@ export function Landing() {
             <SectionHeading id="publish" eyebrow="Publish" title="From zip to a live site">
               Install your theme on any WordPress site, make it yours in the Site Editor, and add pages and posts.
             </SectionHeading>
-            <p className="mt-10 rounded-xl border border-blue-200 bg-blue-50 p-4 text-slate-800">
-              <span aria-hidden>🎓 </span>
-              <strong>Students:</strong> the free WordPress.com Student plan (first year free) can upload themes.{' '}
-              <a className="text-blue-800 underline" href={WPCOM_LINKS.studentPlan}>Details</a>
-            </p>
-            <div className="mt-6">
+            <div className="mt-10">
               <PublishGuide />
             </div>
             <p className="mt-6 text-center">
@@ -363,7 +357,7 @@ export function Landing() {
         </section>
 
         {/* Final call */}
-        <section className="bg-slate-900 py-16 text-center text-white">
+        <section className="bg-slate-900 px-4 py-16 text-center text-white">
           <h2 className="text-3xl font-bold">Ready when you are</h2>
           <p className="mx-auto mt-3 max-w-xl text-slate-300">It takes about ten minutes. Everything stays in your browser until you download it.</p>
           <a href="#/build" className="mt-8 inline-block rounded-lg bg-white px-6 py-3 font-semibold text-slate-900 hover:bg-slate-100">
@@ -372,15 +366,14 @@ export function Landing() {
         </section>
       </main>
 
-      <footer className="border-t border-slate-200 py-10 text-sm text-slate-500">
+      <footer className="border-t border-slate-200 py-8 text-sm text-slate-500">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-x-6 gap-y-2 px-4 sm:px-6">
           <span>FolioBlocks · GPL-2.0-or-later</span>
-          <a className="hover:text-slate-700" href={REPO}>Source on GitHub</a>
-          <a className="hover:text-slate-700" href={`${REPO}/issues/new?template=beta-feedback.yml`}>Give feedback</a>
-          <a className="hover:text-slate-700" href="#/translate">Help translate</a>
-          <a className="hover:text-slate-700" href={SKILLS_REPO}>WordPress agent skills</a>
-          <a className="hover:text-slate-700" href="https://openverse.org">Sample photos from Openverse (CC0)</a>
-          <span className="ml-auto">Not affiliated with WordPress.org or WordPress.com.</span>
+          <nav aria-label="Footer" className="flex gap-5 sm:ml-auto">
+            <a className="hover:text-slate-700" href="#/guide">Guide</a>
+            <a className="hover:text-slate-700" href="#/translate">Help translate</a>
+            <a className="hover:text-slate-700" href={REPO}>GitHub</a>
+          </nav>
         </div>
       </footer>
     </div>

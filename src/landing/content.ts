@@ -125,7 +125,6 @@ export const WPCOM_LINKS = {
   upload: 'https://wordpress.com/support/themes/uploading-setting-up-custom-themes/',
   studio: 'https://wordpress.studio/',
   studioSync: 'https://wordpress.studio/docs/sync/',
-  studentPlan: 'https://wordpress.com/support/plan-features/student-plan/',
 };
 
 /* ---------- Publish guide: shared by the Publish step and the Guide page ---------- */
@@ -152,7 +151,7 @@ export const INSTALL_PLACES: GuidePart[] = [
   {
     id: 'wpcom',
     title: 'WordPress.com',
-    text: 'Theme upload needs the Personal plan or higher; the Free plan can\'t. Students: the free WordPress.com Student plan (first year free) can upload themes.',
+    text: 'Theme upload needs the Personal plan or higher; the Free plan can\'t.',
     steps: [
       'In WordPress.com, go to Appearance → Themes.',
       'Click "Add Theme", then "Upload Theme", and choose your zip.',
@@ -160,7 +159,6 @@ export const INSTALL_PLACES: GuidePart[] = [
     ],
     links: [
       { label: 'WordPress.com: Upload a theme', url: WPCOM_LINKS.upload },
-      { label: 'The Student plan', url: WPCOM_LINKS.studentPlan },
     ],
   },
   {
