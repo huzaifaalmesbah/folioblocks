@@ -1,10 +1,9 @@
 import { useEffect, useState, type ReactNode } from 'react';
 import { PRESETS } from '../presets';
 import { DesignMock } from '../ui/DesignMock';
+import { SiteFooter, SiteHeader } from '../ui/SiteChrome';
 import { PublishGuide } from '../ui/PublishGuide';
 import { themeSlug } from '../generator/utils';
-import { REPO_URL } from '../config';
-import { LangToggle } from '../i18n/LangToggle';
 import { tr } from '../i18n/ui';
 import { useBuilder } from '../store';
 import {
@@ -16,7 +15,6 @@ import {
   SKILLS_REPO,
 } from './content';
 
-const REPO = REPO_URL;
 
 /* ---------- Small pieces ---------- */
 
@@ -105,30 +103,7 @@ export function Landing() {
         Skip to content
       </a>
 
-      <header className="sticky top-0 z-40 border-b border-slate-200/70 bg-white/85 backdrop-blur">
-        <nav className="mx-auto flex max-w-6xl items-center gap-6 px-4 py-3 sm:px-6" aria-label="Main">
-          <a href="#/" className="flex items-center gap-2 font-bold">
-            <span aria-hidden className="grid h-7 w-7 grid-cols-2 gap-0.5 rounded-md bg-blue-700 p-1">
-              <span className="rounded-sm bg-white" />
-              <span className="rounded-sm bg-white/60" />
-              <span className="rounded-sm bg-white/60" />
-              <span className="rounded-sm bg-white" />
-            </span>
-            FolioBlocks
-          </a>
-          <div className="hidden items-center gap-5 text-sm text-slate-600 md:flex">
-            <a href="#designs" className="hover:text-slate-900">Templates</a>
-            <a href="#ai" className="hover:text-slate-900">AI agent</a>
-            <a href="#/guide" className="hover:text-slate-900">Guide</a>
-            <a href="#/translate" className="hover:text-slate-900">Translate</a>
-            <a href={REPO} className="hover:text-slate-900">GitHub</a>
-          </div>
-          <LangToggle className="ml-auto" />
-          <a href="#/build" className="rounded-md bg-slate-900 px-3.5 py-2 text-sm font-semibold text-white hover:bg-slate-700">
-            Start building
-          </a>
-        </nav>
-      </header>
+      <SiteHeader />
 
       <main id="main">
         {/* Hero */}
@@ -394,16 +369,7 @@ export function Landing() {
         </section>
       </main>
 
-      <footer className="border-t border-slate-200 py-8 text-sm text-slate-500">
-        <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-x-6 gap-y-2 px-4 sm:px-6">
-          <span>FolioBlocks · GPL-2.0-or-later</span>
-          <nav aria-label="Footer" className="flex gap-5 sm:ml-auto">
-            <a className="hover:text-slate-700" href="#/guide">Guide</a>
-            <a className="hover:text-slate-700" href="#/translate">Help translate</a>
-            <a className="hover:text-slate-700" href={REPO}>GitHub</a>
-          </nav>
-        </div>
-      </footer>
+      <SiteFooter />
     </div>
   );
 }

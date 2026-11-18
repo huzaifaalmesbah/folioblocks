@@ -326,14 +326,26 @@ const enFiles: Record<string, string> = {
 /**
  * Keep every other language in step with English: new strings are added as
  * an English copy (so they count as not translated yet), strings the code no
- * longer uses are dropped, and translations are kept, in English's order.
+ * longer uses are dropped, and translations are kept, in English's order. A
+ * translation is found in any of the language's files, so a string that
+ * moves from one file to another (say home.json to builder.json) keeps it.
  */
 function synced(code: string, part: string): string | null {
   const path = join(LOCALES, code, `${part}.json`);
   if (!existsSync(path)) return null;
   const source = JSON.parse(enFiles[`${part}.json`]) as Record<string, string>;
+  const all: Record<string, string> = {};
+  for (const p of ['home', 'builder', 'templates', 'theme']) {
+    const other = join(LOCALES, code, `${p}.json`);
+    if (!existsSync(other)) continue;
+    for (const [k, v] of Object.entries(JSON.parse(readFileSync(other, 'utf8')) as Record<string, string>)) {
+      if (typeof v === 'string' && v && v !== k && !(k in all)) all[k] = v;
+    }
+  }
+  // This file's own translation wins over another file's.
   const mine = JSON.parse(readFileSync(path, 'utf8')) as Record<string, string>;
-  return json(Object.fromEntries(Object.keys(source).map((k) => [k, typeof mine[k] === 'string' && mine[k] ? mine[k] : k])));
+  const pick = (k: string) => (typeof mine[k] === 'string' && mine[k] && mine[k] !== k ? mine[k] : (all[k] ?? k));
+  return json(Object.fromEntries(Object.keys(source).map((k) => [k, pick(k)])));
 }
 
 const targets: Record<string, string> = Object.fromEntries(Object.entries(enFiles).map(([f, text]) => [join(LOCALES, 'en', f), text]));

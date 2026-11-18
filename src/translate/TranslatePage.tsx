@@ -5,6 +5,7 @@ import { REPO_URL } from '../config';
 import { allLanguages, ALL_PARTS, SOURCE, type LanguageMeta, type Part } from '../i18n/languages';
 import { englishOf, folderFiles, loadDraft, placeholders, readUpload, save, type Draft } from './files';
 import { inputCls } from '../ui/fields';
+import { SiteFooter, SiteHeader } from '../ui/SiteChrome';
 
 /**
  * Help translate: translate FolioBlocks in the browser, with no git and no
@@ -135,12 +136,7 @@ export function TranslatePage() {
 
   return (
     <div className="min-h-screen bg-white text-slate-900">
-      <header className="border-b border-slate-200">
-        <nav className="mx-auto flex max-w-5xl items-center gap-4 px-4 py-3 sm:px-6">
-          <a href="#/" className="font-semibold">FolioBlocks</a>
-          <a href="#/build" className="ml-auto text-sm text-slate-600 hover:text-slate-900">Open the builder</a>
-        </nav>
-      </header>
+      <SiteHeader current="translate" />
 
       <main className="mx-auto max-w-5xl space-y-8 px-4 py-10 sm:px-6">
         <section className="space-y-3">
@@ -308,6 +304,7 @@ export function TranslatePage() {
           </>
         )}
       </main>
+      <SiteFooter />
     </div>
   );
 }

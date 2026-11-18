@@ -1,5 +1,6 @@
 import { DEV_DOCS, USER_DOCS, type GuideLink } from '../landing/content';
 import { PublishGuide } from '../ui/PublishGuide';
+import { SiteFooter, SiteHeader } from '../ui/SiteChrome';
 
 function LinkList({ links }: { links: GuideLink[] }) {
   return (
@@ -22,14 +23,7 @@ function LinkList({ links }: { links: GuideLink[] }) {
 export function GuidePage() {
   return (
     <div className="min-h-screen bg-white text-slate-900">
-      <header className="border-b border-slate-200">
-        <nav className="mx-auto flex max-w-3xl items-center gap-4 px-4 py-3 sm:px-6">
-          <a href="#/" className="font-semibold">FolioBlocks</a>
-          <a href="#/build" className="ml-auto rounded-md bg-slate-900 px-3 py-1.5 text-sm font-semibold text-white hover:bg-slate-700">
-            Open the builder
-          </a>
-        </nav>
-      </header>
+      <SiteHeader current="guide" />
 
       <main className="mx-auto max-w-3xl space-y-10 px-4 py-10 sm:px-6">
         <section className="space-y-3">
@@ -56,6 +50,7 @@ export function GuidePage() {
           <LinkList links={DEV_DOCS} />
         </section>
       </main>
+      <SiteFooter />
     </div>
   );
 }
