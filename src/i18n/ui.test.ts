@@ -33,7 +33,7 @@ describe('interface translation', () => {
   });
 
   it('covers every template and section name', () => {
-    for (const p of PRESETS.filter((p) => !p.language)) {
+    for (const p of PRESETS) {
       for (const text of [p.label, p.description, p.bestFor]) expect(BN[text], text).toBeTruthy();
     }
     for (const label of Object.values(SECTION_LABELS)) expect(BN[label], label).toBeTruthy();

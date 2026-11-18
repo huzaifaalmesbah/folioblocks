@@ -1,4 +1,4 @@
-import type { FooterVariant, HeaderVariant, Language, PageKey, Palette, Section, Style } from './types';
+import type { FooterVariant, HeaderVariant, PageKey, Palette, Section, Style } from './types';
 
 export type PaletteDef = { key: string; label: string; palette: Palette };
 
@@ -103,8 +103,6 @@ export type PresetDef = {
   description: string;
   /** Who it suits, shown in the gallery. */
   bestFor: string;
-  /** Set when the template is written for a language; applying it switches the site language. */
-  language?: Language;
   style: Style;
   header: HeaderVariant;
   footer: FooterVariant;
@@ -210,21 +208,6 @@ export const PRESETS: PresetDef[] = [
     pages: {
       home: [s('hero', 'centered'), s('posts', 'list'), s('about', 'text'), s('contact', 'cta')],
       about: [s('about', 'photo'), s('experience', 'compact'), s('education', 'list'), s('skills', 'list')],
-      contact: [s('contact', 'full')],
-    },
-  },
-  {
-    key: 'bangla',
-    label: 'বাংলা (Bangla)',
-    description: 'Headings, buttons and menu in Bengali, with a Bengali font. Write your own text in Bangla.',
-    bestFor: 'Sites written in Bengali',
-    language: 'bn',
-    style: { palette: palette('shapla'), fonts: { heading: 'noto-sans-bengali', body: 'noto-sans-bengali' }, radius: 'md' },
-    header: 'inline',
-    footer: 'centered',
-    pages: {
-      home: [s('hero', 'avatar'), s('about', 'text'), s('skills', 'badges'), s('projects', 'grid'), s('posts', 'grid'), s('contact', 'cta')],
-      about: [s('about', 'photo'), s('experience', 'timeline'), s('education', 'list'), s('contributions', 'list'), s('achievements', 'list')],
       contact: [s('contact', 'full')],
     },
   },

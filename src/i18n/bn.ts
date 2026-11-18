@@ -84,8 +84,6 @@ export const BN: Record<string, string> = {
   'A one-page CV: profile, experience, education, skills and achievements on the home page.': 'এক পাতার সিভি: হোম পেজেই প্রোফাইল, অভিজ্ঞতা, শিক্ষা, দক্ষতা ও অর্জন।',
   'Bloggers and people who like to write': 'ব্লগার ও যারা লিখতে ভালোবাসেন',
   'Words first: a quiet intro, then your latest posts. Serif headings on warm paper.': 'আগে লেখা: ছোট পরিচিতি, তারপর আপনার সাম্প্রতিক পোস্ট। উষ্ণ কাগজে সেরিফ শিরোনাম।',
-  'Sites written in Bengali': 'বাংলায় লেখা সাইট',
-  'Headings, buttons and menu in Bengali, with a Bengali font. Write your own text in Bangla.': 'শিরোনাম, বাটন ও মেনু বাংলায়, বাংলা ফন্টসহ। নিজের লেখাও বাংলায় লিখুন।',
   'Designers, illustrators and UI work': 'ডিজাইনার, ইলাস্ট্রেটর ও UI-এর কাজ',
   'Your work does the talking: a short intro, then a large two-column gallery.': 'আপনার কাজই কথা বলবে: ছোট পরিচিতি, তারপর দুই কলামের বড় গ্যালারি।',
   'Freelancers and students taking client work': 'ফ্রিল্যান্সার ও যে শিক্ষার্থীরা ক্লায়েন্টের কাজ করেন',

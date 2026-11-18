@@ -19,10 +19,12 @@ rmSync(OUT, { recursive: true, force: true });
 
 const cases: [string, BuilderState][] = PRESETS.map((p) => [
   p.key,
-  { ...sample, language: p.language ?? 'en', preset: p.key, style: p.style, header: p.header, footer: p.footer, pages: p.pages },
+  { ...sample, language: 'en', preset: p.key, style: p.style, header: p.header, footer: p.footer, pages: p.pages },
 ]);
 // Cover the header and footer variants each preset doesn't use, and an empty profile.
 cases.push(['minimal-centered-split', { ...cases[0][1], header: 'centered', footer: 'split' }]);
+// The theme's own words in Bengali, with a Bengali font.
+cases.push(['minimal-bengali', { ...cases[0][1], language: 'bn', style: { ...cases[0][1].style, fonts: { heading: 'noto-sans-bengali', body: 'noto-sans-bengali' } } }]);
 // Nothing filled in: every optional section must hide itself and the theme must still be valid.
 cases.push([
   'empty-profile',

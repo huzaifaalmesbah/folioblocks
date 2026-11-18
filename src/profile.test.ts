@@ -107,9 +107,13 @@ describe('templates and language', () => {
     }
   });
 
-  it('the Bangla template writes the theme\'s own words in Bengali and bundles a Bengali font', () => {
-    const p = PRESETS.find((x) => x.key === 'bangla')!;
-    const state: BuilderState = { ...withInfo(full, 'bangla'), language: p.language! };
+  it('in Bengali, the theme writes its own words in Bengali and bundles a Bengali font', () => {
+    const base = withInfo(full, 'minimal');
+    const state: BuilderState = {
+      ...base,
+      language: 'bn',
+      style: { ...base.style, fonts: { heading: 'noto-sans-bengali', body: 'noto-sans-bengali' } },
+    };
     const { files, assets } = generateTheme(state);
     const home = files['patterns/page-home.php'];
     expect(home).toContain("esc_html__( 'আমার সম্পর্কে'");
@@ -156,9 +160,9 @@ describe('services, testimonials and the newest designs', () => {
     expect(home).toContain('class="wp-block-group alignfull has-base-color has-accent-3-background-color has-text-color has-background"');
   });
 
-  it('has twenty templates, each with its own key and a best-for line', () => {
-    expect(PRESETS).toHaveLength(20);
-    expect(new Set(PRESETS.map((p) => p.key)).size).toBe(20);
+  it('has nineteen templates, each with its own key and a best-for line', () => {
+    expect(PRESETS).toHaveLength(19);
+    expect(new Set(PRESETS.map((p) => p.key)).size).toBe(19);
     for (const p of PRESETS) expect(p.bestFor.length, p.key).toBeGreaterThan(5);
   });
 });

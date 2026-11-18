@@ -104,7 +104,7 @@ A section with nothing to show returns no markup, so the downloaded theme leaves
 
 ### Templates and languages
 
-Twelve templates in `src/presets.ts`: Minimal, Creative, Developer, Academic, Contributor (WordPress work first), Resume (one-page CV), Writer (posts first), Bangla, Designer (gallery), Freelancer (services and testimonials), Bold (colour-band hero) and Photographer (photo wall). Each sets a palette, fonts, header, footer and the sections of every page; the home page shows them as a gallery.
+Nineteen templates in `src/presets.ts`: Minimal, Creative, Developer, Academic, Contributor (WordPress work first), Resume (one-page CV), Writer (posts first), Designer (gallery), Freelancer (services and testimonials), Bold (colour-band hero), Photographer (photo wall), and eight built from the 2026 designs in `html-templates/` (Profile, Terminal, Bento, Résumé Sheet, Editorial, Aurora, Brutal, Journey) with core-only looks (`src/generator/looks.ts`). Each sets a palette, fonts, header, footer and the sections of every page; the home page shows them as a gallery.
 
 The theme's own words (headings, buttons, menu, page titles) can be written in English or Bengali (`src/generator/i18n.ts`); the student's text is used as typed. Bengali uses the bundled Noto Sans Bengali font. To add a language, add a dictionary there and an option in the Style step.
 

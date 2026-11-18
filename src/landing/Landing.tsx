@@ -76,14 +76,13 @@ function DesignMock({ p }: { p: PresetDef }) {
   const heading = fontDef(fonts.heading).stack;
   const body = fontDef(fonts.body).stack;
   const radius = { none: '0', sm: '3px', md: '6px', lg: '12px' }[p.style.radius];
-  const bn = p.language === 'bn';
-  const name = <div style={{ fontFamily: heading, color: palette.contrast }} className="text-[15px] leading-tight font-bold">{bn ? 'আপনার নাম' : 'Your Name'}</div>;
+  const name = <div style={{ fontFamily: heading, color: palette.contrast }} className="text-[15px] leading-tight font-bold">Your Name</div>;
   const button = (
     <span className="inline-block px-2 py-1 text-[8px] font-semibold" style={{ background: palette.primary, color: palette.base, borderRadius: radius }}>
-      {bn ? 'আমার কাজ দেখুন' : 'View my work'}
+      View my work
     </span>
   );
-  const tag = <div style={{ fontFamily: body, color: palette.contrast, opacity: 0.75 }} className="text-[8px]">{bn ? 'শিক্ষার্থী ও ওয়ার্ডপ্রেস কন্ট্রিবিউটর' : 'Student & WordPress Contributor'}</div>;
+  const tag = <div style={{ fontFamily: body, color: palette.contrast, opacity: 0.75 }} className="text-[8px]">Student & WordPress Contributor</div>;
   const photo = (cls: string, src = img('avatar.webp')) => <img src={src} alt="" className={`object-cover ${cls}`} style={{ borderRadius: radius }} />;
 
   let hero: ReactNode;
@@ -153,8 +152,8 @@ function DesignMock({ p }: { p: PresetDef }) {
       </div>
       <div className="space-y-2 p-3">
         <div className={`flex items-center text-[7px] ${p.header === 'centered' ? 'flex-col gap-0.5' : 'justify-between'}`} style={{ color: palette.contrast, fontFamily: body }}>
-          <span className="font-bold">{bn ? 'আপনার নাম' : 'Your Name'}</span>
-          <span className="opacity-70">{bn ? 'পরিচিতি · ব্লগ · যোগাযোগ' : 'About · Blog · Contact'}</span>
+          <span className="font-bold">Your Name</span>
+          <span className="opacity-70">About · Blog · Contact</span>
         </div>
         {hero}
         <div className="grid grid-cols-3 gap-1.5 rounded p-1.5" style={{ background: palette.accent }}>
