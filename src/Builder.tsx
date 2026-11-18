@@ -9,27 +9,41 @@ import { buildBlueprint, playgroundUrl } from './playground/blueprint';
 import { exportSettings, parseSettings } from './layout';
 import { InfoStep } from './ui/InfoStep';
 import { StyleStep } from './ui/StyleStep';
-import { LayoutStep } from './ui/LayoutStep';
+import { TemplateStep } from './ui/TemplateStep';
+import { PagesStep } from './ui/PagesStep';
+import { PublishStep } from './ui/PublishStep';
+import { MoreMenu } from './ui/MoreMenu';
 import { QuickPreview } from './preview/QuickPreview';
 import { publishChecklist } from './checklist';
 import { LangToggle } from './i18n/LangToggle';
 import { tr } from './i18n/ui';
-import { DownloadDialog } from './ui/DownloadDialog';
 
 type View = 'preview' | 'code';
 
-const VIEWS: { key: View; label: string }[] = [
-  { key: 'preview', label: 'Preview' },
-  { key: 'code', label: 'Code' },
-];
-
+/** Five steps, one job each: pick a design, add your info, adjust the style, arrange pages, publish. */
 const STEPS = [
-  { key: 'info', label: '1. Info', Component: InfoStep },
-  { key: 'style', label: '2. Style', Component: StyleStep },
-  { key: 'layout', label: '3. Layout', Component: LayoutStep },
+  { key: 'template', label: 'Template' },
+  { key: 'info', label: 'Your info' },
+  { key: 'style', label: 'Style' },
+  { key: 'pages', label: 'Pages' },
+  { key: 'publish', label: 'Publish' },
 ] as const;
 
-type StepKey = (typeof STEPS)[number]['key'];
+export type StepKey = (typeof STEPS)[number]['key'];
+const isStep = (v: unknown): v is StepKey => STEPS.some((s) => s.key === v);
+
+/** Where to start: `#/build?step=info` (from the home page's template gallery), the last step this tab was on, or the beginning. */
+function initialStep(): StepKey {
+  const fromHash = new URLSearchParams(window.location.hash.split('?')[1] ?? '').get('step');
+  if (isStep(fromHash)) return fromHash;
+  try {
+    const saved = sessionStorage.getItem('folioblocks-step');
+    if (isStep(saved)) return saved;
+  } catch {
+    // Storage blocked: start at the beginning.
+  }
+  return 'template';
+}
 
 export function Builder() {
   const info = useBuilder((s) => s.info);
@@ -50,19 +64,25 @@ export function Builder() {
   const preview = useMemo(() => generateTheme(state, { samples: true }), [state]);
   const paths = [...Object.keys(files), ...assets.map((a) => a.path)].sort();
 
-  const [step, setStep] = useState<StepKey>('info');
+  const [step, setStepState] = useState<StepKey>(initialStep);
+  const setStep = (next: StepKey) => {
+    setStepState(next);
+    try {
+      sessionStorage.setItem('folioblocks-step', next);
+    } catch {
+      // Storage blocked: the step just isn't remembered.
+    }
+  };
   const [selected, setSelected] = useState('theme.json');
   const [view, setView] = useState<View>('preview');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const [notice, setNotice] = useState('');
-  // Download opens a dialog: a pre-flight check, then what to do next.
-  const [dialog, setDialog] = useState<'closed' | 'check' | 'done'>('closed');
+  const [downloaded, setDownloaded] = useState(false);
   const checklist = useMemo(() => publishChecklist(state), [state]);
   // On small screens the form and the preview take turns.
   const [mobileView, setMobileView] = useState<'edit' | 'preview'>('edit');
 
-  const Current = STEPS.find((s) => s.key === step)!.Component;
   const stepIndex = STEPS.findIndex((s) => s.key === step);
 
   function openInPlayground() {
@@ -103,7 +123,7 @@ export function Builder() {
       const [screenshot, binaries] = await Promise.all([renderScreenshot(state), fetchAssets(assets)]);
       const zip = await buildZip(slug, files, { ...binaries, 'screenshot.png': screenshot });
       saveAs(zip, `${slug}.zip`);
-      setDialog('done');
+      setDownloaded(true);
     } catch (e) {
       setError(e instanceof Error ? e.message : String(e));
     } finally {
@@ -111,25 +131,21 @@ export function Builder() {
     }
   }
 
+  function startOver() {
+    if (confirm(tr('Start over? This clears your info and design in this browser. Your saved designs stay.'))) {
+      reset();
+      setDownloaded(false);
+      setStep('template');
+    }
+  }
+
+  const fix = (s: StepKey) => {
+    setStep(s);
+    setMobileView('edit');
+  };
+
   return (
     <div className="flex h-dvh flex-col bg-slate-50 text-slate-900 lg:flex-row">
-      <DownloadDialog
-        open={dialog !== 'closed'}
-        phase={dialog === 'done' ? 'done' : 'check'}
-        items={checklist}
-        slug={slug}
-        busy={busy}
-        error={error}
-        onDownload={download}
-        onFix={(s) => {
-          setStep(s);
-          setMobileView('edit');
-          setDialog('closed');
-        }}
-        onPlayground={openInPlayground}
-        onClose={() => setDialog('closed')}
-      />
-
       {/* Small screens: one panel at a time. */}
       <div className="grid shrink-0 grid-cols-2 gap-1 border-b border-slate-200 bg-white p-2 lg:hidden" role="tablist" aria-label="Panel">
         {(['edit', 'preview'] as const).map((v) => (
@@ -149,138 +165,131 @@ export function Builder() {
       <aside
         className={`${mobileView === 'edit' ? 'flex' : 'hidden'} min-h-0 w-full flex-1 flex-col border-slate-200 bg-white lg:flex lg:w-[440px] lg:flex-none lg:border-r`}
       >
-        <header className="space-y-3 border-b border-slate-200 p-4 pb-3 lg:p-6 lg:pb-4">
-          <div>
-            <div className="flex items-center justify-between">
-              <h1 className="text-2xl font-bold">
-                <a href="#/" className="hover:text-blue-700" aria-label="FolioBlocks home">
-                  FolioBlocks
-                </a>
-              </h1>
-              <LangToggle />
-            </div>
-            <p className="hidden text-sm text-slate-600 lg:block">Build your WordPress portfolio theme, no code needed.</p>
+        <header className="space-y-3 border-b border-slate-200 p-4 pb-3 lg:px-6">
+          <div className="flex items-center gap-2">
+            <h1 className="mr-auto text-xl font-bold">
+              <a href="#/" className="hover:text-blue-700" aria-label="FolioBlocks home">
+                FolioBlocks
+              </a>
+            </h1>
+            <LangToggle />
+            <MoreMenu
+              items={[
+                { kind: 'button', label: 'Save a backup file', hint: 'Keep your work safe, or continue on another computer.', onClick: exportDraft },
+                { kind: 'file', label: 'Open a backup file', hint: 'Continue from a file you saved before.', accept: 'application/json,.json', onFile: importDraft },
+                { kind: 'divider' },
+                {
+                  kind: 'button',
+                  label: 'View the theme files',
+                  hint: 'The code that goes into your zip.',
+                  onClick: () => {
+                    setView('code');
+                    setMobileView('preview');
+                  },
+                },
+                { kind: 'button', label: 'Download blueprint.json', hint: 'For WordPress Playground (advanced).', onClick: downloadBlueprint },
+                { kind: 'divider' },
+                { kind: 'button', label: 'Start over', hint: 'Clear your info and design in this browser.', danger: true, onClick: startOver },
+              ]}
+            />
           </div>
-          <nav className="grid grid-cols-3 gap-1 rounded-lg bg-slate-100 p-1" aria-label="Steps">
-            {STEPS.map((s) => (
-              <button
-                key={s.key}
-                type="button"
-                aria-current={s.key === step ? 'step' : undefined}
-                onClick={() => setStep(s.key)}
-                className={`rounded-md px-2 py-1.5 text-sm font-medium ${
-                  s.key === step ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-600 hover:text-slate-900'
-                }`}
-              >
-                {s.label}
-              </button>
-            ))}
+          <nav aria-label="Steps">
+            <ol className="grid grid-cols-5 gap-1">
+              {STEPS.map((s, i) => {
+                const current = s.key === step;
+                const done = i < stepIndex;
+                return (
+                  <li key={s.key}>
+                    <button
+                      type="button"
+                      aria-current={current ? 'step' : undefined}
+                      onClick={() => setStep(s.key)}
+                      className={`flex w-full flex-col items-center gap-1 rounded-md px-1 py-1.5 text-xs font-medium ${
+                        current ? 'bg-blue-50 text-blue-800' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+                      }`}
+                    >
+                      <span
+                        aria-hidden
+                        className={`flex h-6 w-6 items-center justify-center rounded-full text-xs font-semibold ${
+                          current ? 'bg-blue-700 text-white' : done ? 'bg-green-600 text-white' : 'bg-slate-200 text-slate-700'
+                        }`}
+                      >
+                        {done ? '✓' : i + 1}
+                      </span>
+                      <span className="leading-tight">{s.label}</span>
+                    </button>
+                  </li>
+                );
+              })}
+            </ol>
           </nav>
         </header>
 
         {/* key={step} remounts the panel so each step starts scrolled to the top. */}
-        <div key={step} className="flex-1 overflow-y-auto p-6">
-          <Current />
-          <div className="mt-6 flex justify-between">
-            <button
-              type="button"
-              disabled={stepIndex === 0}
-              onClick={() => setStep(STEPS[stepIndex - 1].key)}
-              className="text-sm font-medium text-slate-600 hover:text-slate-900 disabled:invisible"
-            >
-              ← Back
-            </button>
-            <button
-              type="button"
-              disabled={stepIndex === STEPS.length - 1}
-              onClick={() => setStep(STEPS[stepIndex + 1].key)}
-              className="text-sm font-medium text-blue-700 hover:text-blue-900 disabled:invisible"
-            >
-              Next →
-            </button>
-          </div>
-        </div>
-
-        <footer className="space-y-2 border-t border-slate-200 bg-white p-4">
-          <button
-            type="button"
-            onClick={openInPlayground}
-            className="w-full rounded-md bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white hover:bg-slate-700"
-          >
-            Open in WordPress Playground ↗
-          </button>
-          <div className="flex gap-2">
-            <button
-              type="button"
-              onClick={() => {
-                setError('');
-                setDialog('check');
-              }}
-              disabled={busy}
-              className="flex-1 rounded-md bg-blue-700 px-4 py-2.5 text-sm font-semibold text-white hover:bg-blue-800 disabled:opacity-60"
-            >
-              Download {slug}.zip
-            </button>
-            <button
-              type="button"
-              onClick={() => confirm(tr('Reset everything to the defaults?')) && reset()}
-              className="rounded-md border border-slate-300 px-3 py-2.5 text-sm text-slate-700 hover:bg-slate-100"
-            >
-              Reset
-            </button>
-          </div>
-          {error && dialog === 'closed' && (
-            <p role="alert" className="text-xs text-red-700">
+        <div key={step} className="flex-1 overflow-y-auto p-4 lg:p-6">
+          {step === 'template' && <TemplateStep />}
+          {step === 'info' && <InfoStep />}
+          {step === 'style' && <StyleStep />}
+          {step === 'pages' && <PagesStep />}
+          {step === 'publish' && (
+            <PublishStep
+              items={checklist}
+              slug={slug}
+              busy={busy}
+              error={error}
+              downloaded={downloaded}
+              onDownload={download}
+              onFix={fix}
+              onPlayground={openInPlayground}
+            />
+          )}
+          {notice && (
+            <p role="status" className="mt-4 text-sm text-green-700">
+              {notice}
+            </p>
+          )}
+          {error && step !== 'publish' && (
+            <p role="alert" className="mt-4 text-sm text-red-700">
               {error}
             </p>
           )}
-          <p className="flex flex-wrap gap-x-3 gap-y-1 text-xs text-slate-500">
-            <button type="button" onClick={exportDraft} className="underline hover:text-slate-700">
-              Save draft (.json)
+        </div>
+
+        <footer className="flex items-center gap-2 border-t border-slate-200 bg-white p-3 lg:px-6">
+          <button
+            type="button"
+            disabled={stepIndex === 0}
+            onClick={() => setStep(STEPS[stepIndex - 1].key)}
+            className="rounded-md px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 disabled:invisible"
+          >
+            ← Back
+          </button>
+          {stepIndex < STEPS.length - 1 && (
+            <button
+              type="button"
+              onClick={() => setStep(STEPS[stepIndex + 1].key)}
+              className="ml-auto rounded-md bg-slate-900 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-700"
+            >
+              Next: {STEPS[stepIndex + 1].label} →
             </button>
-            <label className="cursor-pointer underline hover:text-slate-700 focus-within:ring-2 focus-within:ring-blue-600/30">
-              Load draft
-              <input type="file" accept="application/json,.json" className="sr-only" onChange={importDraft} />
-            </label>
-            <button type="button" onClick={downloadBlueprint} className="underline hover:text-slate-700">
-              Download blueprint.json
-            </button>
-          </p>
-          {notice && (
-            <p role="status" className="text-xs text-green-700">
-              {notice}
-            </p>
           )}
         </footer>
       </aside>
 
       <main className={`${mobileView === 'preview' ? 'flex' : 'hidden'} min-h-0 min-w-0 flex-1 flex-col lg:flex`}>
         <div className="flex items-center gap-3 border-b border-slate-200 bg-white px-4 py-2">
-          <div className="flex gap-1 rounded-lg bg-slate-100 p-1" role="tablist" aria-label="Right panel">
-            {VIEWS.map((v) => (
-              <button
-                key={v.key}
-                type="button"
-                role="tab"
-                aria-selected={view === v.key}
-                onClick={() => setView(v.key)}
-                className={`rounded-md px-3 py-1 text-sm font-medium ${
-                  view === v.key ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-600 hover:text-slate-900'
-                }`}
-              >
-                {v.key === 'code' ? (
-                  <>
-                    Code<span className="hidden sm:inline"> ({paths.length} files)</span>
-                  </>
-                ) : (
-                  v.label
-                )}
+          {view === 'preview' ? (
+            <p className="text-sm font-semibold text-slate-800">
+              Preview <span className="hidden font-normal text-slate-500 sm:inline">· updates as you type</span>
+            </p>
+          ) : (
+            <>
+              <button type="button" onClick={() => setView('preview')} className="rounded-md px-2 py-1 text-sm font-medium text-blue-700 hover:bg-blue-50">
+                ← Back to preview
               </button>
-            ))}
-          </div>
-          <p className="hidden text-xs text-slate-500 xl:block">
-            {view === 'preview' ? 'Updates as you type.' : 'The theme files that go into your zip.'}
-          </p>
+              <p className="hidden text-xs text-slate-500 sm:block">The {paths.length} theme files that go into your zip.</p>
+            </>
+          )}
           <button
             type="button"
             onClick={openInPlayground}

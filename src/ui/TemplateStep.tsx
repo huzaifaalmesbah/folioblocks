@@ -3,18 +3,13 @@ import { tr } from '../i18n/ui';
 import { fontDef } from '../fonts';
 import { presetByKey, PRESETS } from '../presets';
 import { useBuilder } from '../store';
-import type { FooterVariant, HeaderVariant, PageKey } from '../types';
-import { inputCls, SectionTitle, Select } from './fields';
-import { SectionList } from './SectionList';
+import { inputCls, SectionTitle } from './fields';
 
-const PAGE_LABELS: Record<PageKey, string> = { home: 'Home page', about: 'About page', contact: 'Contact page' };
-
-export function LayoutStep() {
+/** Step 1: pick a design to start from, or one you saved. Your info is never touched. */
+export function TemplateStep() {
   const preset = useBuilder((s) => s.preset);
-  const header = useBuilder((s) => s.header);
-  const footer = useBuilder((s) => s.footer);
   const savedLayouts = useBuilder((s) => s.savedLayouts);
-  const { applyPreset, applyLayout, saveLayout, deleteLayout, setHeader, setFooter } = useBuilder.getState();
+  const { applyPreset, applyLayout, saveLayout, deleteLayout } = useBuilder.getState();
   const [layoutName, setLayoutName] = useState('');
 
   function chooseSaved(key: string) {
@@ -135,35 +130,6 @@ export function LayoutStep() {
         </form>
         <p className="text-xs text-slate-500">Saves your colours, fonts, section style and sections (not your info) so you can switch back later.</p>
       </section>
-
-      <section className="space-y-3">
-        <SectionTitle>Header & footer</SectionTitle>
-        <Select<HeaderVariant>
-          label="Header"
-          value={header}
-          options={[
-            { value: 'inline', label: 'Name left, menu right' },
-            { value: 'centered', label: 'Centered' },
-          ]}
-          onChange={setHeader}
-        />
-        <Select<FooterVariant>
-          label="Footer"
-          value={footer}
-          options={[
-            { value: 'centered', label: 'Centered' },
-            { value: 'split', label: 'Copyright left, social icons right' },
-          ]}
-          onChange={setFooter}
-        />
-      </section>
-
-      {(Object.keys(PAGE_LABELS) as PageKey[]).map((page) => (
-        <section key={page} className="space-y-3">
-          <SectionTitle>{PAGE_LABELS[page]}</SectionTitle>
-          <SectionList page={page} />
-        </section>
-      ))}
     </div>
   );
 }

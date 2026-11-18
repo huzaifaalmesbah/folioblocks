@@ -62,7 +62,6 @@
   "Pick a starting point, then make it yours": "একটি দিয়ে শুরু করুন, তারপর নিজের মতো করে নিন",
   "Pick one. wp-env needs Node.js and Docker; WordPress Studio is a desktop app with nothing else to install; Playground CLI needs only Node.js. The first prompt below sets wp-env up for you.": "যেকোনো একটি বেছে নিন। wp-env-এর জন্য Node.js ও Docker লাগে; WordPress Studio একটি ডেস্কটপ অ্যাপ, আর কিছু ইনস্টল করতে হয় না; Playground CLI-এর জন্য শুধু Node.js লাগে। নিচের প্রথম প্রম্পটটি আপনার হয়ে wp-env সেটআপ করে দেবে।",
   "Prompts to copy": "কপি করার প্রম্পট",
-  "Publish": "প্রকাশ",
   "Publish it": "প্রকাশ করুন",
   "Publish only your theme the first time: \"Content and settings\" replaces the live site's content.": "প্রথমবার শুধু থিম প্রকাশ করুন: \"Content and settings\" লাইভ সাইটের কনটেন্ট বদলে দেয়।",
   "Publishing guide": "প্রকাশের গাইড",

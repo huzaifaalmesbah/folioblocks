@@ -7,7 +7,7 @@ import type { BuilderState } from './types';
  * What to look at before downloading. "fix" items make the site look
  * unfinished or broken to a visitor; "tip" items are worth a moment.
  */
-export type CheckItem = { level: 'fix' | 'tip'; text: string; step: 'info' | 'style' | 'layout' };
+export type CheckItem = { level: 'fix' | 'tip'; text: string; step: 'info' | 'style' | 'pages' };
 
 const isUrl = (u: string) => /^https?:\/\/\S+\.\S+/.test(u.trim());
 const isEmail = (e: string) => /^\S+@\S+\.\S+$/.test(e.trim());
@@ -46,7 +46,7 @@ export function publishChecklist(state: BuilderState): CheckItem[] {
   for (const sections of Object.values(pages)) {
     for (const s of sections) if (isSectionEmpty(s, info)) hidden.add(tr(SECTION_LABELS[s.type]));
   }
-  if (hidden.size) tip(tr('Left out because they are empty: {list}.', { list: [...hidden].join(', ') }), 'layout');
+  if (hidden.size) tip(tr('Left out because they are empty: {list}.', { list: [...hidden].join(', ') }), 'pages');
 
   return items;
 }

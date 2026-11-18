@@ -195,7 +195,8 @@ export function Landing() {
     // Switching design replaces colours, fonts and sections, so ask anyone who has started.
     if (hasDraft && !confirm(tr('Switch your theme to the {name} design? Your info and photos stay.', { name: tr(label) }))) return;
     applyPreset(key);
-    window.location.hash = '#/build';
+    // The template is chosen: go straight to the next step.
+    window.location.hash = '#/build?step=info';
   }
 
   return (
