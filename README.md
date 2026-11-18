@@ -22,7 +22,8 @@ Nothing is sent to a server. Everything stays in the browser.
 | 6 | AI fill-in prompts (removed later), download check and next steps, mobile builder | ✅ done |
 | 7 | Twelve templates, services and testimonials, student beta guide | ✅ done |
 | 8 | Bengali app interface | ✅ done |
-| 9 | Run the student beta ([guide](docs/beta-test.md)) | ⏳ next |
+| 9 | Translation system: per-language files, Help translate page, checks ([guide](TRANSLATING.md)) | ✅ done |
+| 10 | Run the student beta ([guide](docs/beta-test.md)) | ⏳ next |
 
 ## Development
 
@@ -102,13 +103,19 @@ The Info step has three tiers: **The basics** (name, tagline, bio, photo, email)
 
 A section with nothing to show returns no markup, so the downloaded theme leaves it out (no "Project one" placeholders in a real site). The preview is generated with `generateTheme(state, { samples: true })`, which fills empty parts from `src/samples.ts` so students still see each section's shape; the Layout step marks those sections.
 
-### Templates and languages
+### Templates
 
 Nineteen templates in `src/presets.ts`: Minimal, Creative, Developer, Academic, Contributor (WordPress work first), Resume (one-page CV), Writer (posts first), Designer (gallery), Freelancer (services and testimonials), Bold (colour-band hero), Photographer (photo wall), and eight built from the 2026 designs in `html-templates/` (Profile, Terminal, Bento, Résumé Sheet, Editorial, Aurora, Brutal, Journey) with core-only looks (`src/generator/looks.ts`). Each sets a palette, fonts, header, footer and the sections of every page; the home page shows them as a gallery.
 
-The theme's own words (headings, buttons, menu, page titles) can be written in English or Bengali (`src/generator/i18n.ts`); the student's text is used as typed. Bengali uses the bundled Noto Sans Bengali font. To add a language, add a dictionary there and an option in the Style step.
+### Languages and translation
 
-The app's own interface is separate: it can be shown in English or Bengali with the switch in the header (`src/i18n/`). Components stay plain English; `src/i18n/bn.ts` is a dictionary keyed by the English text, applied to the rendered page, with `tr()` for messages built in code. Text without a translation stays English. Prompts, code and product names are not translated.
+FolioBlocks is in English, and anyone can translate it, with no git needed: see **[TRANSLATING.md](TRANSLATING.md)** and the [Help translate page](https://huzaifaalmesbah.github.io/folioblocks/#/translate).
+
+- Each language is a folder in `src/i18n/locales/<code>/` with small JSON files: `language.json` (name, direction, font, `enabled`), `home.json`, `builder.json`, `templates.json` and `theme.json` (the words the generated theme shows). `src/i18n/languages.ts` loads them; missing or untranslated strings show in English.
+- `en/` is generated from the code by `npm run i18n:extract` (Rolldown's parser for the interface; generating every section variant for the theme), which also keeps other languages in step. `npm run i18n:check` validates translations and shows progress; `npm run i18n:new` starts a language.
+- A language shows in the app's language menu and the builder's **Site language** list only when its `language.json` says `"enabled": true`. Bengali (`bn/`) is there, switched off for now.
+- The interface: components stay plain English; a DOM translator swaps rendered text that matches a dictionary key, and `tr()` handles messages built in code. Prompts, code and product names are not translated.
+- The **Translations** workflow checks pull requests and, on `main`, runs `i18n:extract` and commits the result.
 
 ### AI agents
 

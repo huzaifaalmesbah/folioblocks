@@ -1,0 +1,40 @@
+name: New translation
+description: Send a translation of FolioBlocks (new language, or more of an existing one)
+title: "Translation: "
+labels: ["translation"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for translating FolioBlocks! Make your translation on the [Help translate page](https://huzaifaalmesbah.github.io/folioblocks/#/translate), download the zip, and drop it in the box below. You don't need to finish everything: what is not translated shows in English.
+        বাংলা: [Help translate পাতায়](https://huzaifaalmesbah.github.io/folioblocks/#/translate) অনুবাদ করুন, zip ফাইলটি ডাউনলোড করে নিচের বক্সে টেনে ছেড়ে দিন। সব শেষ না করলেও চলবে।
+  - type: input
+    id: language
+    attributes:
+      label: Language
+      description: Its name in English and its code, e.g. "Hindi (hi)".
+      placeholder: Hindi (hi)
+    validations:
+      required: true
+  - type: textarea
+    id: file
+    attributes:
+      label: Your translation
+      description: Drag folioblocks-<code>.zip into this box (or click "Paste, drop, or click to add files").
+      placeholder: Drop the zip here.
+    validations:
+      required: true
+  - type: textarea
+    id: notes
+    attributes:
+      label: Anything we should know?
+      description: Words you weren't sure about, or parts you left for later. Optional.
+  - type: checkboxes
+    id: own
+    attributes:
+      label: Before you send
+      options:
+        - label: I translated this myself or checked every line (machine translation alone is not enough).
+          required: true
+        - label: I kept every {placeholder} and link as it is in English.
+          required: true
