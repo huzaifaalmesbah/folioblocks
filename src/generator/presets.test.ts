@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { defaultState } from '../defaults';
-import { FONT_KEYS, fontDef } from '../fonts';
+import { FONT_KEYS, FONT_PAIRS, fontDef } from '../fonts';
 import { buildBlueprint } from '../playground/blueprint';
 import { PRESETS } from '../presets';
 import type { BuilderState, FooterVariant, HeaderVariant } from '../types';
@@ -82,6 +82,13 @@ describe('fonts', () => {
     });
     expect(assets.filter((a) => a.path.includes('/fonts/'))).toEqual([]);
     expect(files['readme.txt']).toContain('bundles no font files');
+  });
+
+  it('font pairs use bundled fonts', () => {
+    for (const p of FONT_PAIRS) {
+      expect(FONT_KEYS, p.key).toContain(p.heading);
+      expect(FONT_KEYS, p.key).toContain(p.body);
+    }
   });
 
   it('every bundled font has a weight range', () => {

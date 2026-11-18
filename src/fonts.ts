@@ -92,3 +92,17 @@ export function fontAssets(keys: FontKey[]): ThemeAsset[] {
 export function fontPath(key: FontKey): string {
   return `assets/fonts/${key}/${key}-var-normal.woff2`;
 }
+
+/**
+ * Font pairs for the Style step: one click sets headings and body text.
+ * Fewer, safer choices than two lists of every font; the lists are still
+ * there under More options.
+ */
+export const FONT_PAIRS: { key: string; label: string; heading: FontKey; body: FontKey }[] = [
+  { key: 'clean', label: 'Clean', heading: 'inter', body: 'inter' },
+  { key: 'friendly', label: 'Friendly', heading: 'dm-sans', body: 'dm-sans' },
+  { key: 'modern', label: 'Modern', heading: 'space-grotesk', body: 'inter' },
+  { key: 'classic', label: 'Classic', heading: 'lora', body: 'inter' },
+  { key: 'elegant', label: 'Elegant', heading: 'playfair-display', body: 'inter' },
+  { key: 'code', label: 'Code', heading: 'jetbrains-mono', body: 'inter' },
+];
