@@ -84,7 +84,7 @@ src/generator/   pure functions → { "style.css": "...", "theme.json": "...", .
 | `src/presets.ts` | Colour palettes and the 4 layout presets (Minimal, Creative, Developer, Academic) |
 | `src/fonts.ts` | Font registry: system stacks plus OFL fonts bundled into the theme |
 | `src/ui/` | Wizard steps: Info, Style, Layout (sortable section lists in `SectionList.tsx`) |
-| `src/layout.ts` | Section list edits, saved layouts, and the settings file format (export / validated import) |
+| `src/layout.ts` | Section list edits, saved designs, and the settings file format (export / validated import) |
 | `src/zip/` | Zip builder, bundled asset fetching and canvas-rendered `screenshot.png` |
 | `src/playground/` | Blueprint builder for "Open in WordPress Playground" |
 
@@ -101,7 +101,7 @@ Students can add a profile photo and a picture per project. They are resized to 
 
 The Info step has three tiers: **The basics** (name, tagline, bio, photo, email), **Recommended** (skills, projects, education, location, social links) and **Optional** (WordPress contributions with date and link, experience, achievements, CV link). A meter (`src/profile.ts`) shows how complete the profile is and what to add next.
 
-A section with nothing to show returns no markup, so the downloaded theme leaves it out (no "Project one" placeholders in a real site). The preview is generated with `generateTheme(state, { samples: true })`, which fills empty parts from `src/samples.ts` so students still see each section's shape; the Layout step marks those sections.
+A section with nothing to show returns no markup, so the downloaded theme leaves it out (no "Project one" placeholders in a real site). The preview is generated with `generateTheme(state, { samples: true })`, which fills empty parts from `src/samples.ts` so students still see each section's shape; the Pages step marks those sections.
 
 ### Templates
 
@@ -121,15 +121,19 @@ FolioBlocks is in English, and anyone can translate it, with no git needed: see 
 
 FolioBlocks never calls an AI, and the builder's form has no AI prompts. Every theme ships an **AGENTS.md** (`src/generator/agentsMd.ts`) with the theme's rules for coding agents, and the home page's AI guide has prompts that fill in the student's theme folder and name.
 
-### Download check, next steps and small screens
+### The builder's five steps
 
-Pressing Download opens a dialog (`src/ui/DownloadDialog.tsx`): first a checklist from `src/checklist.ts` (placeholder name or photo, missing bio, bad links or email, unreadable colours, sections left out), each with a Fix link to the right step; then, once the zip is saved, the upload steps, a Playground link and the AI guide. On small screens the builder shows the form and the preview one at a time (Edit / Preview). The builder is lazy-loaded so the home page stays light, and the preview draws WordPress' own social icons (`src/preview/socialIcons.ts`, from Gutenberg).
+1. **Template** (`src/ui/TemplateStep.tsx`): small drawings of each design (`src/ui/DesignMock.tsx`, shared with the home page), a filter by who they suit (`tracks` in `src/presets.ts`), and **My saved designs**. Switching is instant with Undo; a changed design is first kept in My saved designs (the three latest automatic ones). Under the save status the builder says which template you started from, whether you changed it, and offers Reset.
+2. **Your info** (`src/ui/InfoStep.tsx`): see above.
+3. **Style** (`src/ui/StyleStep.tsx`): eight colours (the template's own first) and six font pairs (`FONT_PAIRS` in `src/fonts.ts`). Your own colours, separate fonts, the **section style** (generator looks) and corners are under More options.
+4. **Pages** (`src/ui/PagesStep.tsx`): header, footer and each page's sections, which can be dragged into a new order (with `@dnd-kit`; keyboard dragging and the ↑ ↓ buttons work too), given a different design, removed, or added.
+5. **Publish** (`src/ui/PublishStep.tsx`): a checklist from `src/checklist.ts` (placeholder name or photo, missing bio, bad links or email, unreadable colours, sections left out), each with a Fix link to the right step; the download; and a quick guide (`src/ui/PublishGuide.tsx`): install on any WordPress, WordPress.com or WordPress Studio, set up pages, customize in the Site Editor, add pages and posts, update later, then Learn WordPress courses. The same guide, in full, is the **Guide page** (`#/guide`); its text, courses and help links live once in `src/landing/content.ts`, and a monthly workflow checks the links.
 
-### Layout editing and drafts
+The footer is just Back and Next. The **⋯ menu** holds backups (Save / Open a backup file: everything, photos included, as `.json`; imports are validated field by field), the theme files, the Playground blueprint and Start over (with Undo). On small screens the form and the preview take turns (Edit / Preview). The builder is lazy-loaded so the home page stays light.
 
-- In the Layout step, each page's sections can be dragged into a new order (with `@dnd-kit`; keyboard dragging and the ↑ ↓ buttons work too), given a different design, removed, or added.
-- **My layouts** saves the current colours, fonts, header, footer and sections (not the student's info) under a name, to switch back to later.
-- **Save draft / Load draft** downloads everything (info, photos, design, saved layouts) as a `.json` file and loads it back, for example on another computer. Imports are validated field by field: unknown sections, bad colours, non-image data and unexpected values fall back to defaults. Loading a draft keeps the saved layouts already in the browser.
+### Keeping work safe
+
+The draft autosaves in the browser: text in localStorage, photos in IndexedDB (`src/imageStore.ts`; localStorage keeps an `idb:` reference, so photos can't fill its ~5 MB). A status line (`src/ui/SaveStatus.tsx`) says when it was saved, or warns when storage is full or not kept (private window), with a one-click backup. The builder asks the browser to keep its storage (`navigator.storage.persist`), notices edits from another tab and offers to load them, and waits for the draft to load before showing anything.
 
 ### Image credits
 
