@@ -18,9 +18,10 @@ import { generateTheme } from '../generator';
 import { LOOKS } from '../generator/looks';
 import { SECTION_LABELS, SECTIONS } from '../generator/sections';
 import { buildBlueprint, playgroundUrl } from '../playground/blueprint';
+import { enabledLanguages } from '../i18n/languages';
 import { PALETTES, PRESETS, presetByKey } from '../presets';
 import type { BuilderState } from '../types';
-import { buildTheme, builderLink, CliError, loadProject, publicDir, saveProject, withTemplate } from './project';
+import { buildTheme, builderLink, CliError, emptyInfo, loadProject, openerPage, publicDir, saveProject, withTemplate } from './project';
 
 const HELP = `folioblocks: make a WordPress portfolio block theme from a folioblocks.json file.
 
@@ -32,8 +33,9 @@ Usage: folioblocks <command> [file] [options]
   template <key> [file]     Switch the template; the info in the file stays
   check [file]              What a visitor would notice, before building
   build [file] [--out dir]  Write the theme folder and its zip (default out: ./theme)
-  link [file]               A link that opens the website builder with this file loaded
+  link [file]               A link (and theme/open-in-builder.html) that opens the website builder with this file loaded
   preview [file]            Run the theme in a local WordPress (Playground CLI, needs Node.js)
+  preview --url [file]      Write theme/open-preview.html, which opens it on playground.wordpress.net
 
 Photos: in the file, "avatar" and project "image" may be paths to local
 .jpg, .png or .webp files (relative to the file); they are embedded.
@@ -64,8 +66,18 @@ async function main() {
       console.log(
         JSON.stringify(
           {
-            templates: PRESETS.map((p) => ({ key: p.key, name: p.label, bestFor: p.bestFor, tracks: p.tracks, description: p.description })),
-            preview: `${SITE_URL}#designs`,
+            templates: PRESETS.map((p) => ({
+              key: p.key,
+              name: p.label,
+              bestFor: p.bestFor,
+              tracks: p.tracks,
+              description: p.description,
+              preview: `${SITE_URL}#template-${p.key}`,
+            })),
+            // The theme's own words (headings, buttons, menu) can be in these languages; others stay English.
+            languages: enabledLanguages().map((l) => ({ code: l.code, name: l.englishName, font: l.font ?? null })),
+            // Fonts for writing systems that need their own (set as both heading and body when the site is in that language).
+            scriptFonts: { bengali: 'noto-sans-bengali' },
             sections: Object.fromEntries(
               Object.entries(SECTIONS).map(([type, variants]) => [type, { label: SECTION_LABELS[type as keyof typeof SECTION_LABELS], variants: Object.fromEntries(Object.entries(variants).map(([k, v]) => [k, v.label])) }]),
             ),
@@ -84,7 +96,8 @@ async function main() {
     case 'init': {
       const file = fileArg();
       if (existsSync(file) && !args.includes('--force')) throw new CliError(`${basename(file)} already exists. Use "folioblocks template <key>" to switch templates, or --force to start over.`);
-      saveProject(file, withTemplate(structuredClone(defaultState), flag('template') ?? 'minimal'));
+      // Start empty: nothing the person didn't say should reach their site.
+      saveProject(file, withTemplate({ ...structuredClone(defaultState), info: emptyInfo() }, flag('template') ?? 'minimal'));
       console.log(`Created ${basename(file)}. Fill in "state.info", then: folioblocks check`);
       return;
     }
@@ -109,7 +122,11 @@ async function main() {
       return;
     }
     case 'link': {
-      console.log(builderLink(loadProject(fileArg())));
+      const url = builderLink(loadProject(fileArg()));
+      const page = join(resolve(flag('out') ?? 'theme'), 'open-in-builder.html');
+      mkdirSync(dirname(page), { recursive: true });
+      writeFileSync(page, openerPage(url, 'Opening your project in the FolioBlocks builder…'));
+      console.log(`${url}\n\nOr open this file in a browser (double-click it): ${page}`);
       return;
     }
     case 'preview': {
@@ -119,7 +136,10 @@ async function main() {
       mkdirSync(dirname(bp), { recursive: true });
       writeFileSync(bp, JSON.stringify(buildBlueprint(state, slug, files, assets), null, 2));
       if (args.includes('--url')) {
-        console.log(playgroundUrl(buildBlueprint(state, slug, files, assets)));
+        // The link carries the whole theme, far too long to paste: put it in a page to double-click.
+        const page = join(dirname(bp), 'open-preview.html');
+        writeFileSync(page, openerPage(playgroundUrl(buildBlueprint(state, slug, files, assets)), 'Opening your site in WordPress Playground…'));
+        console.log(`Open this file in a browser (double-click it) to see your site in WordPress Playground: ${page}`);
         return;
       }
       console.log('Starting WordPress Playground (the first run downloads it)…');

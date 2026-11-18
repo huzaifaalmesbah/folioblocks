@@ -221,7 +221,7 @@ export function Landing() {
             </div>
             <div className="mt-12 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
               {PRESETS.map((p) => (
-                <article key={p.key} className="flex flex-col">
+                <article key={p.key} id={`template-${p.key}`} className="flex scroll-mt-24 flex-col">
                   <DesignMock p={p} />
                   <h3 className="mt-4 font-semibold">{p.label}</h3>
                   <p className="mt-1 text-xs font-medium text-blue-800">Best for: {p.bestFor}</p>

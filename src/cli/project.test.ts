@@ -5,7 +5,7 @@ import JSZip from 'jszip';
 import { describe, expect, it } from 'vitest';
 import { defaultState } from '../defaults';
 import { parseSettings } from '../layout';
-import { buildTheme, builderLink, CliError, loadProject, saveProject, withTemplate } from './project';
+import { buildTheme, builderLink, CliError, emptyInfo, loadProject, openerPage, saveProject, withTemplate } from './project';
 
 const dir = () => mkdtempSync(join(tmpdir(), 'folioblocks-cli-'));
 
@@ -67,5 +67,16 @@ describe('folioblocks command line', () => {
     const back = parseSettings(json).state;
     expect(back.info.name).toBe('Link Test');
     expect(back.info.avatar).toBe('');
+  });
+
+  it('starts a project with nothing made up', () => {
+    const info = emptyInfo();
+    for (const v of Object.values(info)) expect(typeof v === 'string' ? v : Array.isArray(v) ? v.length : Object.keys(v ?? {}).length).toBeFalsy();
+  });
+
+  it('writes an opener page for long links', () => {
+    const page = openerPage('https://example.org/#a&b"c', 'Opening…');
+    expect(page).toContain('location.replace("https://example.org/#a&b\\"c")');
+    expect(page).toContain('href="https://example.org/#a&amp;b&quot;c"');
   });
 });

@@ -112,3 +112,32 @@ export function builderLink(state: BuilderState, site = SITE_URL): string {
   const json = JSON.stringify(JSON.parse(exportSettings(light, [])));
   return `${site}#/build?import=${Buffer.from(json, 'utf8').toString('base64url')}`;
 }
+
+/** A profile with nothing in it: the command line never ships placeholder text. */
+export function emptyInfo(): Info {
+  return {
+    name: '',
+    tagline: '',
+    university: '',
+    location: '',
+    bio: '',
+    email: '',
+    skills: [],
+    contributions: [],
+    projects: [],
+    experience: [],
+    education: [],
+    achievements: [],
+    services: [],
+    testimonials: [],
+    cvUrl: '',
+    socials: {},
+    avatar: '',
+  };
+}
+
+/** A small page that sends the browser to a (long) link: easier to open than to paste. */
+export function openerPage(url: string, message: string): string {
+  const safe = url.replace(/&/g, '&amp;').replace(/"/g, '&quot;');
+  return `<!doctype html><meta charset="utf-8"><title>FolioBlocks</title><p>${message} <a href="${safe}">Continue</a></p><script>location.replace(${JSON.stringify(url)})</script>\n`;
+}
