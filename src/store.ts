@@ -1,37 +1,53 @@
 import { create } from 'zustand';
-import { createJSONStorage, persist } from 'zustand/middleware';
+import { createJSONStorage, persist, type StateStorage } from 'zustand/middleware';
 import { defaultState } from './defaults';
 import { addSection, layoutFromState, moveSection, removeSection, type SavedLayout } from './layout';
 import { presetByKey } from './presets';
 import { OLD_DEFAULT_BIO } from './samples';
+import { packPhotos, unpackPhotos } from './imageStore';
 import { noteSave } from './saveStatus';
 import type { BuilderState, FooterVariant, HeaderVariant, Info, Language, PageKey, Palette, SectionType, Style } from './types';
 
 /**
- * localStorage that never throws: photos can push a draft past the
- * browser's quota, and a failed save must not break the app.
+ * The draft's storage: localStorage for the text, IndexedDB for photos
+ * (see imageStore.ts), and it never throws: a failed save must not break
+ * the app, it shows in the save status instead. Saves run one at a time
+ * and only the newest waiting one is written, so typing fast never lets an
+ * older draft land last.
  */
-const safeStorage: Storage = {
-  get length() {
-    return localStorage.length;
-  },
-  clear: () => localStorage.clear(),
-  key: (i) => localStorage.key(i),
-  getItem: (k) => {
+let saving: Promise<void> = Promise.resolve();
+let pending: { key: string; value: string } | null = null;
+
+const draftStorage: StateStorage = {
+  getItem: async (k) => {
     try {
-      return localStorage.getItem(k);
+      const raw = localStorage.getItem(k);
+      return raw === null ? null : await unpackPhotos(raw);
     } catch {
       return null;
     }
   },
-  removeItem: (k) => localStorage.removeItem(k),
   setItem: (k, v) => {
+    pending = { key: k, value: v };
+    saving = saving.then(async () => {
+      if (!pending) return;
+      const { key, value } = pending;
+      pending = null;
+      try {
+        localStorage.setItem(key, await packPhotos(value));
+        noteSave(true);
+      } catch {
+        // Out of space, or storage switched off: say so instead of failing.
+        noteSave(false);
+      }
+    });
+    return saving;
+  },
+  removeItem: (k) => {
     try {
-      localStorage.setItem(k, v);
-      noteSave(true);
+      localStorage.removeItem(k);
     } catch {
-      // Photos can fill the browser's storage: say so instead of failing.
-      noteSave(false);
+      // Storage switched off: nothing to remove.
     }
   },
 };
@@ -159,7 +175,7 @@ export const useBuilder = create<Store>()(
     {
       name: STORAGE_KEY,
       version: 7,
-      storage: createJSONStorage(() => safeStorage),
+      storage: createJSONStorage(() => draftStorage),
       // Older drafts lack newer fields (v2: header/footer, v3: photos): fill them in from the defaults.
       migrate: (persisted) => {
         const old = (persisted ?? {}) as Partial<BuilderState>;
