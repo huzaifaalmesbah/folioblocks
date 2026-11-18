@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { saveAs } from 'file-saver';
-import { pickState, STORAGE_KEY, useBuilder } from './store';
+import { designChanged, pickState, sourceDesign, STORAGE_KEY, useBuilder } from './store';
 import { requestPersistence, watchOtherTabs } from './saveStatus';
 import { SaveStatus } from './ui/SaveStatus';
 import { UndoBar, type Undo } from './ui/UndoBar';
@@ -57,6 +57,7 @@ export function Builder() {
   const footer = useBuilder((s) => s.footer);
   const pages = useBuilder((s) => s.pages);
   const reset = useBuilder((s) => s.reset);
+  const savedLayouts = useBuilder((s) => s.savedLayouts);
 
   const state = useMemo(
     () => pickState({ info, language, style, preset, header, footer, pages }),
@@ -101,6 +102,8 @@ export function Builder() {
     return watchOtherTabs(STORAGE_KEY);
   }, []);
   const checklist = useMemo(() => publishChecklist(state), [state]);
+  const source = sourceDesign(state, savedLayouts);
+  const changed = designChanged(state, savedLayouts);
   // On small screens the form and the preview take turns.
   const [mobileView, setMobileView] = useState<'edit' | 'preview'>('edit');
 
@@ -222,6 +225,22 @@ export function Builder() {
             />
           </div>
           <SaveStatus onBackup={exportDraft} />
+          {changed && source && (
+            <p className="text-xs text-slate-600">
+              From <span className="font-medium">{source.saved ? source.label : tr(source.label)}</span>, changed ·{' '}
+              <button
+                type="button"
+                className="font-medium text-blue-700 underline"
+                onClick={() =>
+                  withUndo(tr('Back to {name}. Your info stays.', { name: source.saved ? source.label : tr(source.label) }), () =>
+                    source.saved ? useBuilder.getState().applyLayout(preset) : useBuilder.getState().applyPreset(preset),
+                  )
+                }
+              >
+                Reset to it
+              </button>
+            </p>
+          )}
           <nav aria-label="Steps">
             <ol className="grid grid-cols-5 gap-1">
               {STEPS.map((s, i) => {
@@ -256,7 +275,7 @@ export function Builder() {
 
         {/* key={step} remounts the panel so each step starts scrolled to the top. */}
         <div key={step} className="flex-1 overflow-y-auto p-4 lg:p-6">
-          {step === 'template' && <TemplateStep />}
+          {step === 'template' && <TemplateStep onSwitch={withUndo} />}
           {step === 'info' && <InfoStep />}
           {step === 'style' && <StyleStep />}
           {step === 'pages' && <PagesStep />}

@@ -97,12 +97,24 @@ export const PALETTES: PaletteDef[] = [
 
 const palette = (key: string) => PALETTES.find((p) => p.key === key)!.palette;
 
+/** The template filter's groups. */
+export type Track = 'developer' | 'designer' | 'student' | 'job';
+
+export const TRACKS: { key: Track; label: string }[] = [
+  { key: 'developer', label: 'Developer' },
+  { key: 'designer', label: 'Designer' },
+  { key: 'student', label: 'Student' },
+  { key: 'job', label: 'Job holder' },
+];
+
 export type PresetDef = {
   key: string;
   label: string;
   description: string;
   /** Who it suits, shown in the gallery. */
   bestFor: string;
+  /** Who it suits, for the template filter. */
+  tracks: Track[];
   style: Style;
   header: HeaderVariant;
   footer: FooterVariant;
@@ -118,6 +130,7 @@ export const PRESETS: PresetDef[] = [
     label: 'Minimal',
     description: 'Round photo, centered name, a clean project grid. Calm and simple.',
     bestFor: 'Anyone: a clean, friendly start',
+    tracks: ['developer', 'designer', 'student', 'job'],
     style: { palette: palette('wordpress-blue'), fonts: { heading: 'inter', body: 'inter' }, radius: 'md' },
     header: 'inline',
     footer: 'centered',
@@ -132,6 +145,7 @@ export const PRESETS: PresetDef[] = [
     label: 'Creative',
     description: 'Big serif type beside your photo, large showcase rows. Warm colours.',
     bestFor: 'Designers and creative work',
+    tracks: ['designer'],
     style: { palette: palette('sunset'), fonts: { heading: 'playfair-display', body: 'dm-sans' }, radius: 'lg' },
     header: 'centered',
     footer: 'centered',
@@ -146,6 +160,7 @@ export const PRESETS: PresetDef[] = [
     label: 'Developer',
     description: 'Dark mode, monospace headings, project cards and a post list with thumbnails.',
     bestFor: 'Developers and plugin authors',
+    tracks: ['developer', 'student'],
     style: { palette: palette('midnight'), fonts: { heading: 'jetbrains-mono', body: 'inter' }, radius: 'sm' },
     header: 'inline',
     footer: 'split',
@@ -160,6 +175,7 @@ export const PRESETS: PresetDef[] = [
     label: 'Academic',
     description: 'A research profile: portrait beside your details and bio, serif type, compact lists.',
     bestFor: 'Researchers and academic profiles',
+    tracks: ['student', 'job'],
     style: { palette: palette('forest'), fonts: { heading: 'lora', body: 'lora' }, radius: 'none' },
     header: 'inline',
     footer: 'split',
@@ -174,6 +190,7 @@ export const PRESETS: PresetDef[] = [
     label: 'Contributor',
     description: 'Your WordPress work first: numbers at a glance, a dated contribution timeline, then projects.',
     bestFor: 'WordPress Credits and Campus Connect students',
+    tracks: ['student', 'developer'],
     style: { palette: palette('ocean'), fonts: { heading: 'space-grotesk', body: 'inter' }, radius: 'md' },
     header: 'inline',
     footer: 'split',
@@ -188,6 +205,7 @@ export const PRESETS: PresetDef[] = [
     label: 'Resume',
     description: 'A one-page CV: profile, experience, education, skills and achievements on the home page.',
     bestFor: 'Job and internship applications',
+    tracks: ['job', 'student'],
     style: { palette: palette('mono'), fonts: { heading: 'dm-sans', body: 'dm-sans' }, radius: 'sm' },
     header: 'inline',
     footer: 'split',
@@ -202,6 +220,7 @@ export const PRESETS: PresetDef[] = [
     label: 'Writer',
     description: 'Words first: a quiet intro, then your latest posts. Serif headings on warm paper.',
     bestFor: 'Bloggers and people who like to write',
+    tracks: ['student', 'job'],
     style: { palette: palette('paper'), fonts: { heading: 'lora', body: 'inter' }, radius: 'sm' },
     header: 'centered',
     footer: 'centered',
@@ -216,6 +235,7 @@ export const PRESETS: PresetDef[] = [
     label: 'Designer',
     description: 'Your work does the talking: a short intro, then a large two-column gallery.',
     bestFor: 'Designers, illustrators and UI work',
+    tracks: ['designer'],
     style: { palette: palette('rose'), fonts: { heading: 'space-grotesk', body: 'dm-sans' }, radius: 'none' },
     header: 'inline',
     footer: 'centered',
@@ -230,6 +250,7 @@ export const PRESETS: PresetDef[] = [
     label: 'Freelancer',
     description: 'What you offer, proof it works, and an easy way to hire you.',
     bestFor: 'Freelancers and students taking client work',
+    tracks: ['job', 'designer', 'developer'],
     style: { palette: palette('ocean'), fonts: { heading: 'dm-sans', body: 'dm-sans' }, radius: 'lg' },
     header: 'inline',
     footer: 'split',
@@ -244,6 +265,7 @@ export const PRESETS: PresetDef[] = [
     label: 'Bold',
     description: 'A dark colour band with your name in big type, numbers at a glance and strong buttons.',
     bestFor: 'Standing out fast',
+    tracks: ['student', 'designer'],
     style: { palette: palette('electric'), fonts: { heading: 'space-grotesk', body: 'inter' }, radius: 'lg' },
     header: 'inline',
     footer: 'centered',
@@ -258,6 +280,7 @@ export const PRESETS: PresetDef[] = [
     label: 'Photographer',
     description: 'A wall of square photos under a quiet name. Almost no words.',
     bestFor: 'Photographers and visual diaries',
+    tracks: ['designer'],
     style: { palette: palette('mono'), fonts: { heading: 'playfair-display', body: 'inter' }, radius: 'none' },
     header: 'centered',
     footer: 'centered',
@@ -272,6 +295,7 @@ export const PRESETS: PresetDef[] = [
     label: 'Profile',
     description: 'A cover banner with your photo over it, then each part of your story on its own card.',
     bestFor: 'Developers with a job, and anyone with work history',
+    tracks: ['developer', 'job'],
     style: { palette: palette('slate'), fonts: { heading: 'space-grotesk', body: 'inter' }, radius: 'md', look: 'profile' },
     header: 'inline',
     footer: 'centered',
@@ -286,6 +310,7 @@ export const PRESETS: PresetDef[] = [
     label: 'Terminal',
     description: 'Your intro in a terminal window, code-style headings and outlined panes. All monospace.',
     bestFor: 'CSE students and developers',
+    tracks: ['developer', 'student'],
     style: { palette: palette('terminal'), fonts: { heading: 'jetbrains-mono', body: 'jetbrains-mono' }, radius: 'sm', look: 'terminal' },
     header: 'inline',
     footer: 'centered',
@@ -300,6 +325,7 @@ export const PRESETS: PresetDef[] = [
     label: 'Bento',
     description: 'Everything at a glance in a grid of rounded tiles: you, where you are, skills, numbers, contact.',
     bestFor: 'Students and junior developers',
+    tracks: ['developer', 'student'],
     style: { palette: palette('canvas'), fonts: { heading: 'space-grotesk', body: 'dm-sans' }, radius: 'lg', look: 'bento' },
     header: 'inline',
     footer: 'centered',
@@ -314,6 +340,7 @@ export const PRESETS: PresetDef[] = [
     label: 'Résumé Sheet',
     description: 'Your CV on a white sheet: compact sections and small caps headings.',
     bestFor: 'Job applications in any field',
+    tracks: ['job'],
     style: { palette: palette('ink'), fonts: { heading: 'lora', body: 'inter' }, radius: 'sm', look: 'sheet' },
     header: 'inline',
     footer: 'centered',
@@ -328,6 +355,7 @@ export const PRESETS: PresetDef[] = [
     label: 'Editorial',
     description: 'Magazine style: huge serif headlines, numbered sections and big case studies.',
     bestFor: 'Product and UI/UX designers',
+    tracks: ['designer', 'job'],
     style: { palette: palette('newsprint'), fonts: { heading: 'playfair-display', body: 'inter' }, radius: 'none', look: 'editorial' },
     header: 'inline',
     footer: 'centered',
@@ -342,6 +370,7 @@ export const PRESETS: PresetDef[] = [
     label: 'Aurora',
     description: 'Dark, with soft colour glows and glowing pill buttons.',
     bestFor: 'New graduates looking for a first job',
+    tracks: ['student', 'developer'],
     style: { palette: palette('aurora'), fonts: { heading: 'space-grotesk', body: 'dm-sans' }, radius: 'lg', look: 'aurora' },
     header: 'inline',
     footer: 'centered',
@@ -356,6 +385,7 @@ export const PRESETS: PresetDef[] = [
     label: 'Brutal',
     description: 'Thick black borders, hard shadows and loud colour.',
     bestFor: 'Graphic and brand design students',
+    tracks: ['designer', 'student'],
     style: { palette: palette('pop'), fonts: { heading: 'space-grotesk', body: 'dm-sans' }, radius: 'sm', look: 'brutal' },
     header: 'inline',
     footer: 'centered',
@@ -370,6 +400,7 @@ export const PRESETS: PresetDef[] = [
     label: 'Journey',
     description: 'Your career as a story: each role a stop on a timeline, left and right.',
     bestFor: 'Job holders and career changers',
+    tracks: ['job'],
     style: { palette: palette('sage'), fonts: { heading: 'lora', body: 'inter' }, radius: 'md', look: 'journey' },
     header: 'inline',
     footer: 'centered',

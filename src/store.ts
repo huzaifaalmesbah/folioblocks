@@ -39,6 +39,39 @@ const safeStorage: Storage = {
 /** Where the draft lives in localStorage. */
 export const STORAGE_KEY = 'folioblocks-state';
 
+/** The parts of the state a template or saved design sets. */
+type Design = Pick<BuilderState, 'style' | 'header' | 'footer' | 'pages'>;
+
+/** What the current design started from: a template or a saved design. */
+export function sourceDesign(state: Pick<BuilderState, 'preset'>, saved: SavedLayout[]): (Design & { label: string; saved: boolean }) | null {
+  const l = saved.find((x) => x.key === state.preset);
+  if (l) return { ...l, saved: true };
+  const p = presetByKey(state.preset);
+  return p.key === state.preset ? { ...p, saved: false } : null;
+}
+
+/** Compare designs by what shows (section ids don't count; a missing look is Plain). */
+function designKey(d: Design): string {
+  const pages = Object.fromEntries(Object.entries(d.pages).map(([k, list]) => [k, list.map((x) => `${x.type}/${x.variant}`)]));
+  return JSON.stringify({ style: { ...d.style, look: d.style.look ?? 'plain' }, header: d.header, footer: d.footer, pages });
+}
+
+/** Whether the student changed the design since picking its template (or saved design). */
+export function designChanged(state: BuilderState, saved: SavedLayout[]): boolean {
+  const source = sourceDesign(state, saved);
+  return !!source && designKey(source) !== designKey(state);
+}
+
+/** Keep a changed design before a switch replaces it: the three latest are kept in My saved designs. */
+function backupIfChanged(s: BuilderState & { savedLayouts: SavedLayout[] }): SavedLayout[] {
+  if (!designChanged(s, s.savedLayouts)) return s.savedLayouts;
+  const when = new Date().toLocaleString(undefined, { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+  const backup: SavedLayout = { ...layoutFromState(s, `Before switching · ${when}`), auto: true };
+  const autos = s.savedLayouts.filter((l) => l.auto);
+  const drop = autos.length >= 3 ? autos[0].key : null;
+  return [...s.savedLayouts.filter((l) => l.key !== drop), backup];
+}
+
 type Store = BuilderState & {
   setInfo: (patch: Partial<Info>) => void;
   setStyle: (patch: Partial<Style>) => void;
@@ -74,13 +107,14 @@ export const useBuilder = create<Store>()(
       applyPreset: (key) => {
         const p = presetByKey(key);
         // Deep-copy so later edits never mutate the preset definitions.
-        set({
+        set((s) => ({
+          savedLayouts: backupIfChanged(s),
           preset: p.key,
           style: structuredClone(p.style),
           header: p.header,
           footer: p.footer,
           pages: structuredClone(p.pages),
-        });
+        }));
       },
       setLanguage: (language) => set({ language }),
       setHeader: (header) => set({ header }),
@@ -104,6 +138,7 @@ export const useBuilder = create<Store>()(
           const l = s.savedLayouts.find((x) => x.key === key);
           if (!l) return {};
           return {
+            savedLayouts: backupIfChanged(s),
             preset: l.key,
             style: structuredClone(l.style),
             header: l.header,

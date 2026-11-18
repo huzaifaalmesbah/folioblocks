@@ -106,6 +106,28 @@ describe('settings files', () => {
 });
 
 describe('store', () => {
+  it('knows when a design was changed, and keeps it before a switch (three at most)', async () => {
+    const { designChanged, useBuilder } = await import('./store');
+    useBuilder.setState({ savedLayouts: [] });
+    const s = () => useBuilder.getState();
+    s().applyPreset('terminal');
+    expect(designChanged(s(), s().savedLayouts)).toBe(false);
+    // Switching an unchanged design keeps nothing.
+    s().applyPreset('bento');
+    expect(s().savedLayouts).toHaveLength(0);
+    for (let i = 0; i < 4; i++) {
+      s().setStyle({ radius: i % 2 ? 'none' : 'lg' });
+      s().setPalette('primary', `#00000${i}`);
+      expect(designChanged(s(), s().savedLayouts)).toBe(true);
+      s().applyPreset(i % 2 ? 'bento' : 'terminal');
+      expect(designChanged(s(), s().savedLayouts)).toBe(false);
+    }
+    const autos = s().savedLayouts.filter((l) => l.auto);
+    expect(autos).toHaveLength(3);
+    expect(autos.at(-1)!.style.palette.primary).toBe('#000003');
+    useBuilder.setState({ savedLayouts: [] });
+  });
+
   it('keeps existing saved layouts when a draft is imported', async () => {
     const { useBuilder } = await import('./store');
     const store = useBuilder.getState();

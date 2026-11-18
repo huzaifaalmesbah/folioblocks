@@ -1,65 +1,73 @@
 import { useState } from 'react';
 import { tr } from '../i18n/ui';
-import { fontDef } from '../fonts';
-import { presetByKey, PRESETS } from '../presets';
+import { presetByKey, PRESETS, TRACKS, type Track } from '../presets';
 import { useBuilder } from '../store';
+import { DesignMock } from './DesignMock';
 import { inputCls, SectionTitle } from './fields';
 
-/** Step 1: pick a design to start from, or one you saved. Your info is never touched. */
-export function TemplateStep() {
+/**
+ * Step 1: pick a design to start from, or one you saved. Your info is never
+ * touched. Switching is instant: a changed design is kept in My saved
+ * designs first, and the switch can be undone.
+ */
+export function TemplateStep({ onSwitch }: { onSwitch: (message: string, change: () => void) => void }) {
   const preset = useBuilder((s) => s.preset);
   const savedLayouts = useBuilder((s) => s.savedLayouts);
   const { applyPreset, applyLayout, saveLayout, deleteLayout } = useBuilder.getState();
   const [layoutName, setLayoutName] = useState('');
+  const [track, setTrack] = useState<Track | 'all'>('all');
 
-  function chooseSaved(key: string) {
-    if (key === preset) return;
-    if (confirm(tr('Use this saved design? Your colours, fonts, section style and page sections change to it. Your info stays.'))) {
-      applyLayout(key);
-    }
-  }
+  const shown = PRESETS.filter((p) => track === 'all' || p.tracks.includes(track));
 
   function choosePreset(key: string) {
     if (key === preset) return;
-    if (confirm(tr('Use the {name} template? Your colours, fonts, section style and page sections change to the template\'s. Your info stays.', { name: tr(presetByKey(key).label) }))) {
-      applyPreset(key);
-    }
+    onSwitch(tr('Switched to {name}. Your info stays.', { name: tr(presetByKey(key).label) }), () => applyPreset(key));
   }
+
+  function chooseSaved(key: string, label: string) {
+    if (key === preset) return;
+    onSwitch(tr('Switched to {name}. Your info stays.', { name: label }), () => applyLayout(key));
+  }
+
+  const chip = (active: boolean) =>
+    `rounded-full border px-3 py-1 text-xs font-medium ${active ? 'border-blue-600 bg-blue-50 text-blue-800' : 'border-slate-300 text-slate-700 hover:bg-slate-50'}`;
 
   return (
     <div className="space-y-6">
       <section className="space-y-3">
-        <SectionTitle>Template</SectionTitle>
-        <div className="grid gap-2">
-          {PRESETS.map((p) => {
+        <div>
+          <h2 className="text-lg font-semibold">Pick a template</h2>
+          <p className="text-sm text-slate-600">A starting point. Colours, fonts and sections can all be changed in the next steps; your info always stays.</p>
+        </div>
+        <div className="flex flex-wrap gap-1.5" role="group" aria-label="Show templates for">
+          <button type="button" aria-pressed={track === 'all'} onClick={() => setTrack('all')} className={chip(track === 'all')}>
+            All
+          </button>
+          {TRACKS.map((t) => (
+            <button key={t.key} type="button" aria-pressed={track === t.key} onClick={() => setTrack(t.key)} className={chip(track === t.key)}>
+              {t.label}
+            </button>
+          ))}
+        </div>
+        <div className="grid grid-cols-2 gap-3">
+          {shown.map((p) => {
             const active = p.key === preset;
-            const { palette } = p.style;
             return (
               <button
                 key={p.key}
                 type="button"
                 aria-pressed={active}
                 onClick={() => choosePreset(p.key)}
-                className={`flex items-center gap-3 rounded-lg border p-3 text-left ${
+                className={`flex flex-col rounded-xl border p-2 text-left transition ${
                   active ? 'border-blue-600 ring-2 ring-blue-600/30' : 'border-slate-200 hover:border-slate-400'
                 }`}
               >
-                <span
-                  aria-hidden
-                  className="flex h-14 w-14 shrink-0 items-center justify-center rounded-md text-lg font-bold"
-                  style={{
-                    background: palette.base,
-                    color: palette.primary,
-                    border: `3px solid ${palette.accent}`,
-                    fontFamily: fontDef(p.style.fonts.heading).stack,
-                  }}
-                >
-                  Aa
+                <DesignMock p={p} />
+                <span className="mt-2 flex items-center gap-1.5 text-sm font-semibold text-slate-900">
+                  {p.label}
+                  {active && <span className="rounded bg-blue-700 px-1.5 py-0.5 text-[10px] font-semibold text-white">In use</span>}
                 </span>
-                <span>
-                  <span className="block text-sm font-semibold text-slate-900">{p.label}</span>
-                  <span className="block text-xs text-slate-600">{p.description}</span>
-                </span>
+                <span className="text-xs text-slate-600">{p.bestFor}</span>
               </button>
             );
           })}
@@ -68,6 +76,9 @@ export function TemplateStep() {
 
       <section className="space-y-3">
         <SectionTitle>My saved designs</SectionTitle>
+        {savedLayouts.length === 0 && (
+          <p className="text-xs text-slate-500">Nothing saved yet. Save your design below to switch back to it later.</p>
+        )}
         {savedLayouts.length > 0 && (
           <ul className="space-y-2">
             {savedLayouts.map((l) => (
@@ -82,10 +93,13 @@ export function TemplateStep() {
                     <span key={k} className="flex-1" style={{ background: l.style.palette[k] }} />
                   ))}
                 </span>
-                <span className="flex-1 truncate text-sm font-medium text-slate-800">{l.label}</span>
+                <span className="min-w-0 flex-1">
+                  <span className="block truncate text-sm font-medium text-slate-800">{l.label}</span>
+                  {l.auto && <span className="block text-xs text-slate-500">Kept automatically before a switch</span>}
+                </span>
                 <button
                   type="button"
-                  onClick={() => chooseSaved(l.key)}
+                  onClick={() => chooseSaved(l.key, l.label)}
                   disabled={l.key === preset}
                   className="rounded-md border border-slate-300 px-2 py-1 text-xs text-slate-800 hover:bg-slate-100 disabled:opacity-50"
                 >
@@ -121,10 +135,7 @@ export function TemplateStep() {
               onChange={(e) => setLayoutName(e.target.value)}
             />
           </label>
-          <button
-            type="submit"
-            className="shrink-0 rounded-md bg-slate-900 px-3 text-sm font-medium text-white hover:bg-slate-700"
-          >
+          <button type="submit" className="shrink-0 rounded-md bg-slate-900 px-3 text-sm font-medium text-white hover:bg-slate-700">
             Save current
           </button>
         </form>

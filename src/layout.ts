@@ -47,6 +47,8 @@ export type SavedLayout = {
   header: HeaderVariant;
   footer: FooterVariant;
   pages: Record<PageKey, Section[]>;
+  /** Saved by the builder itself, before a switch replaced a changed design. */
+  auto?: boolean;
 };
 
 export function layoutFromState(state: BuilderState, label: string): SavedLayout {
