@@ -1,5 +1,17 @@
 @import "tailwindcss";
 
+/* Tailwind v4 gives buttons the arrow cursor: show the hand on anything clickable. */
+@layer base {
+  button:not(:disabled),
+  [role='button']:not([aria-disabled='true']),
+  [role='tab'],
+  summary,
+  label:has(> input[type='file']),
+  select {
+    cursor: pointer;
+  }
+}
+
 /* Bengali interface: use the bundled Bengali font so it looks the same everywhere. */
 @font-face {
   font-family: 'Noto Sans Bengali';
