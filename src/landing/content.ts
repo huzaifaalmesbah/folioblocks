@@ -1,7 +1,7 @@
 /**
- * Home page content: the AI agent guide (skills, commands, prompts) and
- * the WordPress.com steps. Kept apart from the layout so it's easy to
- * update when tools or plans change.
+ * Home page content: the AI agent guide (the FolioBlocks skill, WordPress
+ * skills and prompts) and the publishing guide. Kept apart from the layout
+ * so it's easy to update when tools or plans change.
  */
 
 export const SKILLS_REPO = 'https://github.com/WordPress/agent-skills';
@@ -21,25 +21,41 @@ export const SKILLS: { name: string; use: string }[] = [
 export const INSTALL_SKILLS =
   'npx skills add WordPress/agent-skills --skill wp-block-themes wp-patterns wp-env wp-wpcli-and-ops wp-playground blueprint wp-project-triage wp-performance';
 
-export const LOCAL_SETUP: { title: string; text: string; code?: string }[] = [
+/* ---------- AI agent: the FolioBlocks skill ---------- */
+
+/** Adds the FolioBlocks skill to an AI coding agent (via the skills CLI). */
+export const INSTALL_FOLIOBLOCKS_SKILL = 'npx skills add huzaifaalmesbah/folioblocks --skill folioblocks';
+
+/** The one prompt a student gives; the skill does the rest. */
+export const ONE_PROMPT = 'Make my portfolio website with the folioblocks skill.';
+
+/** Three steps on the home page. */
+export const AGENT_STEPS: { title: string; text: string; code?: string; link?: GuideLink }[] = [
   {
-    title: 'Build and download your theme',
-    text: 'Make your theme in FolioBlocks, click "Download …zip", and unzip it into an empty project folder. The theme folder (with style.css inside) should sit at the top of that folder.',
+    title: 'Get Node.js and an AI agent',
+    text: 'Install Node.js (free), and use an AI coding agent: Claude Code, Codex, Cursor or GitHub Copilot all work.',
+    link: { label: 'Download Node.js', url: 'https://nodejs.org/' },
   },
   {
-    title: 'Open the folder in your AI agent',
-    text: 'Claude Code, Cursor, GitHub Copilot or Codex all work. Then install the WordPress skills, so the agent follows WordPress best practice instead of guessing:',
-    code: INSTALL_SKILLS,
+    title: 'Add the FolioBlocks skill',
+    text: 'In an empty folder, run this once. It teaches your agent how to make a FolioBlocks theme.',
+    code: INSTALL_FOLIOBLOCKS_SKILL,
   },
   {
-    title: 'Start WordPress locally',
-    text: 'Pick one. wp-env needs Node.js and Docker; WordPress Studio is a desktop app with nothing else to install; Playground CLI needs only Node.js. The first prompt below sets wp-env up for you.',
-    code: 'npm i -g @wordpress/env    # then the agent writes .wp-env.json and runs: wp-env start',
+    title: 'Ask for your portfolio',
+    text: 'Give the agent this one prompt. It asks you a few questions, builds your theme, shows it to you and tells you how to publish it.',
+    code: ONE_PROMPT,
   },
-  {
-    title: 'Give the agent the prompts below',
-    text: 'Copy one prompt at a time, replace the [brackets], and let the agent finish and show you the result before the next one. Check the site in your browser after each step.',
-  },
+];
+
+/** A short example of the conversation, so people know what to expect. */
+export const SAMPLE_CHAT: { who: 'agent' | 'you'; text: string }[] = [
+  { who: 'you', text: 'Make my portfolio website with the folioblocks skill.' },
+  { who: 'agent', text: 'Happy to! A few short questions first, about ten minutes in all. Say "skip" to anything. What name should the site show?' },
+  { who: 'you', text: 'Rafid Hasan. CSE final year at BUET, Dhaka.' },
+  { who: 'agent', text: 'Thanks! Which fits you best: developer, designer, student, or someone with a job? I\'ll suggest three designs.' },
+  { who: 'you', text: 'Developer and student.' },
+  { who: 'agent', text: 'Your theme is built: theme/rafid-hasan-portfolio.zip. Your site is running at http://127.0.0.1:9400 to look around. Want any changes?' },
 ];
 
 export type Prompt = { title: string; skills: string[]; text: string };
@@ -92,35 +108,9 @@ Content: [list what should be on the page].`,
 - Update the About page text to: [your text].
 Show me the list of posts and pages when you are done.`,
   },
-  {
-    title: '5. Check quality before publishing',
-    skills: ['wp-block-themes', 'wp-performance'],
-    text: `Use the wp-block-themes and wp-performance skills to review ./[theme-folder] as if it were going to WordPress.org:
-- theme.json is valid against its schema; style.css and readme.txt headers are complete
-- no untranslated or unescaped output; text domain matches the folder
-- every bundled font and image is GPL-compatible and credited in readme.txt
-- colour contrast passes WCAG AA in every style variation
-- images are a sensible size; nothing loads from a third-party CDN
-List problems first, then fix them, then make [theme-folder].zip with the theme folder at the root of the zip (no .git, node_modules or .DS_Store).`,
-  },
-  {
-    title: '6. Share a live demo link',
-    skills: ['blueprint', 'wp-playground'],
-    text: `Use the blueprint and wp-playground skills. My theme is on GitHub at [https://github.com/you/repo] in the folder [theme-folder].
-
-Write blueprint.json that installs and activates the theme from that repo, sets the site title, creates the same pages and settings as bin/setup.sh, and imports a few sample posts. Validate it against the Blueprint schema, try it with the Playground CLI, and give me the https://playground.wordpress.net/?blueprint-url=… link for my README.`,
-  },
 ];
 
 /** For people who'd rather have the agent build the whole theme from nothing. */
-export const FROM_SCRATCH_PROMPT = `Use the wp-block-themes, wp-patterns and wp-env skills from WordPress/agent-skills.
-
-Build me a personal portfolio block theme. Before writing code, ask me, one group at a time: my name, tagline, university and location; a short bio; my skills; my WordPress contributions; 2–4 projects; contact links; a colour and font mood. Never invent facts about me.
-
-Then build it following WordPress' Ipsum conventions: templates and parts delegate to hidden-* patterns; every pattern has Title, Slug and Description; all strings translatable and escaped; theme.json v3 with "$schema": "https://schemas.wp.org/trunk/theme.json", Twenty Twenty-Five palette slugs and a spacing scale; Home, About, Blog, single post, Contact and 404 templates; self-hosted fonts credited in readme.txt; core blocks only.
-
-Run it with wp-env, check every template in the Site Editor for invalid blocks, and finally zip it with the theme folder at the root of the zip.`;
-
 export const WPCOM_LINKS = {
   upload: 'https://wordpress.com/support/themes/uploading-setting-up-custom-themes/',
   studio: 'https://wordpress.studio/',

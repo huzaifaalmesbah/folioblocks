@@ -8,8 +8,9 @@ import { LangToggle } from '../i18n/LangToggle';
 import { tr } from '../i18n/ui';
 import { useBuilder } from '../store';
 import {
-  FROM_SCRATCH_PROMPT,
-  LOCAL_SETUP,
+  AGENT_STEPS,
+  INSTALL_SKILLS,
+  SAMPLE_CHAT,
   PROMPTS,
   SKILLS,
   SKILLS_REPO,
@@ -117,7 +118,7 @@ export function Landing() {
           </a>
           <div className="hidden items-center gap-5 text-sm text-slate-600 md:flex">
             <a href="#designs" className="hover:text-slate-900">Templates</a>
-            <a href="#ai" className="hover:text-slate-900">AI guide</a>
+            <a href="#ai" className="hover:text-slate-900">AI agent</a>
             <a href="#/guide" className="hover:text-slate-900">Guide</a>
             <a href="#/translate" className="hover:text-slate-900">Translate</a>
             <a href={REPO} className="hover:text-slate-900">GitHub</a>
@@ -184,15 +185,15 @@ export function Landing() {
                 },
                 {
                   n: '2',
-                  title: 'Customize with an AI agent',
-                  text: 'Already have wp-env, Studio or Local? Take your theme further with Claude Code, Cursor or Copilot, using WordPress’ own agent skills.',
-                  link: { href: '#ai', label: 'Read the AI guide' },
+                  title: 'Or chat with an AI agent',
+                  text: 'Answer a few questions in Claude Code, Codex, Cursor or Copilot. The FolioBlocks skill builds the same theme from your answers.',
+                  link: { href: '#ai', label: 'See how' },
                 },
                 {
                   n: '3',
                   title: 'Publish it',
                   text: 'Upload the zip to any WordPress site or WordPress.com. Step by step below.',
-                  link: { href: '#wordpress-com', label: 'Publishing guide' },
+                  link: { href: '#publish', label: 'Publishing guide' },
                 },
               ].map((c) => (
                 <div key={c.n} className="flex flex-col rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
@@ -250,89 +251,116 @@ export function Landing() {
         {/* AI guide */}
         <section className="border-t border-slate-200 bg-slate-50 py-20">
           <div className="mx-auto max-w-4xl px-4 sm:px-6">
-            <SectionHeading id="ai" eyebrow="AI agent guide" title="Take your site further with an AI agent">
-              If you have a local WordPress (wp-env, WordPress Studio or Local) and an AI coding agent, you can customize everything:
-              new pages, sections, style variations, real content. These steps keep the agent on WordPress' best practice.
+            <SectionHeading id="ai" eyebrow="AI agent" title="Or answer a few questions, and let an AI agent build it">
+              Prefer to chat? The FolioBlocks skill teaches your AI agent to ask you about yourself and build your theme with FolioBlocks. Nothing
+              to write by hand, and nothing made up: it uses only your answers.
             </SectionHeading>
 
-            <ol className="mt-12 space-y-6">
-              {LOCAL_SETUP.map((s, i) => (
-                <li key={s.title} className="rounded-xl border border-slate-200 bg-white p-6">
-                  <h3 className="font-semibold">
-                    <span className="mr-2 text-blue-700">{i + 1}.</span>
-                    {s.title}
-                  </h3>
-                  <p className="mt-2 text-slate-600">{s.text}</p>
-                  {s.code && (
-                    <div className="mt-3">
-                      <Code>{s.code}</Code>
-                    </div>
-                  )}
-                </li>
-              ))}
-            </ol>
+            <div className="mt-12 grid gap-6 lg:grid-cols-2">
+              <ol className="space-y-4">
+                {AGENT_STEPS.map((s, i) => (
+                  <li key={s.title} className="rounded-xl border border-slate-200 bg-white p-5">
+                    <h3 className="font-semibold">
+                      <span className="mr-2 text-blue-700">{i + 1}.</span>
+                      {s.title}
+                    </h3>
+                    <p className="mt-1.5 text-sm text-slate-600">{s.text}</p>
+                    {s.code && (
+                      <div className="mt-3">
+                        <Code>{s.code}</Code>
+                      </div>
+                    )}
+                    {s.link && (
+                      <a className="mt-2 inline-block text-sm font-medium text-blue-700 underline" href={s.link.url}>
+                        {s.link.label} ↗
+                      </a>
+                    )}
+                  </li>
+                ))}
+              </ol>
 
-            <h3 className="mt-14 text-xl font-semibold">Which skills, and what for</h3>
-            <p className="mt-2 text-slate-600">
-              All from <a className="text-blue-700 underline" href={SKILLS_REPO}>WordPress/agent-skills</a>. The install command above adds them all.
-            </p>
-            <div className="mt-4 overflow-hidden rounded-xl border border-slate-200 bg-white">
-              <table className="w-full text-left text-sm">
-                <thead className="bg-slate-100 text-slate-700">
-                  <tr>
-                    <th scope="col" className="px-4 py-2 font-semibold">Skill</th>
-                    <th scope="col" className="px-4 py-2 font-semibold">Use it for</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-100">
-                  {SKILLS.map((s) => (
-                    <tr key={s.name}>
-                      <td className="px-4 py-2 font-mono text-[13px] whitespace-nowrap text-slate-900">{s.name}</td>
-                      <td className="px-4 py-2 text-slate-600">{s.use}</td>
-                    </tr>
+              <figure className="rounded-xl border border-slate-200 bg-white p-5">
+                <figcaption className="text-xs font-semibold tracking-wide text-slate-500 uppercase">What it feels like</figcaption>
+                <ul className="mt-3 space-y-2.5">
+                  {SAMPLE_CHAT.map((m) => (
+                    <li key={m.text} className={`flex ${m.who === 'you' ? 'justify-end' : ''}`}>
+                      <span
+                        className={`max-w-[85%] rounded-2xl px-3.5 py-2 text-sm ${
+                          m.who === 'you' ? 'rounded-br-sm bg-blue-700 text-white' : 'rounded-bl-sm bg-slate-100 text-slate-800'
+                        }`}
+                      >
+                        {m.text}
+                      </span>
+                    </li>
                   ))}
-                </tbody>
-              </table>
+                </ul>
+                <p className="mt-4 text-xs text-slate-500">
+                  The theme is the same as the builder makes. Open it in the builder any time to change it by hand.
+                </p>
+              </figure>
             </div>
 
-            <h3 className="mt-14 text-xl font-semibold">Prompts to copy</h3>
-            <p className="mt-2 text-slate-600">
-              One at a time, in order. Replace the [brackets] with your own details.
-              {named && ` Your theme folder (${themeSlug(info.name)}) and name are already filled in.`} Your zip also includes an AGENTS.md
-              file that tells the agent this theme's rules.
-            </p>
-            <div className="mt-4 space-y-3">
-              {PROMPTS.map((p) => (
-                <details key={p.title} className="group rounded-xl border border-slate-200 bg-white open:shadow-sm">
-                  <summary className="flex cursor-pointer list-none items-center gap-3 px-5 py-4">
-                    <span className="flex-1 font-semibold">{p.title}</span>
-                    <span className="hidden gap-1 sm:flex">
-                      {p.skills.map((s) => (
-                        <span key={s} className="rounded bg-blue-50 px-1.5 py-0.5 font-mono text-[11px] text-blue-800">
-                          {s}
+            <details className="group mt-10 rounded-xl border border-slate-200 bg-white">
+              <summary className="flex cursor-pointer list-none items-center gap-3 px-6 py-4">
+                <span className="flex-1">
+                  <span className="block font-semibold">Go further: change the theme's code with WordPress skills</span>
+                  <span className="block text-sm text-slate-500">For new pages, sections or style variations beyond what the builder offers.</span>
+                </span>
+                <span aria-hidden className="text-slate-400 transition group-open:rotate-90">›</span>
+              </summary>
+              <div className="space-y-6 px-6 pb-6">
+                <p className="text-sm text-slate-600">
+                  Unzip your theme into an empty folder, open it in your agent, and add WordPress' own skills so it follows WordPress best
+                  practice. Your zip's AGENTS.md tells the agent this theme's rules. After you change the theme's files by hand, don't rebuild it
+                  from FolioBlocks: that would replace your changes.
+                </p>
+                <Code>{INSTALL_SKILLS}</Code>
+                <div className="space-y-3">
+                  {PROMPTS.map((p) => (
+                    <details key={p.title} className="group/p rounded-lg border border-slate-200">
+                      <summary className="flex cursor-pointer list-none items-center gap-3 px-4 py-3">
+                        <span className="flex-1 text-sm font-semibold">{p.title}</span>
+                        <span className="hidden gap-1 sm:flex">
+                          {p.skills.map((s) => (
+                            <span key={s} className="rounded bg-blue-50 px-1.5 py-0.5 font-mono text-[11px] text-blue-800">
+                              {s}
+                            </span>
+                          ))}
                         </span>
-                      ))}
-                    </span>
-                    <span aria-hidden className="text-slate-400 transition group-open:rotate-90">›</span>
-                  </summary>
-                  <div className="px-5 pb-5">
-                    <Code>{personalise(p.text)}</Code>
+                        <span aria-hidden className="text-slate-400 transition group-open/p:rotate-90">›</span>
+                      </summary>
+                      <div className="px-4 pb-4">
+                        <p className="mb-2 text-xs text-slate-500">
+                          Replace the [brackets].{named && ` Your theme folder (${themeSlug(info.name)}) and name are already filled in.`}
+                        </p>
+                        <Code>{personalise(p.text)}</Code>
+                      </div>
+                    </details>
+                  ))}
+                </div>
+                <details className="rounded-lg border border-slate-200">
+                  <summary className="cursor-pointer px-4 py-3 text-sm font-semibold">The WordPress skills, and what each is for</summary>
+                  <div className="overflow-x-auto px-4 pb-4">
+                    <table className="w-full text-left text-sm">
+                      <tbody className="divide-y divide-slate-100">
+                        {SKILLS.map((s) => (
+                          <tr key={s.name}>
+                            <td className="py-2 pr-4 font-mono text-[13px] whitespace-nowrap text-slate-900">{s.name}</td>
+                            <td className="py-2 text-slate-600">{s.use}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                    <p className="mt-2 text-xs text-slate-500">
+                      From <a className="text-blue-700 underline" href={SKILLS_REPO}>WordPress/agent-skills</a>.
+                    </p>
                   </div>
                 </details>
-              ))}
-              <details className="group rounded-xl border border-dashed border-slate-300 bg-white">
-                <summary className="flex cursor-pointer list-none items-center gap-3 px-5 py-4">
-                  <span className="flex-1 font-semibold">No FolioBlocks? Have the agent build the whole theme</span>
-                  <span aria-hidden className="text-slate-400 transition group-open:rotate-90">›</span>
-                </summary>
-                <div className="px-5 pb-5">
-                  <Code>{FROM_SCRATCH_PROMPT}</Code>
-                </div>
-              </details>
-            </div>
+              </div>
+            </details>
+
             <p className="mt-6 text-sm text-slate-500">
-              Tip: review what the agent changes before keeping it, and keep your theme in Git so you can undo. Use only photos and fonts you
-              have the right to use.
+              Tip: review what an agent changes before keeping it. Use only photos and fonts you have the right to use.
             </p>
           </div>
         </section>
