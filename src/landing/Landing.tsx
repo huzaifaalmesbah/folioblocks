@@ -2,6 +2,7 @@ import { useEffect, useState, type ReactNode } from 'react';
 import { fontDef } from '../fonts';
 import { PRESETS, type PresetDef } from '../presets';
 import { themeSlug } from '../generator/utils';
+import { REPO_URL } from '../config';
 import { LangToggle } from '../i18n/LangToggle';
 import { tr } from '../i18n/ui';
 import { useBuilder } from '../store';
@@ -16,7 +17,7 @@ import {
   WPCOM_UPLOAD_STEPS,
 } from './content';
 
-const REPO = 'https://github.com/huzaifaalmesbah/folioblocks';
+const REPO = REPO_URL;
 const img = (name: string) => `${import.meta.env.BASE_URL}images/${name}`;
 
 /* ---------- Small pieces ---------- */
@@ -218,6 +219,7 @@ export function Landing() {
             <a href="#designs" className="hover:text-slate-900">Templates</a>
             <a href="#ai" className="hover:text-slate-900">AI guide</a>
             <a href="#wordpress-com" className="hover:text-slate-900">WordPress.com</a>
+            <a href="#/translate" className="hover:text-slate-900">Translate</a>
             <a href={REPO} className="hover:text-slate-900">GitHub</a>
           </div>
           <LangToggle className="ml-auto" />
@@ -496,6 +498,7 @@ export function Landing() {
           <span>FolioBlocks · GPL-2.0-or-later</span>
           <a className="hover:text-slate-700" href={REPO}>Source on GitHub</a>
           <a className="hover:text-slate-700" href={`${REPO}/issues/new?template=beta-feedback.yml`}>Give feedback</a>
+          <a className="hover:text-slate-700" href="#/translate">Help translate</a>
           <a className="hover:text-slate-700" href={SKILLS_REPO}>WordPress agent skills</a>
           <a className="hover:text-slate-700" href="https://openverse.org">Sample photos from Openverse (CC0)</a>
           <span className="ml-auto">Not affiliated with WordPress.org or WordPress.com.</span>

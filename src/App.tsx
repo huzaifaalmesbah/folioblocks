@@ -5,23 +5,28 @@ import { Landing } from './landing/Landing';
 
 // The builder (generator, zip, drag-and-drop) loads only when it is opened, so the home page stays light.
 const Builder = lazy(() => import('./Builder').then((m) => ({ default: m.Builder })));
+const TranslatePage = lazy(() => import('./translate/TranslatePage').then((m) => ({ default: m.TranslatePage })));
 
 /**
- * Two views on one static page (GitHub Pages has no server routing):
- * `#/build` is the builder; anything else is the home page, whose own
- * section links (#ai, #wordpress-com) scroll within it.
+ * Three views on one static page (GitHub Pages has no server routing):
+ * `#/build` is the builder, `#/translate` the translation page; anything
+ * else is the home page, whose own section links (#ai, #wordpress-com)
+ * scroll within it.
  */
-function isBuilder(): boolean {
-  return window.location.hash.startsWith('#/build');
+type View = 'home' | 'builder' | 'translate';
+function currentView(): View {
+  const h = window.location.hash;
+  return h.startsWith('#/build') ? 'builder' : h.startsWith('#/translate') ? 'translate' : 'home';
 }
 
 export default function App() {
-  const [builder, setBuilder] = useState(isBuilder);
+  const [view, setView] = useState(currentView);
+  const builder = view === 'builder';
 
   useEffect(() => {
     const onHash = () => {
-      const next = isBuilder();
-      setBuilder((was) => {
+      const next = currentView();
+      setView((was) => {
         if (was !== next) window.scrollTo(0, 0);
         return next;
       });
@@ -34,10 +39,15 @@ export default function App() {
   const rootRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    document.title = builder ? tr('Build your theme · FolioBlocks') : tr('FolioBlocks: build your WordPress portfolio theme');
+    document.title =
+      view === 'builder'
+        ? tr('Build your theme · FolioBlocks')
+        : view === 'translate'
+          ? tr('Help translate · FolioBlocks')
+          : tr('FolioBlocks: build your WordPress portfolio theme');
     document.documentElement.lang = lang;
     document.documentElement.dir = languageMeta(lang).dir;
-  }, [builder, lang]);
+  }, [view, lang]);
 
   // Translate before the first paint, and keep translating as the page changes.
   useLayoutEffect(() => (rootRef.current ? startDomTranslator(rootRef.current, lang) : undefined), [lang]);
@@ -48,6 +58,10 @@ export default function App() {
       {builder ? (
         <Suspense fallback={<p className="p-8 text-slate-600">Loading the builder…</p>}>
           <Builder />
+        </Suspense>
+      ) : view === 'translate' ? (
+        <Suspense fallback={<p className="p-8 text-slate-600">Loading…</p>}>
+          <TranslatePage />
         </Suspense>
       ) : (
         <Landing />
