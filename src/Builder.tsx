@@ -1,6 +1,9 @@
-import { useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { saveAs } from 'file-saver';
-import { pickState, useBuilder } from './store';
+import { pickState, STORAGE_KEY, useBuilder } from './store';
+import { requestPersistence, watchOtherTabs } from './saveStatus';
+import { SaveStatus } from './ui/SaveStatus';
+import { UndoBar, type Undo } from './ui/UndoBar';
 import { generateTheme } from './generator';
 import { buildZip } from './zip/buildZip';
 import { renderScreenshot } from './zip/screenshot';
@@ -79,6 +82,24 @@ export function Builder() {
   const [error, setError] = useState('');
   const [notice, setNotice] = useState('');
   const [downloaded, setDownloaded] = useState(false);
+  const [undo, setUndo] = useState<Undo | null>(null);
+  const clearUndo = useCallback(() => setUndo(null), []);
+
+  // A link to `#/build?step=…` while the builder is open moves to that step.
+  useEffect(() => {
+    const onHash = () => {
+      const next = new URLSearchParams(window.location.hash.split('?')[1] ?? '').get('step');
+      if (isStep(next)) setStepState(next);
+    };
+    window.addEventListener('hashchange', onHash);
+    return () => window.removeEventListener('hashchange', onHash);
+  }, []);
+
+  // Keep the draft safe: ask the browser to keep this site's storage, and notice edits made in another tab.
+  useEffect(() => {
+    requestPersistence();
+    return watchOtherTabs(STORAGE_KEY);
+  }, []);
   const checklist = useMemo(() => publishChecklist(state), [state]);
   // On small screens the form and the preview take turns.
   const [mobileView, setMobileView] = useState<'edit' | 'preview'>('edit');
@@ -131,9 +152,16 @@ export function Builder() {
     }
   }
 
+  /** Replace the draft, keeping a copy so the change can be undone. */
+  function withUndo(message: string, change: () => void) {
+    const before = structuredClone(pickState(useBuilder.getState()));
+    change();
+    setUndo({ message, restore: () => useBuilder.setState(before) });
+  }
+
   function startOver() {
     if (confirm(tr('Start over? This clears your info and design in this browser. Your saved designs stay.'))) {
-      reset();
+      withUndo(tr('Cleared. Your saved designs are still there.'), reset);
       setDownloaded(false);
       setStep('template');
     }
@@ -193,6 +221,7 @@ export function Builder() {
               ]}
             />
           </div>
+          <SaveStatus onBackup={exportDraft} />
           <nav aria-label="Steps">
             <ol className="grid grid-cols-5 gap-1">
               {STEPS.map((s, i) => {
@@ -255,6 +284,7 @@ export function Builder() {
           )}
         </div>
 
+        <UndoBar undo={undo} onDone={clearUndo} />
         <footer className="flex items-center gap-2 border-t border-slate-200 bg-white p-3 lg:px-6">
           <button
             type="button"

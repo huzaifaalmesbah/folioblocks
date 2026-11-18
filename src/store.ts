@@ -4,10 +4,8 @@ import { defaultState } from './defaults';
 import { addSection, layoutFromState, moveSection, removeSection, type SavedLayout } from './layout';
 import { presetByKey } from './presets';
 import { OLD_DEFAULT_BIO } from './samples';
+import { noteSave } from './saveStatus';
 import type { BuilderState, FooterVariant, HeaderVariant, Info, Language, PageKey, Palette, SectionType, Style } from './types';
-
-/** Set when the browser refused to save (photos can fill localStorage). */
-export const storageStatus = { full: false };
 
 /**
  * localStorage that never throws: photos can push a draft past the
@@ -30,12 +28,16 @@ const safeStorage: Storage = {
   setItem: (k, v) => {
     try {
       localStorage.setItem(k, v);
-      storageStatus.full = false;
+      noteSave(true);
     } catch {
-      storageStatus.full = true;
+      // Photos can fill the browser's storage: say so instead of failing.
+      noteSave(false);
     }
   },
 };
+
+/** Where the draft lives in localStorage. */
+export const STORAGE_KEY = 'folioblocks-state';
 
 type Store = BuilderState & {
   setInfo: (patch: Partial<Info>) => void;
@@ -120,7 +122,7 @@ export const useBuilder = create<Store>()(
       reset: () => set(structuredClone(defaultState)),
     }),
     {
-      name: 'folioblocks-state',
+      name: STORAGE_KEY,
       version: 7,
       storage: createJSONStorage(() => safeStorage),
       // Older drafts lack newer fields (v2: header/footer, v3: photos): fill them in from the defaults.

@@ -2,7 +2,7 @@ import type { ReactNode } from 'react';
 import { tr } from '../i18n/ui';
 import { IMAGE_LIMITS, resizeImage } from '../images';
 import { profileCompleteness } from '../profile';
-import { storageStatus, useBuilder } from '../store';
+import { useBuilder } from '../store';
 import type { Socials } from '../types';
 import { Field, ImageField, Repeater } from './fields';
 
@@ -85,11 +85,6 @@ export function InfoStep() {
           onPick={async (f) => setInfo({ avatar: await resizeImage(f, IMAGE_LIMITS.avatar.maxWidth, IMAGE_LIMITS.avatar.maxHeight) })}
           onRemove={() => setInfo({ avatar: '' })}
         />
-        {storageStatus.full && (
-          <p role="alert" className="text-xs text-red-700">
-            Your browser is out of space to save the draft: remove a photo or use smaller ones.
-          </p>
-        )}
         <Field label="Email" type="email" placeholder="you@example.com" value={info.email} onChange={(email) => setInfo({ email })} />
       </Tier>
 
