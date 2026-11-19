@@ -1,5 +1,36 @@
 @import "tailwindcss";
 
+/*
+ * WordPress Education colours (wordpresseducation.org): blue-700 is its brand
+ * blue and blue-800 its darker blue; the greys are WordPress' neutral greys,
+ * with #1e1e1e as the darkest. Every blue-* and slate-* class uses these.
+ */
+@theme {
+  --color-blue-50: #eff2ff;
+  --color-blue-100: #e1e7ff;
+  --color-blue-200: #c7d1ff;
+  --color-blue-300: #a5b4ff;
+  --color-blue-400: #7d8ff7;
+  --color-blue-500: #5a73f0;
+  --color-blue-600: #4664ec;
+  --color-blue-700: #3858e9;
+  --color-blue-800: #213fd4;
+  --color-blue-900: #1b33a8;
+  --color-blue-950: #121f66;
+
+  --color-slate-50: #f6f7f7;
+  --color-slate-100: #f0f0f1;
+  --color-slate-200: #e6e6e6;
+  --color-slate-300: #c3c4c7;
+  --color-slate-400: #a7aaad;
+  --color-slate-500: #6b7075;
+  --color-slate-600: #575d63;
+  --color-slate-700: #40464d;
+  --color-slate-800: #2c3338;
+  --color-slate-900: #1e1e1e;
+  --color-slate-950: #101517;
+}
+
 /* Tailwind v4 gives buttons the arrow cursor: show the hand on anything clickable. */
 @layer base {
   button:not(:disabled),

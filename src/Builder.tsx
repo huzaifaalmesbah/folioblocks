@@ -16,6 +16,7 @@ import { TemplateStep } from './ui/TemplateStep';
 import { PagesStep } from './ui/PagesStep';
 import { PublishStep } from './ui/PublishStep';
 import { MoreMenu } from './ui/MoreMenu';
+import { Logo } from './ui/Logo';
 import { PublishGuide } from './ui/PublishGuide';
 import { QuickPreview } from './preview/QuickPreview';
 import { publishChecklist } from './checklist';
@@ -225,7 +226,7 @@ export function Builder() {
           <div className="flex items-center gap-2">
             <h1 className="mr-auto text-xl font-bold">
               <a href="#/" className="hover:text-blue-700" aria-label="FolioBlocks home">
-                FolioBlocks
+                <Logo />
               </a>
             </h1>
             <LangToggle />
