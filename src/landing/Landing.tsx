@@ -1,6 +1,7 @@
 import { useEffect, useState, type ReactNode } from 'react';
 import { PRESETS } from '../presets';
 import { DesignMock } from '../ui/DesignMock';
+import { askConfirm } from '../ui/confirm';
 import { SiteFooter, SiteHeader } from '../ui/SiteChrome';
 import { PublishGuide } from '../ui/PublishGuide';
 import { themeSlug } from '../generator/utils';
@@ -88,10 +89,17 @@ export function Landing() {
           .replaceAll('[Your tagline]', info.tagline || '[Your tagline]')
       : text;
 
-  function startWith(key: string) {
+  async function startWith(key: string) {
     const label = PRESETS.find((p) => p.key === key)?.label ?? key;
     // Switching design replaces colours, fonts and sections, so ask anyone who has started.
-    if (hasDraft && !confirm(tr('Switch your theme to the {name} design? Your info and photos stay.', { name: tr(label) }))) return;
+    if (
+      hasDraft &&
+      !(await askConfirm(tr('Switch to the {name} design?', { name: tr(label) }), {
+        message: tr('Your info and photos stay. Only the colours, fonts and sections change.'),
+        confirmLabel: tr('Switch design'),
+      }))
+    )
+      return;
     applyPreset(key);
     // The template is chosen: go straight to the next step.
     window.location.hash = '#/build?step=info';
@@ -203,7 +211,7 @@ export function Landing() {
                   <p className="mt-1 flex-1 text-sm text-slate-600">{p.description}</p>
                   <button
                     type="button"
-                    onClick={() => startWith(p.key)}
+                    onClick={() => void startWith(p.key)}
                     className="mt-3 self-start rounded-md border border-slate-300 px-3 py-1.5 text-sm font-medium hover:bg-slate-50"
                     aria-label={tr('Start with the {name} design', { name: tr(p.label) })}
                   >

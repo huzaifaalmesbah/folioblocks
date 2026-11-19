@@ -3,6 +3,7 @@ import { languageMeta } from './i18n/languages';
 import { startDomTranslator, tr, useUi } from './i18n/ui';
 import { Landing } from './landing/Landing';
 import { useBuilder } from './store';
+import { ConfirmHost } from './ui/ConfirmDialog';
 
 // The builder (generator, zip, drag-and-drop) loads only when it is opened, so the home page stays light.
 const Builder = lazy(() => import('./Builder').then((m) => ({ default: m.Builder })));
@@ -85,6 +86,7 @@ export default function App() {
       ) : (
         <Landing />
       )}
+      <ConfirmHost />
     </div>
   );
 }

@@ -17,6 +17,7 @@ import { PagesStep } from './ui/PagesStep';
 import { PublishStep } from './ui/PublishStep';
 import { MoreMenu } from './ui/MoreMenu';
 import { Logo } from './ui/Logo';
+import { askConfirm } from './ui/confirm';
 import { PublishGuide } from './ui/PublishGuide';
 import { QuickPreview } from './preview/QuickPreview';
 import { publishChecklist } from './checklist';
@@ -90,7 +91,7 @@ export function Builder() {
 
   // A link from the folioblocks command line (`#/build?import=…`) carries a project: load it once, after asking.
   useEffect(() => {
-    const load = () => {
+    const load = async () => {
       const params = new URLSearchParams(window.location.hash.split('?')[1] ?? '');
       const data = params.get('import');
       if (!data) return;
@@ -100,16 +101,21 @@ export function Builder() {
         const b64 = data.replace(/-/g, '+').replace(/_/g, '/');
         const bytes = Uint8Array.from(atob(b64 + '='.repeat((4 - (b64.length % 4)) % 4)), (c) => c.charCodeAt(0));
         const parsed = parseSettings(new TextDecoder().decode(bytes));
-        if (!confirm(tr('Load the project from this link ({name})? It replaces your info and design. Your saved designs stay.', { name: parsed.state.info.name }))) return;
+        const ok = await askConfirm(tr('Load the project from this link?'), {
+          message: tr('It replaces your info and design with {name}’s project. Your saved designs stay.', { name: parsed.state.info.name }),
+          confirmLabel: tr('Load project'),
+        });
+        if (!ok) return;
         withUndo(tr('Loaded the project from the link.'), () => useBuilder.getState().importSettings(parsed.state, parsed.layouts));
         setStepState('info');
       } catch (err) {
         setError(err instanceof Error ? err.message : String(err));
       }
     };
-    load();
-    window.addEventListener('hashchange', load);
-    return () => window.removeEventListener('hashchange', load);
+    const onHash = () => void load();
+    onHash();
+    window.addEventListener('hashchange', onHash);
+    return () => window.removeEventListener('hashchange', onHash);
   }, []);
 
   // A link to `#/build?step=…` while the builder is open moves to that step.
@@ -153,7 +159,11 @@ export function Builder() {
     setNotice('');
     try {
       const parsed = parseSettings(await file.text());
-      if (!confirm(tr('Load this draft? It replaces your info and design. Your saved designs are kept.'))) return;
+      const ok = await askConfirm(tr('Load this backup?'), {
+        message: tr('It replaces your info and design. Your saved designs are kept.'),
+        confirmLabel: tr('Load backup'),
+      });
+      if (!ok) return;
       useBuilder.getState().importSettings(parsed.state, parsed.layouts);
       setNotice(tr('Loaded {file}.', { file: file.name }));
     } catch (err) {
@@ -188,8 +198,13 @@ export function Builder() {
     setUndo({ message, restore: () => useBuilder.setState(before) });
   }
 
-  function startOver() {
-    if (confirm(tr('Start over? This clears your info and design in this browser. Your saved designs stay.'))) {
+  async function startOver() {
+    const ok = await askConfirm(tr('Start over?'), {
+      message: tr('This clears your info and design in this browser. Your saved designs stay.'),
+      confirmLabel: tr('Start over'),
+      danger: true,
+    });
+    if (ok) {
       withUndo(tr('Cleared. Your saved designs are still there.'), reset);
       setDownloaded(false);
       setStep('template');

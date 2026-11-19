@@ -3,6 +3,7 @@ import { tr } from '../i18n/ui';
 import { PRESETS, TRACKS, type Track } from '../presets';
 import { useBuilder } from '../store';
 import { DesignMock } from './DesignMock';
+import { askConfirm } from './confirm';
 import { inputCls, SectionTitle } from './fields';
 
 /**
@@ -108,7 +109,14 @@ export function TemplateStep() {
                 <button
                   type="button"
                   aria-label={tr('Delete saved design {name}', { name: l.label })}
-                  onClick={() => confirm(tr('Delete the saved design "{name}"?', { name: l.label })) && deleteLayout(l.key)}
+                  onClick={async () => {
+                    const ok = await askConfirm(tr('Delete the saved design "{name}"?', { name: l.label }), {
+                      message: tr('This can’t be undone.'),
+                      confirmLabel: tr('Delete'),
+                      danger: true,
+                    });
+                    if (ok) deleteLayout(l.key);
+                  }}
                   className="rounded-md px-2 py-1 text-xs text-red-700 hover:bg-red-50"
                 >
                   Delete
